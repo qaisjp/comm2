@@ -1,6 +1,6 @@
 package models
 
 type ResourceDep struct {
-	Source uint64 // package
-	Target uint64 // package
+	Package   uint64 `db:"package"`    // package
+	DependsOn uint64 `db:"depends_on"` // package
 }
