@@ -1,0 +1,4 @@
+jwtsecret: "secret-token"
+
+postgres:
+  connectionstring: "user=postgres dbname=mtacomm sslmode=disable"
