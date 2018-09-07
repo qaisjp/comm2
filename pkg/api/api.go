@@ -57,7 +57,7 @@ func NewAPI(
 	}
 
 	router.POST("/v1/auth/login", authMiddleware.LoginHandler)
-	router.POST("/v1/auth/register", a.Register)
+	router.POST("/v1/accounts", a.createAccount)
 
 	// verifyAuth := authMiddleware.MiddlewareFunc()
 	// resources := resources.Impl{API: a}
