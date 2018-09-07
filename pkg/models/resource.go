@@ -8,7 +8,7 @@ type Resource struct {
 	UpdatedAt time.Time `db:"updated_at"`
 
 	Name        string `db:"name"`
-	LongName    string `db:"longname"`
+	Title       string `db:"title"`
 	Description string `db:"description"`
 	Rating      int    `db:"rating"`
 	Downloads   int    `db:"downloads"`
