@@ -8,7 +8,6 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
-	"github.com/gosimple/slug"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -21,7 +20,6 @@ func (i *Impl) Register(c *gin.Context) {
 		Username: username,
 		Password: password,
 		Email:    email,
-		Slug:     slug.Make(username),
 	}
 
 	success, err := govalidator.ValidateStruct(&u)
@@ -36,9 +34,8 @@ func (i *Impl) Register(c *gin.Context) {
 	var count int
 	err = i.DB.Get(
 		&count,
-		"select count(id) from accounts where (username = $1) or (slug = $2) or (email = $3)",
+		"select count(id) from accounts where (username = $1) or (email = $3)",
 		u.Username,
-		u.Slug,
 		u.Email,
 	)
 
@@ -53,7 +50,7 @@ func (i *Impl) Register(c *gin.Context) {
 	if count > 0 {
 		c.JSON(http.StatusConflict, gin.H{
 			"status":  "error",
-			"message": "Account already exists with that username, slug, or email",
+			"message": "Account already exists with that username or email",
 		})
 		return
 	}
@@ -70,7 +67,7 @@ func (i *Impl) Register(c *gin.Context) {
 
 	u.Password = string(hashedPassword)
 
-	_, err = i.DB.NamedExec("insert into accounts (username, password, email, slug) values (:username, :password, :email, :slug)", &u)
+	_, err = i.DB.NamedExec("insert into accounts (username, password, email) values (:username, :password, :email)", &u)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
