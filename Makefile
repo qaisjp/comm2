@@ -23,4 +23,4 @@ restore_checkpoint::
 
 # might not stick with goose
 migrate::
-	goose --dir=./database/migrations postgres "user=mtasa_hub dbname=mtasa_hub sslmode=disable" up
+	migrate -path database/migrations -database "postgres://mtasa_hub@localhost:5432/mtasa_hub?sslmode=disable" up
