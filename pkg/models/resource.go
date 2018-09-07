@@ -10,7 +10,7 @@ type Resource struct {
 	Name        string `db:"name"`
 	Title       string `db:"title"`
 	Description string `db:"description"`
-	Rating      int    `db:"rating"`
-	Downloads   int    `db:"downloads"`
-	Type        int    `db:"type"` // todo: ResourceType
+	// Rating      int    `db:"rating"`
+	// Downloads   int    `db:"downloads"`
+	// Type        int    `db:"type"` // todo: ResourceType
 }
