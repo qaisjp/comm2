@@ -9,9 +9,9 @@ type Account struct {
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 
-	Username string `db:"username" valid:"stringlength(1|255),required"`
-	Password string `db:"password" valid:"stringlength(5|100),required"`
-	Email    string `db:"email" valid:"email,stringlength(1|254),required"`
+	Username string `db:"username"`
+	Password string `db:"password"`
+	Email    string `db:"email"`
 	// Slug           string `db:"slug" valid:"stringlength(1|255),required"`
 	// Level          int    `db:"level"`
 	// Banned         bool   `db:"banned"`
