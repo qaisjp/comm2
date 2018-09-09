@@ -5,7 +5,8 @@ type Config struct {
 
 	Postgres PostgresConfig
 
-	Address string `default:"0.0.0.0:8080"`
+	JWTSecret string `required:"true"`
+	Address   string `default:"0.0.0.0:8080"`
 }
 
 // PostgresConfig contains all configuration data for a PostgreSQL connection

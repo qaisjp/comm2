@@ -40,11 +40,12 @@ func NewAPI(
 
 	router.Use(cors.Default())
 
+	router.POST("/v1/oauth", a.oauthToken)
 	router.POST("/v1/accounts", a.createAccount)
 
 	// resources := resources.Impl{API: a}
 	// router.GET("/v1/resources", resources.List)
-	// router.POST("/v1/resources", verifyAuth, resources.Patch)
+	router.POST("/v1/resources", a.authMiddleware, a.createResource)
 
 	return a
 }
