@@ -46,6 +46,7 @@ func NewAPI(
 	// resources := resources.Impl{API: a}
 	// router.GET("/v1/resources", resources.List)
 	router.POST("/v1/resources", a.authMiddleware, a.createResource)
+	router.POST("/v1/resources/:id/like", a.authMiddleware, a.likeResource)
 
 	return a
 }
