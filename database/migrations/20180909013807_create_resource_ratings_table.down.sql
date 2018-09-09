@@ -1,0 +1,1 @@
+drop table resource_ratings
