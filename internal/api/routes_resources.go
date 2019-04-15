@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/multitheftauto/community/pkg/models"
+	"github.com/multitheftauto/community/internal/models"
 	"github.com/pkg/errors"
 )
 

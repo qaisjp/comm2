@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/multitheftauto/community/pkg/models"
+	"github.com/multitheftauto/community/internal/models"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	jwt "gopkg.in/dgrijalva/jwt-go.v3"
