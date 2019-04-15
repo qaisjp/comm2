@@ -10,6 +10,7 @@ import (
 	"github.com/multitheftauto/community/internal/api"
 	"github.com/multitheftauto/community/internal/config"
 	"github.com/multitheftauto/community/internal/database"
+	"gocloud.dev/blob/fileblob"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/koding/multiconfig"
@@ -53,10 +54,25 @@ func main() {
 		"cstr":   cfg.Postgres.ConnectionString,
 	}).Info("Connected to a Postgres server")
 
+	// Create a resources directory.
+	const resourcesDir = "resources"
+	err = os.Mkdir(resourcesDir, 0755)
+	if err != nil && !os.IsExist(err) {
+		logger.WithError(err).Fatalln("Could not create resources directory")
+		return
+	}
+
+	// Create a file-based bucket.
+	bucket, err := fileblob.OpenBucket(resourcesDir, nil)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	api := api.NewAPI(
 		cfg,
 		logger,
 		db,
+		bucket,
 	)
 
 	go func() {
