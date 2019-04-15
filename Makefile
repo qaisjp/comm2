@@ -1,26 +1,33 @@
 .PHONY: schema
+PSQL_USER=mtasa
+PSQL_DB=mtasa_hub
 
 reset_schema::
-	dropdb -U mtasa_hub mtasa_hub --if-exists
-	createdb -U mtasa_hub mtasa_hub
-	cat schema.sql | psql -U mtasa_hub mtasa_hub > /dev/null
+	# kick clients off the database
+	psql postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${PSQL_DB}';"
+
+	# reset schema
+	dropdb ${PSQL_DB} --if-exists
+	createdb ${PSQL_DB}
+	psql ${PSQL_DB} -c 'grant all privileges on database ${PSQL_DB} to ${PSQL_USER};'
+	cat schema.sql | psql -U ${PSQL_USER} ${PSQL_DB} > /dev/null
 	@echo "Schema has been reset!"
 
 schema.sql::
-	pg_dump -s -U mtasa_hub mtasa_hub > schema.sql
+	pg_dump -s -U ${PSQL_USER} ${PSQL_DB} > schema.sql
 	@echo "Schema has been written to file"
 
 # save a copy of dev database into dev_backup
 checkpoint::
 	mkdir -p dev_backup
-	pg_dump -F c -U mtasa_hub mtasa_hub > dev_backup/$$(date +%F_%H-%M-%S).dump
+	pg_dump -F c -U ${PSQL_USER} ${PSQL_DB} > dev_backup/$$(date +%F_%H-%M-%S).dump
 
 # restore latest dev backup
 restore_checkpoint::
-	dropdb -U mtasa_hub mtasa_hub
-	createdb -U mtasa_hub mtasa_hub
-	pg_restore -U mtasa_hub -d mtasa_hub $$(find dev_backup | grep \.dump | sort | tail -n 1)
+	dropdb ${PSQL_DB}
+	createdb ${PSQL_DB}
+	psql ${PSQL_DB} -c 'grant all privileges on database ${PSQL_DB} to ${PSQL_USER};'
+	pg_restore -U ${PSQL_USER} -d ${PSQL_DB} $$(find dev_backup | grep \.dump | sort | tail -n 1)
 
-# might not stick with goose
 migrate::
-	migrate -path database/migrations -database "postgres://mtasa_hub@localhost:5432/mtasa_hub?sslmode=disable" up
+	migrate -path database/migrations -database "postgres://${PSQL_USER}@localhost:5432/${PSQL_DB}?sslmode=disable" up
