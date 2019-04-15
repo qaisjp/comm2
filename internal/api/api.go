@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/multitheftauto/community/pkg/config"
+	"github.com/multitheftauto/community/internal/config"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

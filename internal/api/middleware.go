@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/gin-gonic/gin"
-	"github.com/multitheftauto/community/pkg/models"
+	"github.com/multitheftauto/community/internal/models"
 	jwt "gopkg.in/dgrijalva/jwt-go.v3"
 )
 

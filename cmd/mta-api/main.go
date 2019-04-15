@@ -7,9 +7,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/multitheftauto/community/pkg/api"
-	"github.com/multitheftauto/community/pkg/config"
-	"github.com/multitheftauto/community/pkg/database"
+	"github.com/multitheftauto/community/internal/api"
+	"github.com/multitheftauto/community/internal/config"
+	"github.com/multitheftauto/community/internal/database"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/koding/multiconfig"
