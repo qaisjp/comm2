@@ -60,7 +60,12 @@ func NewAPI(
 		Bucket: bucket,
 	}
 
-	router.Use(cors.Default())
+	corsConf := cors.DefaultConfig()
+	corsConf.AddAllowMethods("DELETE", "PATCH")
+	corsConf.AddAllowHeaders("Authorization")
+	corsConf.AllowAllOrigins = true
+
+	router.Use(cors.New(corsConf))
 
 	router.POST("/v1/oauth", a.oauthToken)
 	router.POST("/v1/accounts", a.createAccount)
