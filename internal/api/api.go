@@ -3,7 +3,9 @@ package api
 import (
 	"context"
 	"net/http"
+	"time"
 
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/multitheftauto/community/internal/config"
 	"gocloud.dev/blob"
 
@@ -50,6 +52,7 @@ func NewAPI(
 	bucket *blob.Bucket,
 ) *API {
 
+	// Create default gin router
 	router := gin.Default()
 
 	a := &API{
@@ -60,20 +63,59 @@ func NewAPI(
 		Bucket: bucket,
 	}
 
+	// Handle CORS
 	corsConf := cors.DefaultConfig()
 	corsConf.AddAllowMethods("DELETE", "PATCH")
 	corsConf.AddAllowHeaders("Authorization")
 	corsConf.AllowAllOrigins = true
-
 	router.Use(cors.New(corsConf))
 
-	router.POST("/v1/oauth", a.oauthToken)
-	router.POST("/v1/accounts", a.createAccount)
+	// Initialise JWT middleware
+	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
+		Realm:           "multitheftauto.com",
+		Key:             []byte(conf.JWTSecret),
+		Timeout:         time.Hour * 6,
+		MaxRefresh:      time.Hour * 24 * 3,
+		IdentityKey:     "user_id",
+		PayloadFunc:     a.jwtPayloadFunc,
+		IdentityHandler: a.jwtIdentityHandler,
+		Authenticator:   a.jwtAuthenticator,
+		Authorizator:    a.jwtAuthorizator,
+		Unauthorized:    a.jwtUnauthorized,
 
-	// resources := resources.Impl{API: a}
-	// router.GET("/v1/resources", resources.List)
-	router.POST("/v1/resources", a.authMiddleware, a.createResource)
-	router.POST("/v1/resources/:id/like", a.authMiddleware, a.likeResource)
+		// TokenLookup is a string in the form of "<source>:<name>" that is used
+		// to extract token from the request.
+		// Optional. Default value "header:Authorization".
+		// Possible values:
+		// - "header:<name>"
+		// - "query:<name>"
+		// - "cookie:<name>"
+		// - "param:<name>"
+		TokenLookup: "header: Authorization, query: token, cookie: jwt",
+		// TokenLookup: "query:token",
+		// TokenLookup: "cookie:token",
+	})
+
+	if err != nil {
+		log.WithField("error", err).Fatal("jwt error")
+	}
+
+	// Create JWT middleware
+	authRequired := authMiddleware.MiddlewareFunc()
+
+	v1 := router.Group("/v1")
+	{
+		auth := v1.Group("/auth")
+		{
+			auth.POST("/login", authMiddleware.LoginHandler)
+			auth.POST("/refresh", authMiddleware.RefreshHandler)
+			auth.POST("/register", a.createAccount)
+		}
+
+		// v1.GET("/resources", resources.List)
+		v1.POST("/resources", authRequired, a.createResource)
+		v1.POST("/resources/:id/like", authRequired, a.likeResource)
+	}
 
 	return a
 }

@@ -15,6 +15,6 @@ type Account struct {
 	// Slug           string `db:"slug" valid:"stringlength(1|255),required"`
 	// Level          int    `db:"level"`
 	// Banned         bool   `db:"banned"`
-	Activated bool `db:"activated"`
+	Activated bool `db:"is_activated"`
 	// FollowingCount int    `db:"following_count"` // calculate on fly? feature necessary?
 }
