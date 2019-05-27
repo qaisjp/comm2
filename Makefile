@@ -1,6 +1,6 @@
 .PHONY: schema
-PSQL_USER=mtasa
-PSQL_DB=mtasa_hub
+PSQL_USER=mta
+PSQL_DB=mtahub_dev
 
 reset_schema::
 	# kick clients off the database
