@@ -22,7 +22,7 @@ func (a *API) jwtAuthorizator(data interface{}, c *gin.Context) bool {
 
 func (a *API) jwtAuthenticator(c *gin.Context) (interface{}, error) {
 	var input struct {
-		Email    string
+		Username string
 		Password string
 	}
 
@@ -32,7 +32,7 @@ func (a *API) jwtAuthenticator(c *gin.Context) (interface{}, error) {
 
 	var account models.Account
 
-	err := a.DB.Get(&account, "select id,password,is_activated from accounts where email = $1 limit 1", input.Email)
+	err := a.DB.Get(&account, "select id, password, is_activated from accounts where (email = $1) or (username = $1) limit 1", input.Username)
 	if err != nil {
 		return "", err
 	}
