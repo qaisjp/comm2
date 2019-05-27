@@ -1,3 +1,8 @@
+# This file has been developed over a variety of projects
+# - https://github.com/leafo/streak.club/blob/master/Makefile
+# - https://github.com/chillroom/jacr-api
+# - https://github.com/teamxiv/growbot-api
+
 .PHONY: schema
 PSQL_USER=mta
 PSQL_DB=mtahub_dev
@@ -15,6 +20,7 @@ reset_schema::
 
 schema.sql::
 	pg_dump -s -U ${PSQL_USER} ${PSQL_DB} > schema.sql
+	pg_dump -a -t schema_migrations -U ${PSQL_USER} ${PSQL_DB} >> schema.sql
 	@echo "Schema has been written to file"
 
 # save a copy of dev database into dev_backup
@@ -31,3 +37,4 @@ restore_checkpoint::
 
 migrate::
 	migrate -path database/migrations -database "postgres://${PSQL_USER}@localhost:5432/${PSQL_DB}?sslmode=disable" up
+	make schema.sql
