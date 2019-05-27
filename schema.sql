@@ -31,7 +31,7 @@ CREATE TABLE public.accounts (
     username character varying(254) NOT NULL,
     password character(60) NOT NULL,
     email character varying(254) NOT NULL,
-    activated boolean DEFAULT false NOT NULL
+    is_activated boolean DEFAULT false NOT NULL
 );
 
 
@@ -244,7 +244,7 @@ SET row_security = off;
 --
 
 COPY public.schema_migrations (version, dirty) FROM stdin;
-20180909013807	f
+20190527233803	f
 \.
 
 

@@ -1,0 +1,1 @@
+alter table "accounts" rename column "activated" to "is_activated"
