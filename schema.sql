@@ -2,43 +2,29 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.1
--- Dumped by pg_dump version 10.1
+-- Dumped from database version 11.3
+-- Dumped by pg_dump version 11.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
-
-SET search_path = public, pg_catalog;
 
 SET default_tablespace = '';
 
 SET default_with_oids = false;
 
 --
--- Name: accounts; Type: TABLE; Schema: public; Owner: mtasa_hub
+-- Name: accounts; Type: TABLE; Schema: public; Owner: mta
 --
 
-CREATE TABLE accounts (
+CREATE TABLE public.accounts (
     id integer NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
@@ -49,13 +35,13 @@ CREATE TABLE accounts (
 );
 
 
-ALTER TABLE accounts OWNER TO mtasa_hub;
+ALTER TABLE public.accounts OWNER TO mta;
 
 --
--- Name: accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: mtasa_hub
+-- Name: accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: mta
 --
 
-CREATE SEQUENCE accounts_id_seq
+CREATE SEQUENCE public.accounts_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -64,20 +50,20 @@ CREATE SEQUENCE accounts_id_seq
     CACHE 1;
 
 
-ALTER TABLE accounts_id_seq OWNER TO mtasa_hub;
+ALTER TABLE public.accounts_id_seq OWNER TO mta;
 
 --
--- Name: accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mtasa_hub
+-- Name: accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mta
 --
 
-ALTER SEQUENCE accounts_id_seq OWNED BY accounts.id;
+ALTER SEQUENCE public.accounts_id_seq OWNED BY public.accounts.id;
 
 
 --
--- Name: resources; Type: TABLE; Schema: public; Owner: mtasa_hub
+-- Name: resources; Type: TABLE; Schema: public; Owner: mta
 --
 
-CREATE TABLE resources (
+CREATE TABLE public.resources (
     id integer NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
@@ -88,13 +74,13 @@ CREATE TABLE resources (
 );
 
 
-ALTER TABLE resources OWNER TO mtasa_hub;
+ALTER TABLE public.resources OWNER TO mta;
 
 --
--- Name: resources_id_seq; Type: SEQUENCE; Schema: public; Owner: mtasa_hub
+-- Name: resources_id_seq; Type: SEQUENCE; Schema: public; Owner: mta
 --
 
-CREATE SEQUENCE resources_id_seq
+CREATE SEQUENCE public.resources_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -103,95 +89,95 @@ CREATE SEQUENCE resources_id_seq
     CACHE 1;
 
 
-ALTER TABLE resources_id_seq OWNER TO mtasa_hub;
+ALTER TABLE public.resources_id_seq OWNER TO mta;
 
 --
--- Name: resources_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mtasa_hub
+-- Name: resources_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mta
 --
 
-ALTER SEQUENCE resources_id_seq OWNED BY resources.id;
+ALTER SEQUENCE public.resources_id_seq OWNED BY public.resources.id;
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: mtasa_hub
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: mta
 --
 
-CREATE TABLE schema_migrations (
+CREATE TABLE public.schema_migrations (
     version bigint NOT NULL,
     dirty boolean NOT NULL
 );
 
 
-ALTER TABLE schema_migrations OWNER TO mtasa_hub;
+ALTER TABLE public.schema_migrations OWNER TO mta;
 
 --
--- Name: accounts id; Type: DEFAULT; Schema: public; Owner: mtasa_hub
+-- Name: accounts id; Type: DEFAULT; Schema: public; Owner: mta
 --
 
-ALTER TABLE ONLY accounts ALTER COLUMN id SET DEFAULT nextval('accounts_id_seq'::regclass);
-
-
---
--- Name: resources id; Type: DEFAULT; Schema: public; Owner: mtasa_hub
---
-
-ALTER TABLE ONLY resources ALTER COLUMN id SET DEFAULT nextval('resources_id_seq'::regclass);
+ALTER TABLE ONLY public.accounts ALTER COLUMN id SET DEFAULT nextval('public.accounts_id_seq'::regclass);
 
 
 --
--- Name: accounts accounts_email_key; Type: CONSTRAINT; Schema: public; Owner: mtasa_hub
+-- Name: resources id; Type: DEFAULT; Schema: public; Owner: mta
 --
 
-ALTER TABLE ONLY accounts
+ALTER TABLE ONLY public.resources ALTER COLUMN id SET DEFAULT nextval('public.resources_id_seq'::regclass);
+
+
+--
+-- Name: accounts accounts_email_key; Type: CONSTRAINT; Schema: public; Owner: mta
+--
+
+ALTER TABLE ONLY public.accounts
     ADD CONSTRAINT accounts_email_key UNIQUE (email);
 
 
 --
--- Name: accounts accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: mtasa_hub
+-- Name: accounts accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: mta
 --
 
-ALTER TABLE ONLY accounts
+ALTER TABLE ONLY public.accounts
     ADD CONSTRAINT accounts_pkey PRIMARY KEY (id);
 
 
 --
--- Name: accounts accounts_username_key; Type: CONSTRAINT; Schema: public; Owner: mtasa_hub
+-- Name: accounts accounts_username_key; Type: CONSTRAINT; Schema: public; Owner: mta
 --
 
-ALTER TABLE ONLY accounts
+ALTER TABLE ONLY public.accounts
     ADD CONSTRAINT accounts_username_key UNIQUE (username);
 
 
 --
--- Name: resources resources_name_key; Type: CONSTRAINT; Schema: public; Owner: mtasa_hub
+-- Name: resources resources_name_key; Type: CONSTRAINT; Schema: public; Owner: mta
 --
 
-ALTER TABLE ONLY resources
+ALTER TABLE ONLY public.resources
     ADD CONSTRAINT resources_name_key UNIQUE (name);
 
 
 --
--- Name: resources resources_pkey; Type: CONSTRAINT; Schema: public; Owner: mtasa_hub
+-- Name: resources resources_pkey; Type: CONSTRAINT; Schema: public; Owner: mta
 --
 
-ALTER TABLE ONLY resources
+ALTER TABLE ONLY public.resources
     ADD CONSTRAINT resources_pkey PRIMARY KEY (id);
 
 
 --
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: mtasa_hub
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: mta
 --
 
-ALTER TABLE ONLY schema_migrations
+ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
 --
--- Name: resources resources_creator_fkey; Type: FK CONSTRAINT; Schema: public; Owner: mtasa_hub
+-- Name: resources resources_creator_fkey; Type: FK CONSTRAINT; Schema: public; Owner: mta
 --
 
-ALTER TABLE ONLY resources
-    ADD CONSTRAINT resources_creator_fkey FOREIGN KEY (creator) REFERENCES accounts(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public.resources
+    ADD CONSTRAINT resources_creator_fkey FOREIGN KEY (creator) REFERENCES public.accounts(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
