@@ -6,6 +6,7 @@
 .PHONY: schema
 PSQL_USER=mta
 PSQL_DB=mtahub_dev
+MIGRATE=migrate -path database/migrations -database "postgres://${PSQL_USER}@localhost:5432/${PSQL_DB}?sslmode=disable"
 
 reset_schema::
 	# kick clients off the database
@@ -36,5 +37,8 @@ restore_checkpoint::
 	pg_restore -U ${PSQL_USER} -d ${PSQL_DB} $$(find dev_backup | grep \.dump | sort | tail -n 1)
 
 migrate::
-	migrate -path database/migrations -database "postgres://${PSQL_USER}@localhost:5432/${PSQL_DB}?sslmode=disable" up
+	${MIGRATE} up
 	make schema.sql
+
+migrate_new::
+	${MIGRATE} create -ext sql -dir database/migrations ${NAME}
