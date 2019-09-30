@@ -1,11 +1,11 @@
 # community
 
-## External contributions
+## Contributors
 
-You might have access here to have an idea of how the project is progressing,
-or to perhaps help provide insight on some questions I might have throughout the year.
+If you have access to this repo, it might be to give you an idea of how the project is progressing,
+or to perhaps help provide insight on some questions I may have throughout the year.
 
-Please keep in mind that this project is being used to get "academic credit",
+But please keep in mind that this project is being used to get "academic credit",
 and I need to be very careful to not misrepresent the work I have done!
 
 I ask that you do not push anything to this repository, and to refrain from making code contributions.
