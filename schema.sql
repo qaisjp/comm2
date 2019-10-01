@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.3
--- Dumped by pg_dump version 11.3
+-- Dumped from database version 11.5
+-- Dumped by pg_dump version 11.5
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -21,7 +21,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: accounts; Type: TABLE; Schema: public; Owner: mta
+-- Name: accounts; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.accounts (
@@ -35,10 +35,8 @@ CREATE TABLE public.accounts (
 );
 
 
-ALTER TABLE public.accounts OWNER TO mta;
-
 --
--- Name: accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: mta
+-- Name: accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.accounts_id_seq
@@ -50,17 +48,15 @@ CREATE SEQUENCE public.accounts_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.accounts_id_seq OWNER TO mta;
-
 --
--- Name: accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mta
+-- Name: accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.accounts_id_seq OWNED BY public.accounts.id;
 
 
 --
--- Name: resource_ratings; Type: TABLE; Schema: public; Owner: mta
+-- Name: resource_ratings; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.resource_ratings (
@@ -70,10 +66,8 @@ CREATE TABLE public.resource_ratings (
 );
 
 
-ALTER TABLE public.resource_ratings OWNER TO mta;
-
 --
--- Name: resources; Type: TABLE; Schema: public; Owner: mta
+-- Name: resources; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.resources (
@@ -87,10 +81,8 @@ CREATE TABLE public.resources (
 );
 
 
-ALTER TABLE public.resources OWNER TO mta;
-
 --
--- Name: resources_id_seq; Type: SEQUENCE; Schema: public; Owner: mta
+-- Name: resources_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.resources_id_seq
@@ -102,17 +94,15 @@ CREATE SEQUENCE public.resources_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.resources_id_seq OWNER TO mta;
-
 --
--- Name: resources_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mta
+-- Name: resources_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.resources_id_seq OWNED BY public.resources.id;
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: mta
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.schema_migrations (
@@ -121,24 +111,22 @@ CREATE TABLE public.schema_migrations (
 );
 
 
-ALTER TABLE public.schema_migrations OWNER TO mta;
-
 --
--- Name: accounts id; Type: DEFAULT; Schema: public; Owner: mta
+-- Name: accounts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.accounts ALTER COLUMN id SET DEFAULT nextval('public.accounts_id_seq'::regclass);
 
 
 --
--- Name: resources id; Type: DEFAULT; Schema: public; Owner: mta
+-- Name: resources id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resources ALTER COLUMN id SET DEFAULT nextval('public.resources_id_seq'::regclass);
 
 
 --
--- Name: accounts accounts_email_key; Type: CONSTRAINT; Schema: public; Owner: mta
+-- Name: accounts accounts_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.accounts
@@ -146,7 +134,7 @@ ALTER TABLE ONLY public.accounts
 
 
 --
--- Name: accounts accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: mta
+-- Name: accounts accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.accounts
@@ -154,7 +142,7 @@ ALTER TABLE ONLY public.accounts
 
 
 --
--- Name: accounts accounts_username_key; Type: CONSTRAINT; Schema: public; Owner: mta
+-- Name: accounts accounts_username_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.accounts
@@ -162,7 +150,7 @@ ALTER TABLE ONLY public.accounts
 
 
 --
--- Name: resource_ratings resource_ratings_pkey; Type: CONSTRAINT; Schema: public; Owner: mta
+-- Name: resource_ratings resource_ratings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resource_ratings
@@ -170,7 +158,7 @@ ALTER TABLE ONLY public.resource_ratings
 
 
 --
--- Name: resources resources_name_key; Type: CONSTRAINT; Schema: public; Owner: mta
+-- Name: resources resources_name_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resources
@@ -178,7 +166,7 @@ ALTER TABLE ONLY public.resources
 
 
 --
--- Name: resources resources_pkey; Type: CONSTRAINT; Schema: public; Owner: mta
+-- Name: resources resources_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resources
@@ -186,7 +174,7 @@ ALTER TABLE ONLY public.resources
 
 
 --
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: mta
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.schema_migrations
@@ -194,7 +182,7 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
--- Name: resource_ratings resource_ratings_account_fkey; Type: FK CONSTRAINT; Schema: public; Owner: mta
+-- Name: resource_ratings resource_ratings_account_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resource_ratings
@@ -202,7 +190,7 @@ ALTER TABLE ONLY public.resource_ratings
 
 
 --
--- Name: resource_ratings resource_ratings_resource_fkey; Type: FK CONSTRAINT; Schema: public; Owner: mta
+-- Name: resource_ratings resource_ratings_resource_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resource_ratings
@@ -210,7 +198,7 @@ ALTER TABLE ONLY public.resource_ratings
 
 
 --
--- Name: resources resources_creator_fkey; Type: FK CONSTRAINT; Schema: public; Owner: mta
+-- Name: resources resources_creator_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resources
@@ -225,8 +213,8 @@ ALTER TABLE ONLY public.resources
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.3
--- Dumped by pg_dump version 11.3
+-- Dumped from database version 11.5
+-- Dumped by pg_dump version 11.5
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -240,7 +228,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: public; Owner: mta
+-- Data for Name: schema_migrations; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.schema_migrations (version, dirty) FROM stdin;
