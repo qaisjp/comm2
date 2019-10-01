@@ -4,8 +4,9 @@ import (
 	"time"
 )
 
+// Account represents a user account
 type Account struct {
-	ID        uint64    `id`
+	ID        uint64    `db:"id"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 
