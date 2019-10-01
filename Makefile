@@ -20,9 +20,9 @@ reset_schema::
 	@echo "Schema has been reset!"
 
 schema.sql::
-	pg_dump -s -U ${PSQL_USER} ${PSQL_DB} > schema.sql
-	pg_dump -a -t schema_migrations -U ${PSQL_USER} ${PSQL_DB} >> schema.sql
-	@echo "Schema has been written to file"
+	pg_dump --no-owner --schema-only -U ${PSQL_USER} ${PSQL_DB} > schema.sql
+	pg_dump --no-owner --data-only -t schema_migrations -U ${PSQL_USER} ${PSQL_DB} >> schema.sql
+	@echo "Schema has been written to file 'schema.sql'"
 
 # save a copy of dev database into dev_backup
 checkpoint::
