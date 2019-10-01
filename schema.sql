@@ -21,10 +21,10 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: accounts; Type: TABLE; Schema: public; Owner: -
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.accounts (
+CREATE TABLE public.users (
     id integer NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
@@ -36,10 +36,10 @@ CREATE TABLE public.accounts (
 
 
 --
--- Name: accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.accounts_id_seq
+CREATE SEQUENCE public.users_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -49,17 +49,17 @@ CREATE SEQUENCE public.accounts_id_seq
 
 
 --
--- Name: accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.accounts_id_seq OWNED BY public.accounts.id;
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- Name: resource_ratings; Type: TABLE; Schema: public; Owner: -
+-- Name: resource_votes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.resource_ratings (
+CREATE TABLE public.resource_votes (
     account integer NOT NULL,
     resource integer NOT NULL,
     positive boolean NOT NULL
@@ -112,10 +112,10 @@ CREATE TABLE public.schema_migrations (
 
 
 --
--- Name: accounts id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.accounts ALTER COLUMN id SET DEFAULT nextval('public.accounts_id_seq'::regclass);
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
 
 
 --
@@ -126,35 +126,35 @@ ALTER TABLE ONLY public.resources ALTER COLUMN id SET DEFAULT nextval('public.re
 
 
 --
--- Name: accounts accounts_email_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.accounts
-    ADD CONSTRAINT accounts_email_key UNIQUE (email);
-
-
---
--- Name: accounts accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.accounts
-    ADD CONSTRAINT accounts_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
 
 
 --
--- Name: accounts accounts_username_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.accounts
-    ADD CONSTRAINT accounts_username_key UNIQUE (username);
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
 --
--- Name: resource_ratings resource_ratings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.resource_ratings
-    ADD CONSTRAINT resource_ratings_pkey PRIMARY KEY (account, resource);
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_username_key UNIQUE (username);
+
+
+--
+-- Name: resource_votes resource_votes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resource_votes
+    ADD CONSTRAINT resource_votes_pkey PRIMARY KEY (account, resource);
 
 
 --
@@ -182,19 +182,19 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
--- Name: resource_ratings resource_ratings_account_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: resource_votes resource_votes_account_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.resource_ratings
-    ADD CONSTRAINT resource_ratings_account_fkey FOREIGN KEY (account) REFERENCES public.accounts(id);
+ALTER TABLE ONLY public.resource_votes
+    ADD CONSTRAINT resource_votes_account_fkey FOREIGN KEY (account) REFERENCES public.users(id);
 
 
 --
--- Name: resource_ratings resource_ratings_resource_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: resource_votes resource_votes_resource_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.resource_ratings
-    ADD CONSTRAINT resource_ratings_resource_fkey FOREIGN KEY (resource) REFERENCES public.resources(id);
+ALTER TABLE ONLY public.resource_votes
+    ADD CONSTRAINT resource_votes_resource_fkey FOREIGN KEY (resource) REFERENCES public.resources(id);
 
 
 --
@@ -202,7 +202,7 @@ ALTER TABLE ONLY public.resource_ratings
 --
 
 ALTER TABLE ONLY public.resources
-    ADD CONSTRAINT resources_creator_fkey FOREIGN KEY (creator) REFERENCES public.accounts(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT resources_creator_fkey FOREIGN KEY (creator) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -239,4 +239,3 @@ COPY public.schema_migrations (version, dirty) FROM stdin;
 --
 -- PostgreSQL database dump complete
 --
-
