@@ -45,7 +45,10 @@ CREATE TABLE public.resource_comments (
     message text NOT NULL,
     deleted boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    edited_at timestamp without time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp without time zone DEFAULT now() NOT NULL,
+    parent_comment_id integer
 );
 
 
@@ -128,7 +131,8 @@ CREATE TABLE public.resource_packages (
     created_at timestamp without time zone DEFAULT now(),
     description text DEFAULT ''::text NOT NULL,
     version character varying(10) NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    author_id integer NOT NULL
 );
 
 
@@ -171,7 +175,7 @@ CREATE TABLE public.resources (
     id integer NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    creator integer NOT NULL,
+    author_id integer NOT NULL,
     name character varying(254) NOT NULL,
     title text NOT NULL,
     description text NOT NULL
@@ -209,6 +213,42 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: user_bans; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_bans (
+    id integer NOT NULL,
+    author_id integer NOT NULL,
+    target_user_id integer NOT NULL,
+    reason text NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    expires_at timestamp without time zone DEFAULT now(),
+    active boolean DEFAULT true NOT NULL
+);
+
+
+--
+-- Name: user_bans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_bans_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_bans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_bans_id_seq OWNED BY public.user_bans.id;
+
+
+--
 -- Name: user_followings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -217,6 +257,38 @@ CREATE TABLE public.user_followings (
     target_user_id integer NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL
 );
+
+
+--
+-- Name: user_profile; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_profile (
+    user_id integer NOT NULL,
+    location character varying(255),
+    organisation character varying(255),
+    website character varying(255),
+    bio character varying(255)
+);
+
+
+--
+-- Name: user_tokens; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_tokens (
+    id character(20) NOT NULL,
+    user_id integer NOT NULL,
+    type integer NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: COLUMN user_tokens.type; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.user_tokens.type IS 'activation token? password reset token?';
 
 
 --
@@ -231,7 +303,8 @@ CREATE TABLE public.users (
     password character(60) NOT NULL,
     email character varying(254) NOT NULL,
     is_activated boolean DEFAULT false NOT NULL,
-    level integer NOT NULL
+    level integer NOT NULL,
+    is_banned boolean DEFAULT false NOT NULL
 );
 
 
@@ -281,6 +354,13 @@ ALTER TABLE ONLY public.resource_packages ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.resources ALTER COLUMN id SET DEFAULT nextval('public.resources_id_seq'::regclass);
+
+
+--
+-- Name: user_bans id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_bans ALTER COLUMN id SET DEFAULT nextval('public.user_bans_id_seq'::regclass);
 
 
 --
@@ -363,11 +443,35 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: user_bans user_bans_pk; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_bans
+    ADD CONSTRAINT user_bans_pk PRIMARY KEY (id);
+
+
+--
 -- Name: user_followings user_followings_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_followings
     ADD CONSTRAINT user_followings_pk PRIMARY KEY (source_user_id, target_user_id);
+
+
+--
+-- Name: user_profile user_profile_pk; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_profile
+    ADD CONSTRAINT user_profile_pk PRIMARY KEY (user_id);
+
+
+--
+-- Name: user_tokens user_tokens_pk; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_tokens
+    ADD CONSTRAINT user_tokens_pk PRIMARY KEY (id);
 
 
 --
@@ -408,6 +512,14 @@ ALTER TABLE ONLY public.resource_collaborators
 
 ALTER TABLE ONLY public.resource_collaborators
     ADD CONSTRAINT resource_collaborators_users_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: resource_comments resource_comments_resource_comments_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resource_comments
+    ADD CONSTRAINT resource_comments_resource_comments_id_fk FOREIGN KEY (parent_comment_id) REFERENCES public.resource_comments(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -467,6 +579,14 @@ ALTER TABLE ONLY public.resource_packages
 
 
 --
+-- Name: resource_packages resource_packages_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resource_packages
+    ADD CONSTRAINT resource_packages_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
 -- Name: resource_votes resource_votes_account_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -483,11 +603,27 @@ ALTER TABLE ONLY public.resource_votes
 
 
 --
--- Name: resources resources_creator_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: resources resources_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resources
-    ADD CONSTRAINT resources_creator_fkey FOREIGN KEY (creator) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT resources_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- Name: user_bans user_bans_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_bans
+    ADD CONSTRAINT user_bans_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- Name: user_bans user_bans_users_id_fk_2; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_bans
+    ADD CONSTRAINT user_bans_users_id_fk_2 FOREIGN KEY (target_user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -504,6 +640,22 @@ ALTER TABLE ONLY public.user_followings
 
 ALTER TABLE ONLY public.user_followings
     ADD CONSTRAINT user_followings_users_id_fk_2 FOREIGN KEY (source_user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: user_profile user_profile_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_profile
+    ADD CONSTRAINT user_profile_users_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: user_tokens user_tokens_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_tokens
+    ADD CONSTRAINT user_tokens_users_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
