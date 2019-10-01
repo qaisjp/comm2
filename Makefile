@@ -22,6 +22,7 @@ reset_schema::
 schema.sql::
 	pg_dump --no-owner --schema-only -U ${PSQL_USER} ${PSQL_DB} > schema.sql
 	pg_dump --no-owner --data-only -t schema_migrations -U ${PSQL_USER} ${PSQL_DB} >> schema.sql
+	truncate -s -1 schema.sql
 	@echo "Schema has been written to file 'schema.sql'"
 
 # save a copy of dev database into dev_backup

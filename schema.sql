@@ -540,4 +540,3 @@ COPY public.schema_migrations (version, dirty) FROM stdin;
 --
 -- PostgreSQL database dump complete
 --
-
