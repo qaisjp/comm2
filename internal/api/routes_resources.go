@@ -22,7 +22,6 @@ func (a *API) createResource(c *gin.Context) {
 
 	if err := c.Bind(&input); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"status":  "error",
 			"message": err.Error(),
 		})
 		return
@@ -39,7 +38,6 @@ func (a *API) createResource(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
 			"message": errors.Wrap(err, "could not insert").Error(),
 		})
 
@@ -59,7 +57,6 @@ func (a *API) likeResource(c *gin.Context) {
 	resource, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
 			"message": err.Error(),
 		})
 	}
@@ -69,14 +66,12 @@ func (a *API) likeResource(c *gin.Context) {
 	if err := a.DB.Get(&count, "select count(id) from resources where id = $1", resource); err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{
-				"status":  "error",
 				"message": "That resource could not be found",
 			})
 			return
 		}
 
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
 			"message": errors.Wrap(err, "Could not find resource"),
 		})
 		return
@@ -88,7 +83,6 @@ func (a *API) likeResource(c *gin.Context) {
 
 	if err := c.Bind(&input); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"status":  "error",
 			"message": err.Error(),
 		})
 		return
@@ -112,7 +106,6 @@ func (a *API) likeResource(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
 			"message": errors.Wrap(err, "could not update").Error(),
 		})
 

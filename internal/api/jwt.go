@@ -12,7 +12,6 @@ import (
 
 func (a *API) jwtUnauthorized(c *gin.Context, code int, message string) {
 	c.JSON(code, gin.H{
-		"code":    code,
 		"message": message,
 	})
 }
