@@ -23,7 +23,7 @@ func (a *API) jwtAuthorizator(data interface{}, c *gin.Context) bool {
 func (a *API) jwtAuthenticator(c *gin.Context) (_ interface{}, err error) {
 	var input struct {
 		Username string `valid:"stringlength(1|255),required"`
-		Password string `valid:"stringlength(5|100),required"`
+		Password string `valid:"required"`
 	}
 
 	if err = c.BindJSON(&input); err != nil {
