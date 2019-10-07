@@ -114,7 +114,7 @@ func NewAPI(
 
 		// v1.GET("/resources", resources.List)
 		v1.POST("/resources", authRequired, a.createResource)
-		v1.POST("/resources/:id/like", authRequired, a.likeResource)
+		v1.POST("/resources/:id/vote", authRequired, a.voteResource)
 	}
 
 	return a

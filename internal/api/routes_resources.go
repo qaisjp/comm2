@@ -49,7 +49,7 @@ func (a *API) createResource(c *gin.Context) {
 	c.Status(http.StatusCreated)
 }
 
-func (a *API) likeResource(c *gin.Context) {
+func (a *API) voteResource(c *gin.Context) {
 	account := c.MustGet("account").(*models.Account)
 
 	resource, err := strconv.ParseUint(c.Param("id"), 10, 64)
@@ -93,7 +93,7 @@ func (a *API) likeResource(c *gin.Context) {
 	}
 
 	result, err := a.DB.NamedExec(
-		`insert into resource_ratings
+		`insert into resource_votes
 		(resource, account, positive)
 		values (:resource, :account, :positive)
 		on conflict (resource, account)
