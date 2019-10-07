@@ -39,23 +39,23 @@ func (a *API) jwtAuthenticator(c *gin.Context) (_ interface{}, err error) {
 		return "", err
 	}
 
-	var account models.Account
+	var user models.User
 
-	err = a.DB.Get(&account, "select id, password, is_activated from accounts where (email = $1) or (username = $1) limit 1", input.Username)
+	err = a.DB.Get(&user, "select id, password, is_activated from users where (email = $1) or (username = $1) limit 1", input.Username)
 	if err != nil {
 		return "", err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(input.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
 	if err != nil {
 		return "", err
 	}
 
-	if !account.Activated {
-		return "", errors.New("account not activated")
+	if !user.Activated {
+		return "", errors.New("user not activated")
 	}
 
-	return &account, nil
+	return &user, nil
 }
 
 func (a *API) jwtIdentityHandler(c *gin.Context) interface{} {
@@ -65,7 +65,7 @@ func (a *API) jwtIdentityHandler(c *gin.Context) interface{} {
 }
 
 func (a *API) jwtPayloadFunc(data interface{}) jwt.MapClaims {
-	if v, ok := data.(*models.Account); ok {
+	if v, ok := data.(*models.User); ok {
 		return jwt.MapClaims{
 			"id": v.ID,
 		}

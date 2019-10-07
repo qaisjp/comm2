@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-// Account represents a user account
-type Account struct {
+// User represents a user account
+type User struct {
 	ID        uint64    `db:"id"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
@@ -14,8 +14,8 @@ type Account struct {
 	Password string `db:"password"`
 	Email    string `db:"email"`
 	// Slug           string `db:"slug" valid:"stringlength(1|255),required"`
-	// Level          int    `db:"level"`
-	// Banned         bool   `db:"banned"`
+	Level     int  `db:"level"`
 	Activated bool `db:"is_activated"`
+	Banned    bool `db:"is_banned"`
 	// FollowingCount int    `db:"following_count"` // calculate on fly? feature necessary?
 }

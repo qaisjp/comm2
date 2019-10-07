@@ -12,7 +12,7 @@ import (
 )
 
 func (a *API) createResource(c *gin.Context) {
-	account := c.MustGet("account").(*models.Account)
+	user := c.MustGet("user").(*models.User)
 
 	var input struct {
 		Name        string `json:"name"`
@@ -31,7 +31,7 @@ func (a *API) createResource(c *gin.Context) {
 		Name:        input.Name,
 		Title:       input.Title,
 		Description: input.Description,
-		Creator:     account.ID,
+		Creator:     user.ID,
 	}
 
 	result, err := a.DB.NamedExec("insert into resources (name, title, description, creator) values (:name, :title, :description, :creator)", &r)
@@ -50,7 +50,7 @@ func (a *API) createResource(c *gin.Context) {
 }
 
 func (a *API) voteResource(c *gin.Context) {
-	account := c.MustGet("account").(*models.Account)
+	user := c.MustGet("user").(*models.User)
 
 	resource, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -87,7 +87,7 @@ func (a *API) voteResource(c *gin.Context) {
 	}
 
 	r := models.ResourceRating{
-		Account:  account.ID,
+		Account:  user.ID,
 		Resource: resource,
 		Positive: input.Positive,
 	}

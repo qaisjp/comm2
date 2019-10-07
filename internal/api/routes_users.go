@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (a *API) createAccount(c *gin.Context) {
+func (a *API) createUser(c *gin.Context) {
 	var input struct {
 		Username string `json:"username" valid:"stringlength(1|255),required"`
 		Password string `json:"password" valid:"stringlength(5|100),required"`
@@ -25,7 +25,7 @@ func (a *API) createAccount(c *gin.Context) {
 		return
 	}
 
-	u := models.Account{
+	u := models.User{
 		Username: input.Username,
 		Password: input.Password,
 		Email:    input.Email,
@@ -42,7 +42,7 @@ func (a *API) createAccount(c *gin.Context) {
 	var count int
 	err = a.DB.Get(
 		&count,
-		"select count(id) from accounts where (username = $1) or (email = $2)",
+		"select count(id) from users where (username = $1) or (email = $2)",
 		u.Username,
 		u.Email,
 	)
@@ -56,7 +56,7 @@ func (a *API) createAccount(c *gin.Context) {
 
 	if count > 0 {
 		c.JSON(http.StatusConflict, gin.H{
-			"message": "Account already exists with that username or email",
+			"message": "User already exists with that username or email",
 		})
 		return
 	}
@@ -72,7 +72,7 @@ func (a *API) createAccount(c *gin.Context) {
 
 	u.Password = string(hashedPassword)
 
-	_, err = a.DB.NamedExec("insert into accounts (username, password, email, is_activated) values (:username, :password, :email, true)", &u)
+	_, err = a.DB.NamedExec("insert into users (username, password, email, is_activated) values (:username, :password, :email, true)", &u)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": errors.Wrap(err, "could not insert").Error(),

@@ -109,7 +109,7 @@ func NewAPI(
 		{
 			auth.POST("/login", authMiddleware.LoginHandler)
 			auth.POST("/refresh", authMiddleware.RefreshHandler)
-			auth.POST("/register", a.createAccount)
+			auth.POST("/register", a.createUser)
 		}
 
 		// v1.GET("/resources", resources.List)
