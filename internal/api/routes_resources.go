@@ -46,9 +46,7 @@ func (a *API) createResource(c *gin.Context) {
 
 	fmt.Printf("%x\n", result)
 
-	c.JSON(http.StatusCreated, gin.H{
-		"status": "success",
-	})
+	c.Status(http.StatusCreated)
 }
 
 func (a *API) likeResource(c *gin.Context) {

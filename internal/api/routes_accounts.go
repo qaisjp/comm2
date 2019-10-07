@@ -75,14 +75,11 @@ func (a *API) createAccount(c *gin.Context) {
 	_, err = a.DB.NamedExec("insert into accounts (username, password, email, is_activated) values (:username, :password, :email, true)", &u)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
 			"message": errors.Wrap(err, "could not insert").Error(),
 		})
 
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"status": "success",
-	})
+	c.Status(http.StatusCreated)
 }
