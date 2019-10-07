@@ -303,7 +303,7 @@ CREATE TABLE public.users (
     password character(60) NOT NULL,
     email character varying(254) NOT NULL,
     is_activated boolean DEFAULT false NOT NULL,
-    level integer NOT NULL,
+    level integer DEFAULT 0 NOT NULL,
     is_banned boolean DEFAULT false NOT NULL
 );
 
