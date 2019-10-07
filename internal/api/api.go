@@ -76,7 +76,7 @@ func NewAPI(
 		Key:             []byte(conf.JWTSecret),
 		Timeout:         time.Hour * 6,
 		MaxRefresh:      time.Hour * 24 * 3,
-		IdentityKey:     "user_id",
+		IdentityKey:     "user",
 		PayloadFunc:     a.jwtPayloadFunc,
 		IdentityHandler: a.jwtIdentityHandler,
 		Authenticator:   a.jwtAuthenticator,
@@ -114,7 +114,11 @@ func NewAPI(
 
 		// v1.GET("/resources", resources.List)
 		v1.POST("/resources", authRequired, a.createResource)
-		v1.POST("/resources/:id/vote", authRequired, a.voteResource)
+		resources := v1.Group("/resources/:id", a.checkResource)
+		{
+			resources.GET("", a.getResource)
+			resources.POST("/vote", authRequired, a.voteResource)
+		}
 	}
 
 	return a

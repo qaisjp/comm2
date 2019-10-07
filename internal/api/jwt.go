@@ -60,8 +60,14 @@ func (a *API) jwtAuthenticator(c *gin.Context) (_ interface{}, err error) {
 
 func (a *API) jwtIdentityHandler(c *gin.Context) interface{} {
 	claims := jwt.ExtractClaims(c)
+	userID := int(claims["id"].(float64))
 
-	return int(claims["id"].(float64))
+	var user models.User
+	if err := a.DB.Get(&user, "select * from users where id = $1", userID); err != nil {
+		panic(err.Error())
+	}
+
+	return &user
 }
 
 func (a *API) jwtPayloadFunc(data interface{}) jwt.MapClaims {

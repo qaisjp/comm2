@@ -11,6 +11,39 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (a *API) checkResource(c *gin.Context) {
+	resourceID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		c.Abort()
+		return
+	}
+
+	// Check if the resource exists
+	var resource models.Resource
+	if err := a.DB.Get(&resource, "select * from resources where id = $1", resourceID); err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "That resource could not be found",
+			})
+			c.Abort()
+			return
+		}
+
+		a.Log.WithField("err", err).Errorln("Could not find resource")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": errors.Wrap(err, "Could not find resource"),
+		})
+		c.Abort()
+		return
+	}
+
+	// Store the resource
+	c.Set("resource", &resource)
+}
+
 func (a *API) createResource(c *gin.Context) {
 	user := c.MustGet("user").(*models.User)
 
@@ -31,10 +64,10 @@ func (a *API) createResource(c *gin.Context) {
 		Name:        input.Name,
 		Title:       input.Title,
 		Description: input.Description,
-		Creator:     user.ID,
+		AuthorID:    user.ID,
 	}
 
-	result, err := a.DB.NamedExec("insert into resources (name, title, description, creator) values (:name, :title, :description, :creator)", &r)
+	result, err := a.DB.NamedExec("insert into resources (name, title, description, author_id) values (:name, :title, :description, :author_id)", &r)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -49,31 +82,14 @@ func (a *API) createResource(c *gin.Context) {
 	c.Status(http.StatusCreated)
 }
 
+func (a *API) getResource(c *gin.Context) {
+	resource := c.MustGet("resource").(*models.Resource)
+	c.JSON(http.StatusOK, resource)
+}
+
 func (a *API) voteResource(c *gin.Context) {
 	user := c.MustGet("user").(*models.User)
-
-	resource, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-	}
-
-	// Check if the resource exists
-	var count int
-	if err := a.DB.Get(&count, "select count(id) from resources where id = $1", resource); err != nil {
-		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{
-				"message": "That resource could not be found",
-			})
-			return
-		}
-
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": errors.Wrap(err, "Could not find resource"),
-		})
-		return
-	}
+	resource := c.MustGet("resource").(*models.Resource)
 
 	var input struct {
 		Positive bool `json:"positive"`
@@ -88,7 +104,7 @@ func (a *API) voteResource(c *gin.Context) {
 
 	r := models.ResourceRating{
 		Account:  user.ID,
-		Resource: resource,
+		Resource: resource.ID,
 		Positive: input.Positive,
 	}
 
