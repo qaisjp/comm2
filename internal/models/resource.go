@@ -3,10 +3,10 @@ package models
 import "time"
 
 type Resource struct {
-	ID        uint64    `db:"id`
+	ID        uint64    `db:"id"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
-	Creator   uint64    `db:"creator"`
+	AuthorID  uint64    `db:"author_id"`
 
 	Name        string `db:"name"`
 	Title       string `db:"title"`
