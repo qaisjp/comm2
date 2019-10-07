@@ -34,7 +34,6 @@ func (a *API) createAccount(c *gin.Context) {
 	success, err := govalidator.ValidateStruct(&u)
 	if !success {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
 			"message": err.Error(),
 		})
 		return
@@ -50,7 +49,6 @@ func (a *API) createAccount(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
 			"message": errors.Wrapf(err, "could not check existence").Error(),
 		})
 		return
@@ -58,7 +56,6 @@ func (a *API) createAccount(c *gin.Context) {
 
 	if count > 0 {
 		c.JSON(http.StatusConflict, gin.H{
-			"status":  "error",
 			"message": "Account already exists with that username or email",
 		})
 		return
@@ -68,7 +65,6 @@ func (a *API) createAccount(c *gin.Context) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
 			"message": err.Error(),
 		})
 		return
