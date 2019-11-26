@@ -122,7 +122,6 @@ func (a *API) voteResource(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": errors.Wrap(err, "could not update").Error(),
 		})
-
 		return
 	}
 

@@ -3,6 +3,7 @@ module github.com/multitheftauto/community
 go 1.12
 
 require (
+	github.com/Masterminds/squirrel v1.1.0
 	github.com/appleboy/gin-jwt v0.0.0-20190409072159-633d983b91f0
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/fatih/camelcase v1.0.0 // indirect
