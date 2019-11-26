@@ -132,7 +132,8 @@ CREATE TABLE public.resource_packages (
     description text DEFAULT ''::text NOT NULL,
     version character varying(10) NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    author_id integer NOT NULL
+    author_id integer NOT NULL,
+    draft boolean DEFAULT true NOT NULL
 );
 
 
