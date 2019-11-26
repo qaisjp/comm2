@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -102,5 +103,68 @@ func (a *API) createResourcePackage(c *gin.Context) {
 
 func (a *API) getResourcePackage(c *gin.Context) {
 	resource := c.MustGet("resource_pkg").(*models.ResourcePackage)
-	c.JSON(http.StatusOK, resource)
+
+	// c.Header("Content-Disposition",
+	// c.Header("Cache-Control", "no-store")
+
+	r, err := a.Bucket.NewReader(c, resource.Filename, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+	}
+
+	c.DataFromReader(http.StatusOK, r.Size(), "application/zip", r, map[string]string{
+		"Cache-Control":       "no-store",
+		"Content-Disposition": fmt.Sprintf("attachment; filename=\"%s\"", resource.Filename),
+	})
+	// bytesWritten, copyErr := io.Copy(c.Writer, r)
+	// if copyErr != nil {
+	// 	fmt.Printf("Error copying file to the http response %s\n", copyErr.Error())
+	// 	return
+	// }
+	// fmt.Printf("%d bytes writte\n", bytesWritten)
+
+	// c.JSON(http.StatusOK, resource)
+}
+
+func (a *API) uploadResourcePackage(c *gin.Context) {
+	pkg := c.MustGet("resource_pkg").(*models.ResourcePackage)
+	header, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+	}
+
+	fmt.Println(header.Filename)
+	f, err := header.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+	}
+
+	w, err := a.Bucket.NewWriter(c, header.Filename, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+	}
+
+	bs, err := io.Copy(w, f)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+	}
+	fmt.Printf("%d bytes written\n", bs)
+
+	if err := w.Close(); err != nil {
+		fmt.Println("Could not close writer")
+	}
+	if err := f.Close(); err != nil {
+		fmt.Println("Could not close file")
+	}
+	c.JSON(http.StatusOK, pkg)
 }
