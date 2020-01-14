@@ -150,7 +150,5 @@ func (a *API) voteResource(c *gin.Context) {
 
 	fmt.Printf("%+v\n", result)
 
-	c.JSON(http.StatusNoContent, gin.H{
-		"status": "success",
-	})
+	c.Status(http.StatusNoContent)
 }
