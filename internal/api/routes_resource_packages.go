@@ -80,10 +80,7 @@ func (a *API) createResourcePackage(c *gin.Context) {
 		Description string `json:"description"`
 	}
 
-	if err := c.Bind(&input); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"message": err.Error(),
-		})
+	if err := c.BindJSON(&input); err != nil {
 		return
 	}
 

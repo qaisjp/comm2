@@ -74,10 +74,7 @@ func (a *API) createResource(c *gin.Context) {
 		Description string `json:"description"`
 	}
 
-	if err := c.Bind(&input); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"message": err.Error(),
-		})
+	if err := c.BindJSON(&input); err != nil {
 		return
 	}
 
@@ -124,10 +121,7 @@ func (a *API) voteResource(c *gin.Context) {
 		Positive bool `json:"positive"`
 	}
 
-	if err := c.Bind(&input); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"message": err.Error(),
-		})
+	if err := c.BindJSON(&input); err != nil {
 		return
 	}
 
