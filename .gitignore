@@ -3,6 +3,9 @@ mta-api
 dev_backup
 config.yaml
 
+# Exclude uploads directory
+uploads
+
 # Created by https://www.gitignore.io/api/go
 
 ### Go ###
