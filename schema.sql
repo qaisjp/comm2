@@ -568,7 +568,7 @@ ALTER TABLE ONLY public.resource_media
 --
 
 ALTER TABLE ONLY public.resource_media
-    ADD CONSTRAINT resource_media_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT resource_media_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -576,7 +576,7 @@ ALTER TABLE ONLY public.resource_media
 --
 
 ALTER TABLE ONLY public.resource_packages
-    ADD CONSTRAINT resource_packages_resources_id_fk FOREIGN KEY (resource_id) REFERENCES public.resources(id);
+    ADD CONSTRAINT resource_packages_resources_id_fk FOREIGN KEY (resource_id) REFERENCES public.resources(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -584,7 +584,7 @@ ALTER TABLE ONLY public.resource_packages
 --
 
 ALTER TABLE ONLY public.resource_packages
-    ADD CONSTRAINT resource_packages_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+    ADD CONSTRAINT resource_packages_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -592,7 +592,7 @@ ALTER TABLE ONLY public.resource_packages
 --
 
 ALTER TABLE ONLY public.resource_votes
-    ADD CONSTRAINT resource_votes_resource_fkey FOREIGN KEY (resource_id) REFERENCES public.resources(id);
+    ADD CONSTRAINT resource_votes_resource_fkey FOREIGN KEY (resource_id) REFERENCES public.resources(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -600,7 +600,7 @@ ALTER TABLE ONLY public.resource_votes
 --
 
 ALTER TABLE ONLY public.resource_votes
-    ADD CONSTRAINT resource_votes_user_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+    ADD CONSTRAINT resource_votes_user_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -608,7 +608,7 @@ ALTER TABLE ONLY public.resource_votes
 --
 
 ALTER TABLE ONLY public.resources
-    ADD CONSTRAINT resources_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+    ADD CONSTRAINT resources_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
