@@ -65,6 +65,27 @@ func (a *API) listResources(c *gin.Context) {
 	c.JSON(http.StatusOK, resources)
 }
 
+func (a *API) deleteResource(c *gin.Context) {
+	user := c.MustGet("user").(*models.User)
+	resource := c.MustGet("resource").(*models.Resource)
+
+	// Only the creator of a resource can delete it
+	if user.ID != resource.AuthorID {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "Only the creator of a resource can delete it",
+		})
+	}
+
+	_, err := a.QB.Delete("resources").Where("id = $1", resource.ID).ExecContext(c)
+	if err != nil {
+		a.Log.WithError(err).Errorln("could not delete resource")
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
+
 func (a *API) createResource(c *gin.Context) {
 	user := c.MustGet("user").(*models.User)
 

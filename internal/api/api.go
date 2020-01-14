@@ -62,7 +62,7 @@ func NewAPI(
 		Log:    log,
 		Gin:    router,
 		DB:     db,
-		QB:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
+		QB:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar).RunWith(db),
 		Bucket: bucket,
 	}
 
@@ -120,6 +120,8 @@ func NewAPI(
 		resources := v1.Group("/resources/:id", a.checkResource)
 		{
 			resources.GET("", a.getResource)
+			resources.DELETE("", authRequired, a.mustOwnResource, a.deleteResource)
+
 			resources.POST("/vote", authRequired, a.voteResource)
 
 			resources.POST("/new", authRequired, a.mustOwnResource, a.createResourcePackage)
