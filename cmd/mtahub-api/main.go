@@ -54,10 +54,10 @@ func main() {
 		"cstr":   cfg.Postgres.ConnectionString,
 	}).Info("Connected to a Postgres server")
 
-	// Create a resources directory.
-	const resourcesDir = "resources"
-	err = os.Mkdir(resourcesDir, 0755)
-	if err != nil && !os.IsExist(err) {
+	// Create a resources directory
+	const resourcesDir = "uploads/resources"
+	err = os.MkdirAll(resourcesDir, 0755)
+	if err != nil {
 		logger.WithError(err).Fatalln("Could not create resources directory")
 		return
 	}
