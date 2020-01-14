@@ -13,10 +13,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+// mustOwnResource is a middleware that ensures that the
+// authenticated user owns the resource being accessed.
+//
+// todo: mustOwnResource should support a resource_authors table
 func (a *API) mustOwnResource(c *gin.Context) {
+	// Get our user and resource
 	user := c.MustGet("user").(*models.User)
 	resource := c.MustGet("resource").(*models.Resource)
 
+	// Throw an error and abort if the author ID and user does not match
 	if resource.AuthorID != user.ID {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "You don't own that resource",
@@ -26,9 +32,12 @@ func (a *API) mustOwnResource(c *gin.Context) {
 	}
 }
 
+// checkResourcePkg is a middleware that verifies that the package id
+// exists for the current resource being accessed.
 func (a *API) checkResourcePkg(c *gin.Context) {
 	resource := c.MustGet("resource").(*models.Resource)
 
+	//
 	pkgID, err := strconv.ParseUint(c.Param("pkg_id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -61,6 +70,7 @@ func (a *API) checkResourcePkg(c *gin.Context) {
 	c.Set("resource_pkg", &pkg)
 }
 
+// createResourcePackage is an endpoint that creates a resource package draft
 func (a *API) createResourcePackage(c *gin.Context) {
 	fmt.Println("Upload resource package")
 	user := c.MustGet("user").(*models.User)
@@ -128,6 +138,7 @@ func (a *API) getResourcePackage(c *gin.Context) {
 	// c.JSON(http.StatusOK, resource)
 }
 
+// uploadResourcePackage is an endpoint that uploads a file to an existing resource package
 func (a *API) uploadResourcePackage(c *gin.Context) {
 	pkg := c.MustGet("resource_pkg").(*models.ResourcePackage)
 	header, err := c.FormFile("file")

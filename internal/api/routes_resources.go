@@ -44,6 +44,27 @@ func (a *API) checkResource(c *gin.Context) {
 	c.Set("resource", &resource)
 }
 
+// listResources is an endpoint that allows you to list and search through resources.
+//
+// todo:
+// - support authentication to include hidden stuff
+// - exclude hidden stuff for unauthenticated requests
+// - support search/filter fields
+// - support pagination / cursors
+func (a *API) listResources(c *gin.Context) {
+	var resources []*models.Resource
+	err := a.DB.SelectContext(c, &resources, "select * from resources;")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Internal server error",
+		})
+		a.Log.WithError(err).Errorln("could not select resources for listResources")
+		return
+	}
+
+	c.JSON(http.StatusOK, resources)
+}
+
 func (a *API) createResource(c *gin.Context) {
 	user := c.MustGet("user").(*models.User)
 
