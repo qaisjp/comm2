@@ -112,7 +112,7 @@ func NewAPI(
 			auth.POST("/register", a.createUser)
 		}
 
-		// v1.GET("/resources", resources.List)
+		v1.GET("/resources", a.listResources)
 		v1.POST("/resources", authRequired, a.createResource)
 		resources := v1.Group("/resources/:id", a.checkResource)
 		{
