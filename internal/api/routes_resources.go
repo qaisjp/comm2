@@ -81,6 +81,14 @@ func (a *API) createResource(c *gin.Context) {
 		return
 	}
 
+	// Expect at least a name to be set
+	if input.Name == "" {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"message": "You must provide a name",
+		})
+		return
+	}
+
 	r := models.Resource{
 		Name:        input.Name,
 		Title:       input.Title,
