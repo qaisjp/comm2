@@ -43,3 +43,6 @@ migrate::
 
 migrate_new::
 	${MIGRATE} create -ext sql -dir database/migrations ${NAME}
+
+dev_run:
+	config=config.yaml gin --notifications -i --path="." -d "cmd/mtahub-api" --appPort 8080 --port 9999 --bin "cmd/mtahub-api/mtahub-api" run main.go
