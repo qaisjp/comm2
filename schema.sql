@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.5
--- Dumped by pg_dump version 11.5
+-- Dumped from database version 12.1
+-- Dumped by pg_dump version 12.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -18,7 +18,7 @@ SET row_security = off;
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: resource_collaborators; Type: TABLE; Schema: public; Owner: -
@@ -162,8 +162,8 @@ ALTER SEQUENCE public.resource_packages_id_seq OWNED BY public.resource_packages
 --
 
 CREATE TABLE public.resource_votes (
-    account integer NOT NULL,
-    resource integer NOT NULL,
+    user_id integer NOT NULL,
+    resource_id integer NOT NULL,
     positive boolean NOT NULL
 );
 
@@ -416,7 +416,7 @@ ALTER TABLE ONLY public.resource_packages
 --
 
 ALTER TABLE ONLY public.resource_votes
-    ADD CONSTRAINT resource_votes_pkey PRIMARY KEY (account, resource);
+    ADD CONSTRAINT resource_votes_pkey PRIMARY KEY (user_id, resource_id);
 
 
 --
@@ -588,19 +588,19 @@ ALTER TABLE ONLY public.resource_packages
 
 
 --
--- Name: resource_votes resource_votes_account_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.resource_votes
-    ADD CONSTRAINT resource_votes_account_fkey FOREIGN KEY (account) REFERENCES public.users(id);
-
-
---
 -- Name: resource_votes resource_votes_resource_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resource_votes
-    ADD CONSTRAINT resource_votes_resource_fkey FOREIGN KEY (resource) REFERENCES public.resources(id);
+    ADD CONSTRAINT resource_votes_resource_fkey FOREIGN KEY (resource_id) REFERENCES public.resources(id);
+
+
+--
+-- Name: resource_votes resource_votes_user_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resource_votes
+    ADD CONSTRAINT resource_votes_user_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
@@ -667,8 +667,8 @@ ALTER TABLE ONLY public.user_tokens
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.5
--- Dumped by pg_dump version 11.5
+-- Dumped from database version 12.1
+-- Dumped by pg_dump version 12.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -686,7 +686,7 @@ SET row_security = off;
 --
 
 COPY public.schema_migrations (version, dirty) FROM stdin;
-20190527233803	f
+20200114225241	f
 \.
 
 

@@ -1,6 +1,6 @@
 package models
 
 type ResourceDep struct {
-	Package   uint64 `db:"package"`    // package
+	PackageID uint64 `db:"package_id"` // package
 	DependsOn uint64 `db:"depends_on"` // package
 }

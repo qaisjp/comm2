@@ -126,9 +126,9 @@ func (a *API) voteResource(c *gin.Context) {
 	}
 
 	r := models.ResourceRating{
-		Account:  user.ID,
-		Resource: resource.ID,
-		Positive: input.Positive,
+		UserID:     user.ID,
+		ResourceID: resource.ID,
+		Positive:   input.Positive,
 	}
 
 	result, err := a.DB.NamedExec(

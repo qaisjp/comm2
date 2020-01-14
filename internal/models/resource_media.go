@@ -7,10 +7,10 @@ type ResourceMedia struct {
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 
-	Resource    uint64 `db:"resource"` // relation
+	ResourceID  uint64 `db:"resource_id"` // relation
 	Title       string `db:"title"`
 	Description string `db:"description"`
-	Author      uint64 `db:"author"` // user - the person who uploaded the media
+	AuthorID    uint64 `db:"author_id"` // user - the person who uploaded the media
 
 	Type int `db:"type"` // image or video?
 
