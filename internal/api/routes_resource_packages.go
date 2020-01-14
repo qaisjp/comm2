@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 
-	sq "github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
 	"github.com/multitheftauto/community/internal/models"
 	"github.com/pkg/errors"
@@ -84,8 +83,7 @@ func (a *API) createResourcePackage(c *gin.Context) {
 		return
 	}
 
-	qb := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
-	s, args, err := qb.Insert("resource_packages").Columns("resource_id", "author_id", "description", "draft", "filename", "version").Values(resource.ID, user.ID, input.Description, true, "", "").ToSql()
+	s, args, err := a.QB.Insert("resource_packages").Columns("resource_id", "author_id", "description", "draft", "filename", "version").Values(resource.ID, user.ID, input.Description, true, "", "").ToSql()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Yikes"})
 		return
