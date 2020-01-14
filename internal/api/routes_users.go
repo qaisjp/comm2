@@ -17,11 +17,7 @@ func (a *API) createUser(c *gin.Context) {
 		Email    string `json:"email" valid:"email,stringlength(1|254),required"`
 	}
 
-	if err := c.Bind(&input); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"status":  "error",
-			"message": err.Error(),
-		})
+	if err := c.BindJSON(&input); err != nil {
 		return
 	}
 
