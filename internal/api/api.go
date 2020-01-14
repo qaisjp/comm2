@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
 	jwt "github.com/appleboy/gin-jwt"
 	"github.com/multitheftauto/community/internal/config"
 	"gocloud.dev/blob"
@@ -22,6 +23,7 @@ type API struct {
 	Log    *logrus.Logger
 	Gin    *gin.Engine
 	DB     *sqlx.DB
+	QB     sq.StatementBuilderType
 
 	Server *http.Server
 }
@@ -60,6 +62,7 @@ func NewAPI(
 		Log:    log,
 		Gin:    router,
 		DB:     db,
+		QB:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		Bucket: bucket,
 	}
 
