@@ -71,7 +71,7 @@ func (a *API) checkResource(c *gin.Context) {
 // - support search/filter fields
 // - support pagination / cursors
 func (a *API) listResources(c *gin.Context) {
-	var resources []*Resource
+	resources := []*Resource{}
 	err := a.DB.SelectContext(c, &resources, "select * from resources;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
