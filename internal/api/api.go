@@ -8,6 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	jwt "github.com/appleboy/gin-jwt"
 	"github.com/multitheftauto/community/internal/config"
+	"github.com/multitheftauto/community/internal/models"
 	"gocloud.dev/blob"
 
 	"github.com/gin-contrib/cors"
@@ -105,6 +106,16 @@ func NewAPI(
 
 	// Create JWT middleware
 	authRequired := authMiddleware.MiddlewareFunc()
+	authMaybeRequired := func(ctx *gin.Context) {
+		// Only execute auth if header present
+		if _, ok := ctx.Request.Header["Authorization"]; ok {
+			authRequired(ctx)
+			return
+		}
+
+		var user *models.User
+		ctx.Set("user", user)
+	}
 
 	v1 := router.Group("/v1")
 	{
