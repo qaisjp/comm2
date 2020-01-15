@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"errors"
 
 	jwt "github.com/appleboy/gin-jwt"
@@ -42,13 +43,17 @@ func (a *API) jwtAuthenticator(c *gin.Context) (_ interface{}, err error) {
 	var user models.User
 
 	err = a.DB.Get(&user, "select id, password, is_activated from users where (email = $1) or (username = $1) limit 1", input.Username)
-	if err != nil {
-		return "", err
+	if err == sql.ErrNoRows {
+		return "", errors.New("no such user")
+	} else if err != nil {
+		a.Log.WithError(err).Errorln("failed to select user during login")
+		return "", errors.New("internal server error")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
 	if err != nil {
-		return "", err
+		a.Log.WithError(err).Errorln("bcrypt comparison failed during user login")
+		return "", errors.New("internal server error")
 	}
 
 	if !user.Activated {
