@@ -234,3 +234,43 @@ func (a *API) voteResource(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+func (a *API) listResourcePackages(ctx *gin.Context) {
+	resource := ctx.MustGet("resource").(*models.Resource)
+	user := ctx.MustGet("user").(*models.User)
+
+	if user != nil {
+		manages, err := a.canUserManageResource(ctx, user.ID, resource.ID)
+		if err != nil {
+			a.Log.WithError(err).Errorln("failed to check if user manages resource")
+			ctx.Status(http.StatusInternalServerError)
+			return
+		}
+
+		// Unset user if they are not a manager
+		if !manages {
+			user = nil
+		}
+	}
+
+	q := a.QB.Select("*").From("resource_packages").Where("resource_id = $1", resource.ID)
+	if user == nil {
+		q = q.Where("not draft")
+	}
+
+	query, values, err := q.ToSql()
+	if err != nil {
+		a.Log.WithError(err).Errorln("could not convert to sql")
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
+
+	rows := []*models.ResourcePackage{}
+	if err := a.DB.SelectContext(ctx, &rows, query, values...); err != nil {
+		a.Log.WithError(err).Errorln("could not retrieve resource packages")
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, rows)
+}
