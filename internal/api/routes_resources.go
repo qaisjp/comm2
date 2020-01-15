@@ -30,6 +30,47 @@ func (a *API) mustOwnResource(c *gin.Context) {
 	}
 }
 
+// canUserManageResource checks if a given user can manage a given resource
+func (a *API) canUserManageResource(ctx *gin.Context, userID uint64, resourceID uint64) (canAccess bool, err error) {
+	// Check the resource from context if the resource ID matches
+	if data, ok := ctx.Get("resource"); ok {
+		resource := data.(*models.Resource)
+		if resource.ID != resourceID {
+			// If they are the owner, return true
+			if resource.AuthorID == userID {
+				fmt.Println("quik owner")
+				return true, nil
+			}
+
+			// Otherwise just check the resource_collaborators table
+			err = a.QB.Select("true").From("resource_collaborators").
+				Where("accepted AND resource_id = $1 AND user_id = $2", resourceID, userID).
+				ScanContext(ctx, &canAccess)
+
+			if err == sql.ErrNoRows {
+				err = nil
+			} else if err != nil {
+				err = errors.Wrap(err, "sql query failed")
+			}
+
+			return
+		}
+	}
+
+	err = a.DB.GetContext(ctx, &canAccess, `
+		select true from resource_collaborators where accepted and resource_id = $1 and user_id = $2
+			union distinct
+		select true from resources where id = $1 and author_id = $2
+	`, resourceID, userID)
+
+	// If the error is a lack of rows, suppress it
+	if err == sql.ErrNoRows {
+		err = nil
+	}
+
+	return
+}
+
 func (a *API) checkResource(c *gin.Context) {
 	resourceID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
