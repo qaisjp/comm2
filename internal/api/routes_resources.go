@@ -143,6 +143,7 @@ func (a *API) voteResource(c *gin.Context) {
 	}
 
 	if err := c.BindJSON(&input); err != nil {
+		a.Log.WithError(err).Errorln("could not BindJSON")
 		return
 	}
 
@@ -154,9 +155,9 @@ func (a *API) voteResource(c *gin.Context) {
 
 	result, err := a.DB.NamedExec(
 		`insert into resource_votes
-		(resource, account, positive)
-		values (:resource, :account, :positive)
-		on conflict (resource, account)
+		(resource_id, user_id, positive)
+		values (:resource_id, :user_id, :positive)
+		on conflict (resource_id, user_id)
 		do update set positive = :positive
 		`,
 		&r,
