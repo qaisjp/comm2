@@ -124,8 +124,8 @@ func NewAPI(
 
 			resources.POST("/vote", authRequired, a.voteResource)
 
-			resources.POST("/new", authRequired, a.mustOwnResource, a.createResourcePackage)
-			pkg := resources.Group("/:pkg_id", a.checkResourcePkg)
+			resources.POST("/pkg", authRequired, a.mustOwnResource, a.createResourcePackage)
+			pkg := resources.Group("/pkg/:pkg_id", a.checkResourcePkg)
 			{
 				pkg.GET("", a.getResourcePackage)
 				pkg.PUT("/upload", authRequired, a.mustOwnResource, a.uploadResourcePackage)

@@ -71,7 +71,6 @@ func (a *API) checkResourcePkg(c *gin.Context) {
 
 // createResourcePackage is an endpoint that creates a resource package draft
 func (a *API) createResourcePackage(c *gin.Context) {
-	fmt.Println("Upload resource package")
 	user := c.MustGet("user").(*models.User)
 	resource := c.MustGet("resource").(*models.Resource)
 
@@ -83,27 +82,19 @@ func (a *API) createResourcePackage(c *gin.Context) {
 		return
 	}
 
-	s, args, err := a.QB.Insert("resource_packages").Columns("resource_id", "author_id", "description", "draft", "filename", "version").Values(resource.ID, user.ID, input.Description, true, "", "").ToSql()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Yikes"})
-		return
-	}
-	fmt.Printf("sql: %#v\nargs:%#v\nerr: %#v", s, args, err)
-
-	result, err := a.DB.Exec(s, args...)
-
-	// result, err := a.DB.NamedExec("insert into resource_packages (resource_id, author_id, description, author_id) values (:name, :title, :description, :author_id)", &r)
+	var id int64
+	err := a.QB.Insert("resource_packages").
+		Columns("resource_id", "author_id", "description", "draft", "filename", "version").
+		Values(resource.ID, user.ID, input.Description, true, "", "").Suffix("RETURNING id").
+		ScanContext(c, &id)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": errors.Wrap(err, "could not insert").Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+		a.Log.WithError(err).Errorln("database error creating resource package")
 		return
 	}
 
-	fmt.Printf("Result: %#v\n", result)
-
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, gin.H{"package_id": id})
 }
 
 func (a *API) getResourcePackage(c *gin.Context) {
