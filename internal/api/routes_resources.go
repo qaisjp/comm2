@@ -18,7 +18,7 @@ import (
 func (a *API) mustOwnResource(c *gin.Context) {
 	// Get our user and resource
 	user := c.MustGet("user").(*models.User)
-	resource := c.MustGet("resource").(*models.Resource)
+	resource := c.MustGet("resource").(*Resource)
 
 	// Throw an error and abort if the author ID and user does not match
 	if resource.AuthorID != user.ID {
@@ -28,47 +28,6 @@ func (a *API) mustOwnResource(c *gin.Context) {
 		c.Abort()
 		return
 	}
-}
-
-// canUserManageResource checks if a given user can manage a given resource
-func (a *API) canUserManageResource(ctx *gin.Context, userID uint64, resourceID uint64) (canAccess bool, err error) {
-	// Check the resource from context if the resource ID matches
-	if data, ok := ctx.Get("resource"); ok {
-		resource := data.(*models.Resource)
-		if resource.ID != resourceID {
-			// If they are the owner, return true
-			if resource.AuthorID == userID {
-				fmt.Println("quik owner")
-				return true, nil
-			}
-
-			// Otherwise just check the resource_collaborators table
-			err = a.QB.Select("true").From("resource_collaborators").
-				Where("accepted AND resource_id = $1 AND user_id = $2", resourceID, userID).
-				ScanContext(ctx, &canAccess)
-
-			if err == sql.ErrNoRows {
-				err = nil
-			} else if err != nil {
-				err = errors.Wrap(err, "sql query failed")
-			}
-
-			return
-		}
-	}
-
-	err = a.DB.GetContext(ctx, &canAccess, `
-		select true from resource_collaborators where accepted and resource_id = $1 and user_id = $2
-			union distinct
-		select true from resources where id = $1 and author_id = $2
-	`, resourceID, userID)
-
-	// If the error is a lack of rows, suppress it
-	if err == sql.ErrNoRows {
-		err = nil
-	}
-
-	return
 }
 
 func (a *API) checkResource(c *gin.Context) {
@@ -82,7 +41,7 @@ func (a *API) checkResource(c *gin.Context) {
 	}
 
 	// Check if the resource exists
-	var resource models.Resource
+	var resource Resource
 	if err := a.DB.Get(&resource, "select * from resources where id = $1", resourceID); err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -112,7 +71,7 @@ func (a *API) checkResource(c *gin.Context) {
 // - support search/filter fields
 // - support pagination / cursors
 func (a *API) listResources(c *gin.Context) {
-	var resources []*models.Resource
+	var resources []*Resource
 	err := a.DB.SelectContext(c, &resources, "select * from resources;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -127,7 +86,7 @@ func (a *API) listResources(c *gin.Context) {
 
 func (a *API) deleteResource(c *gin.Context) {
 	user := c.MustGet("user").(*models.User)
-	resource := c.MustGet("resource").(*models.Resource)
+	resource := c.MustGet("resource").(*Resource)
 
 	// Only the creator of a resource can delete it
 	if user.ID != resource.AuthorID {
@@ -167,7 +126,7 @@ func (a *API) createResource(c *gin.Context) {
 		return
 	}
 
-	r := models.Resource{
+	r := Resource{
 		Name:        input.Name,
 		Title:       input.Title,
 		Description: input.Description,
@@ -190,13 +149,13 @@ func (a *API) createResource(c *gin.Context) {
 }
 
 func (a *API) getResource(c *gin.Context) {
-	resource := c.MustGet("resource").(*models.Resource)
+	resource := c.MustGet("resource").(*Resource)
 	c.JSON(http.StatusOK, resource)
 }
 
 func (a *API) voteResource(c *gin.Context) {
 	user := c.MustGet("user").(*models.User)
-	resource := c.MustGet("resource").(*models.Resource)
+	resource := c.MustGet("resource").(*Resource)
 
 	var input struct {
 		Positive bool `json:"positive"`
@@ -207,7 +166,7 @@ func (a *API) voteResource(c *gin.Context) {
 		return
 	}
 
-	r := models.ResourceRating{
+	r := ResourceRating{
 		UserID:     user.ID,
 		ResourceID: resource.ID,
 		Positive:   input.Positive,
@@ -236,7 +195,7 @@ func (a *API) voteResource(c *gin.Context) {
 }
 
 func (a *API) listResourcePackages(ctx *gin.Context) {
-	resource := ctx.MustGet("resource").(*models.Resource)
+	resource := ctx.MustGet("resource").(*Resource)
 	user := ctx.MustGet("user").(*models.User)
 
 	if user != nil {
@@ -265,7 +224,7 @@ func (a *API) listResourcePackages(ctx *gin.Context) {
 		return
 	}
 
-	rows := []*models.ResourcePackage{}
+	rows := []*ResourcePackage{}
 	if err := a.DB.SelectContext(ctx, &rows, query, values...); err != nil {
 		a.Log.WithError(err).Errorln("could not retrieve resource packages")
 		ctx.Status(http.StatusInternalServerError)

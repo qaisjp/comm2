@@ -15,7 +15,7 @@ import (
 // checkResourcePkg is a middleware that verifies that the package id
 // exists for the current resource being accessed.
 func (a *API) checkResourcePkg(c *gin.Context) {
-	resource := c.MustGet("resource").(*models.Resource)
+	resource := c.MustGet("resource").(*Resource)
 
 	// Parse pkg_id param
 	pkgID, err := strconv.ParseUint(c.Param("pkg_id"), 10, 64)
@@ -28,7 +28,7 @@ func (a *API) checkResourcePkg(c *gin.Context) {
 	}
 
 	// Check if the resource package exists
-	var pkg models.ResourcePackage
+	var pkg ResourcePackage
 	if err := a.DB.Get(&pkg, "select * from resource_packages where id = $1 and resource_id = $2", pkgID, resource.ID); err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -53,7 +53,7 @@ func (a *API) checkResourcePkg(c *gin.Context) {
 // createResourcePackage is an endpoint that creates a resource package draft
 func (a *API) createResourcePackage(c *gin.Context) {
 	user := c.MustGet("user").(*models.User)
-	resource := c.MustGet("resource").(*models.Resource)
+	resource := c.MustGet("resource").(*Resource)
 
 	var input struct {
 		Description string `json:"description"`
@@ -79,7 +79,7 @@ func (a *API) createResourcePackage(c *gin.Context) {
 }
 
 func (a *API) getResourcePackage(c *gin.Context) {
-	resource := c.MustGet("resource_pkg").(*models.ResourcePackage)
+	resource := c.MustGet("resource_pkg").(*ResourcePackage)
 
 	// c.Header("Content-Disposition",
 	// c.Header("Cache-Control", "no-store")
@@ -107,7 +107,7 @@ func (a *API) getResourcePackage(c *gin.Context) {
 
 // uploadResourcePackage is an endpoint that uploads a file to an existing resource package
 func (a *API) uploadResourcePackage(c *gin.Context) {
-	pkg := c.MustGet("resource_pkg").(*models.ResourcePackage)
+	pkg := c.MustGet("resource_pkg").(*ResourcePackage)
 	header, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
