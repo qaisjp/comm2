@@ -79,6 +79,29 @@ func (a *API) createResourcePackage(c *gin.Context) {
 }
 
 func (a *API) getResourcePackage(c *gin.Context) {
+	pkg := c.MustGet("resource_pkg").(*ResourcePackage)
+	user := c.MustGet("user").(*models.User)
+	if pkg.Draft {
+		ok := false
+		if user != nil {
+			var err error
+			ok, err = a.canUserManageResource(c, user.ID, pkg.ResourceID)
+			if err != nil {
+				a.Log.WithError(err).Errorln("could not download package")
+				c.Status(http.StatusInternalServerError)
+				return
+			}
+		}
+
+		if !ok {
+			c.JSON(http.StatusNotFound, gin.H{"message": "That package does not exist"})
+			return
+		}
+	}
+	c.JSON(http.StatusOK, pkg)
+}
+
+func (a *API) downloadResourcePackage(c *gin.Context) {
 	resource := c.MustGet("resource_pkg").(*ResourcePackage)
 
 	// c.Header("Content-Disposition",
