@@ -105,11 +105,21 @@ func NewAPI(
 	}
 
 	// Create JWT middleware
-	authRequired := authMiddleware.MiddlewareFunc()
+	authMiddlewareFunc := authMiddleware.MiddlewareFunc()
+	authRequired := func(ctx *gin.Context) {
+		user := ctx.MustGet("user").(*models.User)
+		if user == nil {
+			ctx.Header("WWW-Authenticate", "JWT realm="+authMiddleware.Realm)
+			ctx.Abort()
+			ctx.JSON(http.StatusUnauthorized, gin.H{
+				"message": "You must be logged in to perform that operation.",
+			})
+		}
+	}
 	authMaybeRequired := func(ctx *gin.Context) {
 		// Only execute auth if header present
 		if _, ok := ctx.Request.Header["Authorization"]; ok {
-			authRequired(ctx)
+			authMiddlewareFunc(ctx)
 			return
 		}
 
@@ -117,7 +127,7 @@ func NewAPI(
 		ctx.Set("user", user)
 	}
 
-	v1 := router.Group("/v1")
+	v1 := router.Group("/v1", authMaybeRequired)
 	{
 		auth := v1.Group("/auth")
 		{
