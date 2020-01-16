@@ -13,19 +13,20 @@ import (
 
 // mustOwnResource is a middleware that ensures that the
 // authenticated user owns the resource being accessed.
-//
-// todo: mustOwnResource should support a resource_authors table
-func (a *API) mustOwnResource(c *gin.Context) {
+func (a *API) mustOwnResource(ctx *gin.Context) {
 	// Get our user and resource
-	user := c.MustGet("user").(*models.User)
-	resource := c.MustGet("resource").(*Resource)
+	user := ctx.MustGet("user").(*models.User)
+	resource := ctx.MustGet("resource").(*Resource)
 
 	// Throw an error and abort if the author ID and user does not match
-	if resource.AuthorID != user.ID {
-		c.JSON(http.StatusUnauthorized, gin.H{
+	if ok, err := a.canUserManageResource(ctx, user.ID, resource.ID); err != nil {
+		ctx.Status(http.StatusInternalServerError)
+		return
+	} else if !ok {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"message": "You don't own that resource",
 		})
-		c.Abort()
+		ctx.Abort()
 		return
 	}
 }
