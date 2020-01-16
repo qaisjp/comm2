@@ -132,13 +132,28 @@ func (a *API) downloadResourcePackage(c *gin.Context) {
 func (a *API) uploadResourcePackage(c *gin.Context) {
 	pkg := c.MustGet("resource_pkg").(*ResourcePackage)
 	header, err := c.FormFile("file")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+	if err == http.ErrNotMultipart {
+		c.Status(http.StatusUnsupportedMediaType)
+		c.JSON(http.StatusUnsupportedMediaType, gin.H{"message": err.Error()})
+		return
+	} else if err == http.ErrMissingFile {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "missing file"})
+		return
+	} else if err != nil {
+		a.Log.WithError(err).Errorln("could not upload package")
+		c.Status(http.StatusInternalServerError)
+		return
 	}
 
-	fmt.Println(header.Filename)
+	filename := "pkg" + strconv.FormatUint(pkg.ID, 10) + ".zip"
+
+	// Make sure the file is a zip
+	if typ := header.Header.Get("Content-Type"); typ != "application/zip" {
+		c.Status(http.StatusUnsupportedMediaType)
+		c.JSON(http.StatusUnsupportedMediaType, gin.H{"message": "Expected zip, got " + typ})
+		return
+	}
+
 	f, err := header.Open()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -146,7 +161,7 @@ func (a *API) uploadResourcePackage(c *gin.Context) {
 		})
 	}
 
-	w, err := a.Bucket.NewWriter(c, header.Filename, nil)
+	w, err := a.Bucket.NewWriter(c, filename, nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
