@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -157,16 +158,24 @@ func (a *API) uploadResourcePackage(c *gin.Context) {
 		return
 	}
 
-	f, err := header.Open()
-	if err != nil {
+	var zipBody []byte
+	if f, err := header.Open(); err != nil {
 		a.Log.WithError(err).Errorln("could not open file header's associated file when uploading package")
+		c.Status(http.StatusInternalServerError)
+		return
+	} else if zipBody, err = ioutil.ReadAll(f); err != nil {
+		a.Log.WithError(err).Errorln("could not read zip body when uploading package")
+		c.Status(http.StatusInternalServerError)
+		return
+	} else if err := f.Close(); err != nil {
+		a.Log.WithError(err).Errorln("could not close input file when uploading package")
 		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	var fCopy bytes.Buffer
-	tee := io.TeeReader(f, &fCopy)
-	if ok, reason, err := resource.CheckResourceZip(tee); err != nil {
+	f := bytes.NewReader(zipBody)
+
+	if ok, reason, err := resource.CheckResourceZip(f, int64(len(zipBody))); err != nil {
 		a.Log.WithError(err).Errorln("failed to check resource zip when uploading package")
 		c.Status(http.StatusInternalServerError)
 		return
@@ -184,7 +193,13 @@ func (a *API) uploadResourcePackage(c *gin.Context) {
 		return
 	}
 
-	if _, err := io.Copy(w, &fCopy); err != nil {
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
+		a.Log.WithError(err).Errorln("could not seek to start of file when uploading package")
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	if _, err := io.Copy(w, f); err != nil {
 		a.Log.WithError(err).Errorln("could not copy from request to bucket when uploading package")
 		c.Status(http.StatusInternalServerError)
 		return
@@ -192,11 +207,6 @@ func (a *API) uploadResourcePackage(c *gin.Context) {
 
 	if err := w.Close(); err != nil {
 		a.Log.WithError(err).Errorln("could not close writer when uploading package")
-		c.Status(http.StatusInternalServerError)
-		return
-	}
-	if err := f.Close(); err != nil {
-		a.Log.WithError(err).Errorln("could not close reader when uploading package")
 		c.Status(http.StatusInternalServerError)
 		return
 	}
