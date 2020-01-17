@@ -5,23 +5,48 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"os"
 	fpath "path/filepath"
+	"plugin"
 	"regexp"
 
 	"github.com/pkg/errors"
 )
 
-var bannedExtensions = map[string]struct{}{
-	".exe": struct{}{},
-	".com": struct{}{},
-	".bat": struct{}{},
-}
+var securityPlugin *plugin.Plugin
+
+var bannedExtensions = map[string]struct{}{}
 
 var allowedResourceTypes = map[string]struct{}{
 	"gamemode": struct{}{},
 	"map":      struct{}{},
 	"script":   struct{}{},
 	"misc":     struct{}{},
+}
+
+func init() {
+	secpath := os.Getenv("MTAHUB_SECURITY_PLUGIN")
+	if secpath == "" {
+		return
+	}
+
+	var err error
+	securityPlugin, err = plugin.Open(secpath)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	beS, err := securityPlugin.Lookup("BannedExtensions")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	beMp, ok := beS.(*map[string]struct{})
+	if !ok {
+		panic("could not load BannedExtensions")
+	}
+
+	bannedExtensions = *beMp
 }
 
 // CheckResourceZip decodes an input zip and checks if the resource is ok
@@ -32,6 +57,7 @@ func CheckResourceZip(f io.ReaderAt, size int64) (ok bool, reason string, err er
 	}
 
 	var metaZipfile *zip.File
+	fmt.Printf("bannedExtensions %#v\n", bannedExtensions)
 
 	for _, file := range r.File {
 		fileInfo := file.FileInfo()
