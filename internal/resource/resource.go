@@ -1,16 +1,17 @@
 package resource
 
 import (
+	"archive/zip"
 	"io"
-	"io/ioutil"
+	"strconv"
 )
 
 // CheckResourceZip decodes an input zip and checks if the resource is ok
-func CheckResourceZip(f io.Reader) (ok bool, reason string, err error) {
-	_, err = ioutil.ReadAll(f)
+func CheckResourceZip(f io.ReaderAt, size int64) (ok bool, reason string, err error) {
+	r, err := zip.NewReader(f, size)
 	if err != nil {
 		return
 	}
 
-	return true, "unimplemented", nil
+	return false, strconv.Itoa(len(r.File)) + " files", nil
 }
