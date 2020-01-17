@@ -1,14 +1,17 @@
 package api
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/multitheftauto/community/internal/models"
+	"github.com/multitheftauto/community/internal/resource"
+
+	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
 
@@ -161,6 +164,19 @@ func (a *API) uploadResourcePackage(c *gin.Context) {
 		return
 	}
 
+	var fCopy bytes.Buffer
+	tee := io.TeeReader(f, &fCopy)
+	if ok, reason, err := resource.CheckResourceZip(tee); err != nil {
+		a.Log.WithError(err).Errorln("failed to check resource zip when uploading package")
+		c.Status(http.StatusInternalServerError)
+		return
+	} else if !ok {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"message": reason,
+		}) // todo(report): explain we picked this status code because https://httpstatuses.com/422
+		return
+	}
+
 	w, err := a.Bucket.NewWriter(c, filename, nil)
 	if err != nil {
 		a.Log.WithError(err).Errorln("could not create new bucket writer when uploading package")
@@ -168,7 +184,7 @@ func (a *API) uploadResourcePackage(c *gin.Context) {
 		return
 	}
 
-	if _, err := io.Copy(w, f); err != nil {
+	if _, err := io.Copy(w, &fCopy); err != nil {
 		a.Log.WithError(err).Errorln("could not copy from request to bucket when uploading package")
 		c.Status(http.StatusInternalServerError)
 		return
