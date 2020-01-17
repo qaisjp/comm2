@@ -156,31 +156,33 @@ func (a *API) uploadResourcePackage(c *gin.Context) {
 
 	f, err := header.Open()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		a.Log.WithError(err).Errorln("could not open file header's associated file when uploading package")
+		c.Status(http.StatusInternalServerError)
+		return
 	}
 
 	w, err := a.Bucket.NewWriter(c, filename, nil)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		a.Log.WithError(err).Errorln("could not create new bucket writer when uploading package")
+		c.Status(http.StatusInternalServerError)
+		return
 	}
 
-	bs, err := io.Copy(w, f)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+	if _, err := io.Copy(w, f); err != nil {
+		a.Log.WithError(err).Errorln("could not copy from request to bucket when uploading package")
+		c.Status(http.StatusInternalServerError)
+		return
 	}
-	fmt.Printf("%d bytes written\n", bs)
 
 	if err := w.Close(); err != nil {
-		fmt.Println("Could not close writer")
+		a.Log.WithError(err).Errorln("could not close writer when uploading package")
+		c.Status(http.StatusInternalServerError)
+		return
 	}
 	if err := f.Close(); err != nil {
-		fmt.Println("Could not close file")
+		a.Log.WithError(err).Errorln("could not close reader when uploading package")
+		c.Status(http.StatusInternalServerError)
+		return
 	}
 	c.JSON(http.StatusOK, pkg)
 }
