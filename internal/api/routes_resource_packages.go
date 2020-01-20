@@ -50,6 +50,14 @@ func (a *API) checkResourcePkg(c *gin.Context) {
 		return
 	}
 
+	// If draft, run mustOwnResource middleware
+	if pkg.Draft {
+		a.mustOwnResource(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
 	// Store the resource package
 	c.Set("resource_pkg", &pkg)
 }
