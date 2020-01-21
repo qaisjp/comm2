@@ -16,11 +16,18 @@ import (
 func (a *API) mustOwnResource(ctx *gin.Context) {
 	// Get our user and resource
 	user := ctx.MustGet("user").(*models.User)
+	if user == nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Authentication required."})
+		ctx.Abort()
+		return
+	}
+
 	resource := ctx.MustGet("resource").(*Resource)
 
 	// Throw an error and abort if the author ID and user does not match
 	if ok, err := a.canUserManageResource(ctx, user.ID, resource.ID); err != nil {
 		ctx.Status(http.StatusInternalServerError)
+		ctx.Abort()
 		return
 	} else if !ok {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
