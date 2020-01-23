@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/multitheftauto/community/internal/models"
 	"github.com/pkg/errors"
 )
 
@@ -15,7 +14,7 @@ import (
 // authenticated user owns the resource being accessed.
 func (a *API) mustOwnResource(ctx *gin.Context) {
 	// Get our user and resource
-	user := ctx.MustGet("user").(*models.User)
+	user := ctx.MustGet("current_user").(*User)
 	if user == nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Authentication required."})
 		ctx.Abort()
@@ -93,7 +92,7 @@ func (a *API) listResources(c *gin.Context) {
 }
 
 func (a *API) deleteResource(c *gin.Context) {
-	user := c.MustGet("user").(*models.User)
+	user := c.MustGet("current_user").(*User)
 	resource := c.MustGet("resource").(*Resource)
 
 	// Only the creator of a resource can delete it
@@ -114,7 +113,7 @@ func (a *API) deleteResource(c *gin.Context) {
 }
 
 func (a *API) createResource(c *gin.Context) {
-	user := c.MustGet("user").(*models.User)
+	user := c.MustGet("current_user").(*User)
 
 	var input struct {
 		Name        string `json:"name"`
@@ -162,7 +161,7 @@ func (a *API) getResource(c *gin.Context) {
 }
 
 func (a *API) voteResource(c *gin.Context) {
-	user := c.MustGet("user").(*models.User)
+	user := c.MustGet("current_user").(*User)
 	resource := c.MustGet("resource").(*Resource)
 
 	var input struct {
@@ -204,7 +203,7 @@ func (a *API) voteResource(c *gin.Context) {
 
 func (a *API) listResourcePackages(ctx *gin.Context) {
 	resource := ctx.MustGet("resource").(*Resource)
-	user := ctx.MustGet("user").(*models.User)
+	user := ctx.MustGet("current_user").(*User)
 
 	if user != nil {
 		manages, err := a.canUserManageResource(ctx, user.ID, resource.ID)

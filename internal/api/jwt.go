@@ -7,7 +7,6 @@ import (
 	jwt "github.com/appleboy/gin-jwt"
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
-	"github.com/multitheftauto/community/internal/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -40,7 +39,7 @@ func (a *API) jwtAuthenticator(c *gin.Context) (_ interface{}, err error) {
 		return "", err
 	}
 
-	var user models.User
+	var user User
 
 	err = a.DB.Get(&user, "select id, password, is_activated from users where (email = $1) or (username = $1) limit 1", input.Username)
 	if err == sql.ErrNoRows {
@@ -67,7 +66,7 @@ func (a *API) jwtIdentityHandler(c *gin.Context) interface{} {
 	claims := jwt.ExtractClaims(c)
 	userID := int(claims["id"].(float64))
 
-	var user models.User
+	var user User
 	if err := a.DB.Get(&user, "select * from users where id = $1", userID); err != nil {
 		panic(err.Error())
 	}
@@ -76,7 +75,7 @@ func (a *API) jwtIdentityHandler(c *gin.Context) interface{} {
 }
 
 func (a *API) jwtPayloadFunc(data interface{}) jwt.MapClaims {
-	if v, ok := data.(*models.User); ok {
+	if v, ok := data.(*User); ok {
 		return jwt.MapClaims{
 			"id": v.ID,
 		}

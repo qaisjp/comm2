@@ -1,8 +1,6 @@
-package models
+package api
 
-import (
-	"time"
-)
+import "time"
 
 // User represents a user account
 type User struct {
@@ -18,4 +16,23 @@ type User struct {
 	Activated bool `db:"is_activated"`
 	Banned    bool `db:"is_banned"`
 	// FollowingCount int    `db:"following_count"` // calculate on fly? feature necessary?
+}
+
+func (u User) PublicInfo() PublicUserInfo {
+	return PublicUserInfo{
+		ID:        u.ID,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
+
+		Username: u.Username,
+	}
+}
+
+// User represents a public user object
+type PublicUserInfo struct {
+	ID        uint64    `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+
+	Username string `json:"username"`
 }
