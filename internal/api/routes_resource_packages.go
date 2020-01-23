@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/multitheftauto/community/internal/models"
 	"github.com/multitheftauto/community/internal/resource"
 
 	"github.com/gin-gonic/gin"
@@ -64,7 +63,7 @@ func (a *API) checkResourcePkg(c *gin.Context) {
 
 // createResourcePackage is an endpoint that creates a resource package draft
 func (a *API) createResourcePackage(c *gin.Context) {
-	user := c.MustGet("user").(*models.User)
+	user := c.MustGet("current_user").(*User)
 	resource := c.MustGet("resource").(*Resource)
 
 	var input struct {
@@ -92,7 +91,7 @@ func (a *API) createResourcePackage(c *gin.Context) {
 
 func (a *API) getResourcePackage(c *gin.Context) {
 	pkg := c.MustGet("resource_pkg").(*ResourcePackage)
-	user := c.MustGet("user").(*models.User)
+	user := c.MustGet("current_user").(*User)
 	if pkg.Draft {
 		ok := false
 		if user != nil {

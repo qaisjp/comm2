@@ -8,7 +8,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	jwt "github.com/appleboy/gin-jwt"
 	"github.com/multitheftauto/community/internal/config"
-	"github.com/multitheftauto/community/internal/models"
 	"gocloud.dev/blob"
 
 	"github.com/gin-contrib/cors"
@@ -107,7 +106,7 @@ func NewAPI(
 	// Create JWT middleware
 	authMiddlewareFunc := authMiddleware.MiddlewareFunc()
 	authRequired := func(ctx *gin.Context) {
-		user := ctx.MustGet("user").(*models.User)
+		user := ctx.MustGet("current_user").(*User)
 		if user == nil {
 			ctx.Header("WWW-Authenticate", "JWT realm="+authMiddleware.Realm)
 			ctx.Abort()
@@ -123,8 +122,8 @@ func NewAPI(
 			return
 		}
 
-		var user *models.User
-		ctx.Set("user", user)
+		var user *User
+		ctx.Set("current_user", user)
 	}
 
 	v1 := router.Group("/v1", authMaybeRequired)
@@ -154,6 +153,12 @@ func NewAPI(
 				pkg.GET("/download", a.downloadResourcePackage)
 				pkg.PUT("/upload", authRequired, a.mustOwnResource, a.uploadResourcePackage)
 			}
+		}
+
+		users := v1.Group("/users/:id", a.checkUser)
+		{
+			users.GET("", a.getUser)
+
 		}
 	}
 
