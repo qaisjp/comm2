@@ -79,7 +79,7 @@ func NewAPI(
 		Key:             []byte(conf.JWTSecret),
 		Timeout:         time.Hour * 6,
 		MaxRefresh:      time.Hour * 24 * 3,
-		IdentityKey:     "user",
+		IdentityKey:     "current_user",
 		PayloadFunc:     a.jwtPayloadFunc,
 		IdentityHandler: a.jwtIdentityHandler,
 		Authenticator:   a.jwtAuthenticator,
