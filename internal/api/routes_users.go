@@ -46,6 +46,14 @@ func (a *API) checkUser(c *gin.Context) {
 
 func (a *API) getUser(c *gin.Context) {
 	user := c.MustGet("user").(*User)
+
+	// todo: support extra private info
+	// currentUser := c.MustGet("current_user").(*User)
+	// if user.ID == currentUser.ID {
+	// 	c.JSON(http.StatusOK, user.PrivateInfo())
+	// 	return
+	// }
+
 	c.JSON(http.StatusOK, user.PublicInfo())
 }
 
