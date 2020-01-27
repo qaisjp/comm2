@@ -158,7 +158,11 @@ func NewAPI(
 		users := v1.Group("/users/:id", a.checkUser)
 		{
 			users.GET("", a.getUser)
+		}
 
+		user := v1.Group("/user", authRequired)
+		{
+			user.GET("", a.getCurrentUser)
 		}
 	}
 
