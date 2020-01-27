@@ -46,7 +46,7 @@ func (a *API) checkUser(c *gin.Context) {
 
 func (a *API) getUser(c *gin.Context) {
 	user := c.MustGet("user").(*User)
-	c.JSON(http.StatusOK, user.Public())
+	c.JSON(http.StatusOK, user.PublicInfo())
 }
 
 func (a *API) createUser(c *gin.Context) {
