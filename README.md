@@ -1,14 +1,14 @@
 # community
 
-## Contributors
+## Contributions
 
-If you have access to this repo, it might be to give you an idea of how the project is progressing,
-or to perhaps help provide insight on some questions I may have throughout the year.
+**Please do not send code contributions at this stage.**
 
-But please keep in mind that this project is being used to get "academic credit",
-and I need to be very careful to not misrepresent the work I have done!
+This repo is only public to give you an idea of how the project is progressing.
 
-I ask that you do not push anything to this repository, and to refrain from making code contributions.
+This project is being used to get "academic credit" and I need to be very careful to not misrepresent the work I have done!
+
+Those with write access, I ask that you do not push anything to this repository.
 
 **Question to Don (Honours project coordinator)**
 > Is source for honours projects required to be closed source until the end of the project?
