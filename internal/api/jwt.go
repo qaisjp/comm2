@@ -46,13 +46,15 @@ func (a *API) jwtAuthenticator(c *gin.Context) (_ interface{}, err error) {
 		return "", errors.New("no such user")
 	} else if err != nil {
 		a.Log.WithError(err).Errorln("failed to select user during login")
-		return "", errors.New("internal server error")
+		return "", errors.New("something went wrong")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
-	if err != nil {
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return "", errors.New("incorrect username or password")
+	} else if err != nil {
 		a.Log.WithError(err).Errorln("bcrypt comparison failed during user login")
-		return "", errors.New("internal server error")
+		return "", errors.New("something went wrong")
 	}
 
 	if !user.Activated {
