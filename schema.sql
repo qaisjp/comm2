@@ -27,7 +27,6 @@ SET default_table_access_method = heap;
 CREATE TABLE public.resource_collaborators (
     resource_id integer NOT NULL,
     user_id integer NOT NULL,
-    level integer NOT NULL,
     accepted boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL
