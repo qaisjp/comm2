@@ -1,11 +1,13 @@
-<form>
-  <label for="login-username">
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)">
+  <label>
     Username
-    <input id="login-username" placeholder="username" type="text" autocomplete="username">
+    <input placeholder="username" type="text" autocomplete="username" formControlName="username" required>
   </label>
 
-  <label for="login-password">
+  <label>
     Password
-    <input id="login-password" placeholder="password" type="password" autocomplete="current-password">
+    <input placeholder="password" type="password" autocomplete="current-password" formControlName="password" required>
   </label>
+
+  <button class="button" type="submit" [disabled]="loginForm.disabled">Log in</button>
 </form>

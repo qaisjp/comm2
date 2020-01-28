@@ -1,3 +1,4 @@
+import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
@@ -14,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
   ],
   imports: [
     BrowserModule,
+    HttpClientModule, // import HttpClientModule after BrowserModule
     AppRoutingModule,
     ProfileModule,
     AuthModule,
