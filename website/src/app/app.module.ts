@@ -8,11 +8,14 @@ import { HomeComponent } from './home/home.component';
 import { ProfileModule } from './profile/profile.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthInterceptor } from './auth/auth.interceptor';
+import { LogService } from './log.service';
+import { NavbarComponent } from './navbar/navbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
+    NavbarComponent,
   ],
   imports: [
     BrowserModule,
