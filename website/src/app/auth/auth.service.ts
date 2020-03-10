@@ -29,7 +29,7 @@ export class AuthService {
   public login(username: string, password: string) {
     this.http.post(`${environment.api.baseurl}/v1/auth/login`, { username, password }).pipe(
       tap(data => this.log.debug(`login response`, data)),
-      catchError(this.handleError<string>('login'))
+        catchError(this.handleError<string>('login'))
     ).subscribe((data: LoginResponse) => {
       this.log.log('login response: ', data);
       this.accessToken = data.token;
@@ -40,8 +40,6 @@ export class AuthService {
       ).subscribe((userData: AuthenticatedUser) => {
         this.userSource.next(userData);
       });
-
-
     });
   }
 

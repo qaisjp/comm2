@@ -1,5 +1,5 @@
+<h1>Latest resources</h1>
+<!-- todo: show spinner -->
 <div>
-  <p>
-    This is the homepage.
-  </p>
+  <li *ngFor="let item of (latestResources$ | async); index as i">{{ item | json}}</li>
 </div>

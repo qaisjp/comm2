@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {LogService} from '../log.service';
 
 export interface User {
   readonly id: number;
@@ -15,5 +17,6 @@ export interface AuthenticatedUser extends User {
 })
 export class UserService {
 
-  constructor() { }
+  constructor() {
+  }
 }

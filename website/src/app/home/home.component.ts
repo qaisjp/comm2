@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import {Resource, ResourceService} from '../resource/resource.service';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -6,10 +8,16 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
+  latestResources$: Observable<Resource>;
 
-  constructor() { }
+  constructor(
+    private resources: ResourceService
+  ) {
+
+  }
 
   ngOnInit() {
+    this.latestResources$ = this.resources.getLatestResources();
   }
 
 }
