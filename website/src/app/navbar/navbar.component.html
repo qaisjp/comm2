@@ -8,7 +8,7 @@ Current user json: {{ user$ | async | json }}</pre>
   <div *ngIf="user$ | async as user; else loggedOut" style="display: inline-block">
     <ul style="display: inline-block">
       <li style="display: inline;"><a [routerLink]="['/']">home</a></li>
-      <li style="display: inline; padding-left: 1em;"><a [routerLink]="['/user/', user.username]">profile</a></li>
+      <li style="display: inline; padding-left: 1em;"><a [routerLink]="['/u', user.username]">profile</a></li>
       <li style="display: inline; padding-left: 1em;">logout ({{ user.username }})</li>
     </ul>
   </div>
