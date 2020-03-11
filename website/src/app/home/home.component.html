@@ -1,5 +1,14 @@
 <h1>Latest resources</h1>
 <!-- todo: show spinner -->
 <div>
-  <li *ngFor="let item of (latestResources$ | async); index as i">{{ item | json}}</li>
+  <li *ngFor="let res of (latestResources$ | async); index as i">
+    <a [routerLink]="['r/' + res.name]">
+      {{ res.name }}
+    </a>
+    by
+    <a [routerLink]="['u/' + res.author_id]">
+      {{ res.name }}
+    </a>
+    - <code style="color: green">{{res | json}}</code>
+  </li>
 </div>

@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { LogService } from './log.service';
 import { NavbarComponent } from './navbar/navbar.component';
+import {ResourceModule} from './resource/resource.module';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { NavbarComponent } from './navbar/navbar.component';
     HttpClientModule, // import HttpClientModule after BrowserModule
     AppRoutingModule,
     ProfileModule,
+    ResourceModule,
     AuthModule,
   ],
   providers: [

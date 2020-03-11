@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginPageComponent } from './auth/login-page/login-page.component';
 import {RegisterPageComponent} from './auth/register-page/register-page.component';
+import {ResourcePageComponent} from './resource/resource-page/resource-page.component';
 
 
 const routes: Routes = [
@@ -20,6 +21,10 @@ const routes: Routes = [
     path: 'register',
     component: RegisterPageComponent,
     pathMatch: 'full',
+  },
+  {
+    path: 'r/:resourceName',
+    component: ResourcePageComponent,
   },
 ];
 
