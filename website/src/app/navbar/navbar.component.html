@@ -1,10 +1,17 @@
+<div style="border: solid green 3px; padding: 5px">
+<pre>Debug
+Current user json: {{ user$ | async | json }}</pre>
+</div>
+
 <div style="width: 100%; border: solid cyan 2px;">
   <h1>Nav</h1>
-  <div>
-    {{ user$ | async | json }}
-  </div>
   <div *ngIf="user$ | async as user; else loggedOut">
     Welcome, {{user.username}}!
   </div>
-  <ng-template #loggedOut><app-login></app-login></ng-template>
+  <ng-template #loggedOut>
+    <ul>
+      <li><a [routerLink]="['/login']">login</a></li>
+      <li><a [routerLink]="['/register']">register</a></li>
+    </ul>
+  </ng-template>
 </div>
