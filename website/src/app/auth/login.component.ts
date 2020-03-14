@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { AuthService } from './auth.service';
+import {AlertService} from '../alert.service';
+import {Router} from '@angular/router';
 
 interface LoginInputControls {
   username: string,
@@ -18,6 +20,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private formBuilder: FormBuilder,
+    private router: Router,
+    private alerts: AlertService,
   ) {
     this.loginForm = this.formBuilder.group({
       username: '',
@@ -30,8 +34,10 @@ export class LoginComponent implements OnInit {
 
   onSubmit(data: LoginInputControls) {
     this.loginForm.disable();
-    console.log("login form data", data);
-    this.authService.login(data.username, data.password);
+    console.log('login form data', data);
+    this.authService.login(data.username, data.password)
+      .then(success => this.router.navigate(['/']))
+      .catch(reason => this.alerts.setAlert(reason));
   }
 
 }

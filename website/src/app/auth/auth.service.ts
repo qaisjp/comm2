@@ -55,7 +55,7 @@ export class AuthService {
     this.accessToken = localStorage.getItem('accessToken');
 
     // Prepare observable
-    const success = new Subject<AuthenticatedUser>()
+    const success = new Subject<AuthenticatedUser>();
 
     // Get the local user
     this.http.get(`${environment.api.baseurl}/v1/user`).pipe(
@@ -76,18 +76,30 @@ export class AuthService {
   }
 
 
-  public login(username: string, password: string) {
+  public login(username: string, password: string): Promise<true> {
 
-    this.http.post(`${environment.api.baseurl}/v1/auth/login`, { username, password }).pipe(
+    const subject = new Subject<true>();
+
+    this.http.post(`${environment.api.baseurl}/v1/auth/login`, { username, password }, {headers: {'X-Authorization-None': ''}}).pipe(
       tap(data => this.log.debug(`login response`, data)),
-        catchError(this.handleError<string>('login'))
+        catchError(err => {
+          // catchError(this.handleError<string>('login'))
+          subject.error(err.message); // todo better error message stuff
+          return throwError(err);
+        })
     ).subscribe((data: LoginResponse) => {
       this.log.log('login response: ', data);
 
       AuthService.setAccessToken(data.token);
       this.sessionRestored = false;
-      return this.restoreSession();
+      this.restoreSession()
+        .then(_ => subject.next(true))
+        .catch(reason => {
+          subject.error(reason);
+        });
     });
+
+    return subject.asObservable().toPromise();
   }
 
   public logout(config: { silent: boolean } = { silent: false }) {
