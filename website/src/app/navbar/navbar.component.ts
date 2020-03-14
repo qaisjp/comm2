@@ -11,7 +11,8 @@ import {Observable} from 'rxjs';
 export class NavbarComponent implements OnInit {
   private user$: Observable<AuthenticatedUser>;
 
-  constructor(auth: AuthService) {
+  constructor(
+    private auth: AuthService) {
     this.user$ = auth.user$;
   }
 

@@ -10,7 +10,7 @@ Current user json: {{ user$ | async | json }}</pre>
       <li style="display: inline;"><a [routerLink]="['/']">home</a></li>
       <li style="display: inline; padding-left: 1em;"><a [routerLink]="['/u', user.username]">profile</a></li>
       <li style="display: inline; padding-left: 1em;"><a href="#">new resource</a></li>
-      <li style="display: inline; padding-left: 1em;">logout ({{ user.username }})</li>
+      <li style="display: inline; padding-left: 1em;"><a [routerLink]="" (click)="auth.logout()">logout ({{ user.username }})</a></li>
     </ul>
   </div>
   <ng-template #loggedOut>
