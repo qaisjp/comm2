@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
-import { LogService } from '../log.service';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {environment} from 'src/environments/environment';
+import {LogService} from '../log.service';
 import {tap, catchError, map, mergeMap, switchMap} from 'rxjs/operators';
 import {BehaviorSubject, Observable, of, ReplaySubject, Subject, throwError} from 'rxjs';
-import { AuthenticatedUser } from '../user/user.service';
+import {AuthenticatedUser} from '../user/user.service';
 
 interface LoginResponse {
   token: string;
@@ -19,7 +19,8 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private log: LogService
-  ) { }
+  ) {
+  }
 
   accessToken: string | null = null;
 
@@ -73,21 +74,21 @@ export class AuthService {
 
 
   public login(username: string, password: string): Observable<AuthenticatedUser> {
-    return this.http.post(`${environment.api.baseurl}/v1/auth/login`, { username, password }, {headers: {'X-Authorization-None': ''}}).pipe(
+    return this.http.post(`${environment.api.baseurl}/v1/auth/login`, {username, password}, {headers: {'X-Authorization-None': ''}}).pipe(
       tap(data => this.log.debug(`login response`, data)),
       switchMap((data: LoginResponse) => {
-          this.log.log('login response: ', data);
+        this.log.log('login response: ', data);
 
-          AuthService.setAccessToken(data.token);
-          this.sessionRestored = false;
-          return this.restoreSession();
+        AuthService.setAccessToken(data.token);
+        this.sessionRestored = false;
+        return this.restoreSession();
       }),
-      tap(user => this.userSource.next(user) ),
+      tap(user => this.userSource.next(user)),
     );
 
   }
 
-  public logout(config: { silent: boolean } = { silent: false }) {
+  public logout(config: { silent: boolean } = {silent: false}) {
     this.accessToken = null;
     localStorage.removeItem('accessToken');
     this.userSource.next(null);
