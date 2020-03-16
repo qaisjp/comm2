@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { AuthService } from './auth.service';
 import {AlertService} from '../alert.service';
 import {Router} from '@angular/router';
+import {catchError} from 'rxjs/operators';
+import {throwError} from 'rxjs';
 
 interface LoginInputControls {
   username: string,
@@ -26,7 +28,7 @@ export class LoginComponent implements OnInit {
     this.loginForm = this.formBuilder.group({
       username: '',
       password: '',
-    } as LoginInputControls)
+    } as LoginInputControls);
   }
 
   ngOnInit() {
@@ -35,9 +37,18 @@ export class LoginComponent implements OnInit {
   onSubmit(data: LoginInputControls) {
     this.loginForm.disable();
     console.log('login form data', data);
-    this.authService.login(data.username, data.password)
-      .then(success => this.router.navigate(['/']))
-      .catch(reason => this.alerts.setAlert(reason));
+
+
+    this.authService.login(data.username, data.password).pipe(
+      catchError(reason => {
+        this.alerts.setAlert(reason);
+        this.loginForm.enable();
+        return throwError(reason);
+      })
+    ).subscribe(() => {
+      this.router.navigate(['/']);
+    });
+
   }
 
 }

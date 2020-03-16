@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { LogService } from '../log.service';
-import { tap, catchError } from 'rxjs/operators';
-import {Observable, of, ReplaySubject, Subject, throwError} from 'rxjs';
+import {tap, catchError, map, mergeMap, switchMap} from 'rxjs/operators';
+import {BehaviorSubject, Observable, of, ReplaySubject, Subject, throwError} from 'rxjs';
 import { AuthenticatedUser } from '../user/user.service';
 
 interface LoginResponse {
@@ -36,7 +36,10 @@ export class AuthService {
     return localStorage.getItem('accessToken') !== null;
   }
 
-  restoreSession(): Promise<AuthenticatedUser> {
+  restoreSession(): Observable<AuthenticatedUser> {
+    // Prepare observable
+    const success = new Subject<AuthenticatedUser>();
+
     // Prevent multiple calls of restoreSession (without a manual clear)
     if (this.sessionRestored) {
       throw new Error('restoreSession should not be called multiple times');
@@ -45,7 +48,7 @@ export class AuthService {
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken === null) {
       this.log.log('auth.service/restoreSession: you are not logged in.');
-      return throwError('you are not logged in').toPromise();
+      return throwError('you are not logged in');
     }
 
     // Mark the session as restored before any request, to prevent concurrent restores
@@ -54,11 +57,8 @@ export class AuthService {
     // Load access token from localStorage
     this.accessToken = localStorage.getItem('accessToken');
 
-    // Prepare observable
-    const success = new Subject<AuthenticatedUser>();
-
     // Get the local user
-    this.http.get(`${environment.api.baseurl}/v1/user`).pipe(
+    return this.http.get(`${environment.api.baseurl}/v1/user`).pipe(
       tap(userData => this.log.debug(`login get user response`, userData)),
       catchError(err => {
         this.logout({silent: true});
@@ -67,39 +67,26 @@ export class AuthService {
         // this.handleError<string>('login.get-user');
         return throwError(err);
       }),
-    ).subscribe((userData: AuthenticatedUser) => {
-      this.userSource.next(userData);
-      success.next(userData);
-    });
-
-    return success.toPromise();
+      map(data => data as AuthenticatedUser)
+    );
   }
 
 
-  public login(username: string, password: string): Promise<true> {
-
-    const subject = new Subject<true>();
-
-    this.http.post(`${environment.api.baseurl}/v1/auth/login`, { username, password }, {headers: {'X-Authorization-None': ''}}).pipe(
+  public login(username: string, password: string): Observable<AuthenticatedUser> {
+    return this.http.post(`${environment.api.baseurl}/v1/auth/login`, { username, password }, {headers: {'X-Authorization-None': ''}}).pipe(
       tap(data => this.log.debug(`login response`, data)),
         catchError(err => {
-          // catchError(this.handleError<string>('login'))
-          subject.error(err.message); // todo better error message stuff
           return throwError(err);
-        })
-    ).subscribe((data: LoginResponse) => {
-      this.log.log('login response: ', data);
+        }),
+      switchMap((data: LoginResponse) => {
+          this.log.log('login response: ', data);
 
-      AuthService.setAccessToken(data.token);
-      this.sessionRestored = false;
-      this.restoreSession()
-        .then(_ => subject.next(true))
-        .catch(reason => {
-          subject.error(reason);
-        });
-    });
+          AuthService.setAccessToken(data.token);
+          this.sessionRestored = false;
+          return this.restoreSession();
+      })
+    );
 
-    return subject.asObservable().toPromise();
   }
 
   public logout(config: { silent: boolean } = { silent: false }) {

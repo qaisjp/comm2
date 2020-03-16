@@ -1,6 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from './auth/auth.service';
 import {AlertService} from './alert.service';
+import {Router} from '@angular/router';
+import {catchError} from 'rxjs/operators';
+import {throwError} from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -16,11 +19,17 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    if (AuthService.canRestoreSession()) {
-      this.auth.restoreSession().catch(reason => {
+    if (!AuthService.canRestoreSession()) {
+      return;
+    }
+
+    this.auth.restoreSession().pipe(
+      catchError(reason => {
         console.error('restoreSession on initial start failed because', reason);
         this.alerts.setAlert(reason.message); // todo actually fix reason
-      });
-    }
+        return throwError(reason);
+      })
+    );
+
   }
 }
