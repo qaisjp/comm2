@@ -75,16 +75,14 @@ export class AuthService {
   public login(username: string, password: string): Observable<AuthenticatedUser> {
     return this.http.post(`${environment.api.baseurl}/v1/auth/login`, { username, password }, {headers: {'X-Authorization-None': ''}}).pipe(
       tap(data => this.log.debug(`login response`, data)),
-        catchError(err => {
-          return throwError(err);
-        }),
       switchMap((data: LoginResponse) => {
           this.log.log('login response: ', data);
 
           AuthService.setAccessToken(data.token);
           this.sessionRestored = false;
           return this.restoreSession();
-      })
+      }),
+      tap(user => this.userSource.next(user) ),
     );
 
   }
