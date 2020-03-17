@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "mtahub"
+    }
+  },
+  "defaultProject": "mtahub",
+  "cli": {
+    "analytics": "0e5ece46-1a1d-46d0-8e5f-a2bc8d47655e"
+  }
 }
