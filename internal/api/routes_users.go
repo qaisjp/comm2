@@ -7,23 +7,23 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (a *API) checkUser(c *gin.Context) {
+	var fieldVal interface{} = c.Param("id")
+	fieldName := "username"
 	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		c.Abort()
-		return
+	if err == nil {
+		fieldVal = userID
+		fieldName = "id"
 	}
 
 	// Check if the user exists
 	var user User
-	if err := a.DB.Get(&user, "select * from users where id = $1", userID); err != nil {
+	if err := a.DB.Get(&user, "select * from users where "+pq.QuoteIdentifier(fieldName)+" = $1", fieldVal); err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{
 				"message": "That user could not be found",
