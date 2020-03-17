@@ -30,7 +30,9 @@ export class AppComponent implements OnInit {
         this.alerts.setAlert(reason.message); // todo actually fix reason
         return throwError(reason);
       })
-    );
+    ).subscribe(u => {
+      console.log('Logged in', u.username);
+    });
 
   }
 }

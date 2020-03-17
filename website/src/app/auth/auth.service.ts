@@ -68,7 +68,8 @@ export class AuthService {
         // this.handleError<string>('login.get-user');
         return throwError(err);
       }),
-      map(data => data as AuthenticatedUser)
+      map(data => data as AuthenticatedUser),
+      tap(user => this.userSource.next(user)),
     );
   }
 
@@ -83,7 +84,6 @@ export class AuthService {
         this.sessionRestored = false;
         return this.restoreSession();
       }),
-      tap(user => this.userSource.next(user)),
     );
 
   }
