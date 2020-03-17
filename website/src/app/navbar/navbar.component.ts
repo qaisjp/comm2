@@ -9,10 +9,11 @@ import {Observable} from 'rxjs';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  private user$: Observable<AuthenticatedUser>;
+  public user$: Observable<AuthenticatedUser>;
 
   constructor(
-    private auth: AuthService) {
+    public auth: AuthService,
+  ) {
     this.user$ = auth.user$;
   }
 

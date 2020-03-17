@@ -15,8 +15,9 @@ export class AppComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private alerts: AlertService,
-  ) { }
+    public alerts: AlertService,
+  ) {
+  }
 
   ngOnInit() {
     if (!AuthService.canRestoreSession()) {
