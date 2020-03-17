@@ -5,6 +5,7 @@ import {ResourceService} from '../resource/resource.service';
 import {User, UserService} from '../user/user.service';
 import {AlertService} from '../alert.service';
 import {Location} from '@angular/common';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -12,7 +13,7 @@ import {Location} from '@angular/common';
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
-  public user: User;
+  public user$ = new Subject<User>();
 
   constructor(
     private route: ActivatedRoute,
@@ -35,7 +36,7 @@ export class ProfileComponent implements OnInit {
           });
         }
 
-        this.user = data;
+        this.user$.next(data);
         this.alerts.setAlert( JSON.stringify(data) );
       });
     });

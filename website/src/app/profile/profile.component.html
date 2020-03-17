@@ -1,1 +1,1 @@
-<p>profile works! you are accessing {{ user.username }}</p>
+<p *ngIf="user$ | async as user">profile works! you are accessing {{ user.username }}</p>
