@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ResourcePageComponent } from './resource-page/resource-page.component';
+import { ResourceViewComponent } from './view/view.component';
 
 
 
 @NgModule({
-  declarations: [ResourcePageComponent],
+  declarations: [ResourceViewComponent],
   imports: [
     CommonModule
   ]
