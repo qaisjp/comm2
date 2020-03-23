@@ -9,7 +9,7 @@ Current user json: {{ user$ | async | json }}</pre>
     <ul style="display: inline-block">
       <li style="display: inline;"><a [routerLink]="['/']">home</a></li>
       <li style="display: inline; padding-left: 1em;"><a [routerLink]="['/u', user.username]">profile</a></li>
-      <li style="display: inline; padding-left: 1em;"><a href="#">new resource</a></li>
+      <li style="display: inline; padding-left: 1em;"><a [routerLink]="['create']">create resource</a></li>
       <li style="display: inline; padding-left: 1em;"><a [routerLink]="" (click)="auth.logout()">logout ({{ user.username }})</a></li>
     </ul>
   </div>
