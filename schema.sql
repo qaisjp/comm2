@@ -178,7 +178,8 @@ CREATE TABLE public.resources (
     author_id integer NOT NULL,
     name character varying(254) NOT NULL,
     title text NOT NULL,
-    description text NOT NULL
+    description text NOT NULL,
+    status integer DEFAULT 1 NOT NULL
 );
 
 

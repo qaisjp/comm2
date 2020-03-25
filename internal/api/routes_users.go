@@ -57,6 +57,53 @@ func (a *API) getUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user.PublicInfo())
 }
 
+func (a *API) getUserProfile(ctx *gin.Context) {
+	user := ctx.MustGet("user").(*User)
+	elevated := false
+	if currentUser := ctx.MustGet("current_user").(*User); currentUser != nil {
+		elevated = user.ID == currentUser.ID
+	}
+
+	var result interface{}
+
+	pu := user.PublicInfo()
+
+	resources := []Resource{}
+	{
+		resourceQuery := "select * from resources where author_id = $1"
+		if !elevated {
+			resourceQuery += " and status = 'public'"
+		}
+		if err := a.DB.SelectContext(ctx, &resources, resourceQuery, user.ID); err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong."})
+			ctx.Error(err)
+			a.Log.WithError(err).Errorln("could not get resources for profile info")
+			return
+		}
+	}
+
+	type BaseProfileInfo struct {
+		PublicUserInfo
+		Resources []Resource `json:"resources"`
+	}
+	base := BaseProfileInfo{
+		PublicUserInfo: pu,
+		Resources:      resources,
+	}
+
+	if elevated {
+		result = struct {
+			BaseProfileInfo
+		}{base}
+	} else {
+		result = struct {
+			BaseProfileInfo
+		}{base}
+	}
+
+	ctx.JSON(http.StatusOK, result)
+}
+
 func (a *API) createUser(c *gin.Context) {
 	var input struct {
 		Username string `json:"username" valid:"stringlength(1|255),required"`

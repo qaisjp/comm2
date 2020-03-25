@@ -21,7 +21,13 @@ type Resource struct {
 	// Rating      int    `db:"rating"`
 	// Downloads   int    `db:"downloads"`
 	// Type        int    `db:"type"` // todo: ResourceType
+	Status string `db:"status" json:"status"`
 }
+
+const (
+	ResourceStatusPublic  string = "public"
+	ResourceStatusPrivate string = "private"
+)
 
 type ResourcePackage struct {
 	ID        uint64    `db:"id" json:"id"`

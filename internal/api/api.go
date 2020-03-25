@@ -126,6 +126,11 @@ func NewAPI(
 		ctx.Set("current_user", user)
 	}
 
+	private := router.Group("/private", authMaybeRequired)
+	{
+		private.GET("/profile/:id", a.checkUser, a.getUserProfile)
+	}
+
 	v1 := router.Group("/v1", authMaybeRequired)
 	{
 		auth := v1.Group("/auth")
