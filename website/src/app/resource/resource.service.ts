@@ -38,18 +38,25 @@ export class ResourceService {
   ) {
   }
 
+  public get(id: number | string): Observable<Resource> {
+    return this.http.get(`${environment.api.baseurl}/v1/resources/${encodeURIComponent(id)}`).pipe(
+      tap(data => this.log.debug(`getResource(${id})`)),
+      map(data => data as Resource),
+    );
+  }
+
   public getLatestResources(): Observable<Resource> {
     return this.http.get(`${environment.api.baseurl}/v1/resources`, {headers: {'X-Authorization-None': ''}}).pipe(
       tap(data => this.log.debug(`getLatestResources response`, data)),
       catchError(alertErrorReturnZero<string>('ResourceService.getLatestResources')),
-      map(data => data as Resource)
+      map(data => data as Resource),
     );
   }
 
   public create(name: string): Observable<ResourceCreateResponse> {
     return this.http.post(`${environment.api.baseurl}/v1/resources`, {name}).pipe(
       tap(data => this.log.debug(`sending createResource with name ${name}`)),
-      map(data => data as ResourceCreateResponse)
+      map(data => data as ResourceCreateResponse),
     );
   }
 }

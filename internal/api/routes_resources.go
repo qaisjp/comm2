@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
@@ -45,18 +46,17 @@ func (a *API) mustOwnResource(ctx *gin.Context) {
 }
 
 func (a *API) checkResource(c *gin.Context) {
+	var fieldVal interface{} = c.Param("id")
+	fieldName := "name"
 	resourceID, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		c.Abort()
-		return
+	if err == nil {
+		fieldVal = resourceID
+		fieldName = "id"
 	}
 
 	// Check if the resource exists
 	var resource Resource
-	if err := a.DB.Get(&resource, "select * from resources where id = $1", resourceID); err != nil {
+	if err := a.DB.Get(&resource, "select * from resources where "+pq.QuoteIdentifier(fieldName)+" = $1", fieldVal); err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{
 				"message": "That resource could not be found",
