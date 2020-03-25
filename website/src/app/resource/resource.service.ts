@@ -6,6 +6,11 @@ import {environment} from '../../environments/environment';
 import {catchError, map, tap} from 'rxjs/operators';
 import {alertErrorReturnZero} from '../util';
 
+export enum ResourceStatus {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+}
+
 export interface Resource {
   readonly id: number;
   readonly created_at: Date;
@@ -14,6 +19,7 @@ export interface Resource {
   name: string;
   title: string;
   description: string;
+  status: ResourceStatus;
 }
 
 interface ResourceCreateResponse {

@@ -11,10 +11,15 @@ export interface User {
   readonly id: number;
   readonly created_at: Date;
   username: string;
+  gravatar: string;
 }
 
 export interface AuthenticatedUser extends User {
   readonly updated_at: Date;
+}
+
+export interface UserProfile extends User {
+  readonly resources: Resource[];
 }
 
 @Injectable({
@@ -33,6 +38,14 @@ export class UserService {
     return this.http.get(url, {headers: {'X-Authorization-None': ''}}).pipe(
       tap(data => this.log.debug(`getUser response`, data)),
       map(data => data as User)
+    );
+  }
+
+  public getUserProfile(usernameOrID: string | number): Observable<UserProfile> {
+    const url = `${environment.api.baseurl}/private/profile/${encodeURIComponent(usernameOrID)}`;
+    return this.http.get(url).pipe(
+      tap(data => this.log.debug(`getUserProfile response`, data)),
+      map(data => data as UserProfile)
     );
   }
 }

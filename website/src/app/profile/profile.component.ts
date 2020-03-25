@@ -1,11 +1,14 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Params, Router} from '@angular/router';
-import {mergeMap, pluck} from 'rxjs/operators';
-import {ResourceService} from '../resource/resource.service';
-import {User, UserService} from '../user/user.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ResourceStatus} from '../resource/resource.service';
+import {User, UserProfile, UserService} from '../user/user.service';
 import {AlertService} from '../alert.service';
 import {Location} from '@angular/common';
 import {Subject} from 'rxjs';
+
+interface UserProfileExtended extends UserProfile {
+  hasPrivate: boolean;
+}
 
 @Component({
   selector: 'app-profile',
@@ -13,7 +16,7 @@ import {Subject} from 'rxjs';
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
-  public user$ = new Subject<User>();
+  public user$ = new Subject<UserProfileExtended>();
 
   constructor(
     private route: ActivatedRoute,
@@ -26,7 +29,7 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.users.getUser(params.username).subscribe((data: User) => {
+      this.users.getUserProfile(params.username).subscribe((data: UserProfile) => {
         // Update url from ID to username if necessary without causing a page reload
         if (data.username !== params.username) {
           this.router.navigate(['u', data.username], {
@@ -36,8 +39,14 @@ export class ProfileComponent implements OnInit {
           });
         }
 
-        this.user$.next(data);
-        this.alerts.setAlert( JSON.stringify(data) );
+        const hasPrivate = undefined !==
+          data.resources.find(r => r.status === ResourceStatus.PRIVATE);
+
+        this.user$.next({
+          ...data,
+          hasPrivate,
+        });
+        this.alerts.setAlert( `${hasPrivate}` + JSON.stringify(data) );
       });
     });
   }
