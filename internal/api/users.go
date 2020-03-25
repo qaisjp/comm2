@@ -1,6 +1,10 @@
 package api
 
-import "time"
+import (
+	"crypto/md5"
+	"fmt"
+	"time"
+)
 
 // User represents a user account
 type User struct {
@@ -25,6 +29,7 @@ func (u User) PublicInfo() PublicUserInfo {
 		UpdatedAt: u.UpdatedAt,
 
 		Username: u.Username,
+		Gravatar: fmt.Sprintf("https://www.gravatar.com/avatar/%x", md5.Sum([]byte(u.Email))),
 	}
 }
 
@@ -35,4 +40,5 @@ type PublicUserInfo struct {
 	UpdatedAt time.Time `json:"updated_at"`
 
 	Username string `json:"username"`
+	Gravatar string `json:"gravatar"`
 }
