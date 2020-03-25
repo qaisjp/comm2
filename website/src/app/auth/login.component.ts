@@ -7,8 +7,8 @@ import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 
 interface LoginInputControls {
-  username: string,
-  password: string,
+  username: string;
+  password: string;
 }
 
 @Component({

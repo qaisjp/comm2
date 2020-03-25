@@ -4,11 +4,18 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
+
+var reResourceName = regexp.MustCompile("[a-zA-Z0-9]+")
+
+func isResourceNameValid(str string) bool {
+	return reResourceName.MatchString(str)
+}
 
 // mustOwnResource is a middleware that ensures that the
 // authenticated user owns the resource being accessed.
@@ -131,6 +138,11 @@ func (a *API) createResource(c *gin.Context) {
 			"message": "You must provide a name",
 		})
 		return
+	} else if !isResourceNameValid(input.Name) {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"message": "Name contains invalid characters",
+		})
+		return
 	}
 
 	r := Resource{
@@ -140,19 +152,35 @@ func (a *API) createResource(c *gin.Context) {
 		AuthorID:    user.ID,
 	}
 
-	result, err := a.DB.NamedExec("insert into resources (name, title, description, author_id) values (:name, :title, :description, :author_id)", &r)
+	var count int
+	if err := a.DB.GetContext(c, &count, "select count(*) from resources where name=$1", r.Name); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Something went wrong.",
+		})
+		a.Log.WithField("err", err).Errorln("could not check for resource existence")
+		return
+	}
+
+	if count != 0 {
+		c.JSON(http.StatusConflict, gin.H{
+			"message": "That name is taken.",
+		})
+		return
+	}
+
+	var id int64
+	err := a.DB.QueryRowxContext(c,
+		"insert into resources (name, title, description, author_id) values ($1, $2, $3, $4) returning id",
+		r.Name, r.Title, r.Description, r.AuthorID).Scan(&id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": errors.Wrap(err, "could not insert").Error(),
 		})
-
 		return
 	}
 
-	fmt.Printf("%x\n", result)
-
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
 func (a *API) getResource(c *gin.Context) {

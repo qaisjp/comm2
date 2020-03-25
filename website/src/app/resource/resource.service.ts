@@ -16,6 +16,10 @@ export interface Resource {
   description: string;
 }
 
+interface ResourceCreateResponse {
+  readonly id: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -33,6 +37,13 @@ export class ResourceService {
       tap(data => this.log.debug(`getLatestResources response`, data)),
       catchError(alertErrorReturnZero<string>('ResourceService.getLatestResources')),
       map(data => data as Resource)
+    );
+  }
+
+  public create(name: string): Observable<ResourceCreateResponse> {
+    return this.http.post(`${environment.api.baseurl}/v1/resources`, {name}).pipe(
+      tap(data => this.log.debug(`sending createResource with name ${name}`)),
+      map(data => data as ResourceCreateResponse)
     );
   }
 }

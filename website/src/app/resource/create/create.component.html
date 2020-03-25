@@ -1,1 +1,11 @@
-<p>create works!</p>
+<div>
+  <h1>Create a resource</h1>
+  <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
+    <label>
+      Name
+      <input placeholder="race" type="text" formControlName="name" required>
+    </label>
+
+    <button class="button" type="submit" [disabled]="form.disabled || form.value.name.length === 0">Next</button>
+  </form>
+</div>
