@@ -4,8 +4,8 @@
     <li>Rating: NONE</li>
     <li>Authors: {{ resource.author_id }}</li>
     <li>Description: {{ resource.description }}</li>
-    <li>Last updated: {{ resource.updated_at }}</li>
-    <li>Created at: {{ resource.created_at }}</li>
+    <li>Last updated: {{ resource.updated_at | amTimeAgo }}</li>
+    <li>Created at: {{ resource.created_at | amTimeAgo }}</li>
   </ul>
 
 

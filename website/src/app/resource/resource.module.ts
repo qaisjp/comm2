@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ResourceViewComponent } from './view/view.component';
 import { ResourceCreateComponent } from './create/create.component';
 import {ReactiveFormsModule} from '@angular/forms';
+import {MomentModule} from 'ngx-moment';
 
 
 
@@ -10,7 +11,8 @@ import {ReactiveFormsModule} from '@angular/forms';
   declarations: [ResourceViewComponent, ResourceCreateComponent],
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MomentModule
   ]
 })
 export class ResourceModule { }
