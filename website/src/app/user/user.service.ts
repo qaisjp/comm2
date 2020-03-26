@@ -10,8 +10,8 @@ import {Resource} from '../resource/resource.service';
 export interface User {
   readonly id: number;
   readonly created_at: string;
-  username: string;
-  gravatar: string;
+  readonly username: string;
+  readonly gravatar: string;
 }
 
 export interface AuthenticatedUser extends User {

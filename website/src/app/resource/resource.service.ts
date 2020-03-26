@@ -5,6 +5,7 @@ import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {catchError, map, tap} from 'rxjs/operators';
 import {alertErrorReturnZero} from '../util';
+import {User} from '../user/user.service';
 
 export enum ResourceStatus {
   PUBLIC = 'public',
@@ -20,6 +21,7 @@ export interface Resource {
   title: string;
   description: string;
   status: ResourceStatus;
+  authors: User[];
 }
 
 interface ResourceCreateResponse {

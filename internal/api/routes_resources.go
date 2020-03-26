@@ -183,9 +183,48 @@ func (a *API) createResource(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
-func (a *API) getResource(c *gin.Context) {
-	resource := c.MustGet("resource").(*Resource)
-	c.JSON(http.StatusOK, resource)
+func (a *API) getResource(ctx *gin.Context) {
+	resource := ctx.MustGet("resource").(*Resource)
+
+	type ResourceUserInfo struct {
+		PublicUserInfo
+		IsCreator bool `json:"is_creator"`
+	}
+
+	extended := struct {
+		*Resource
+		Authors []ResourceUserInfo `json:"authors"`
+	}{
+		Resource: resource,
+	}
+
+	// Add the creator to Authros
+	{
+		var creator User
+		if err := a.DB.GetContext(ctx, &creator, "select * from users where id = $1", resource.AuthorID); err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong."})
+			a.Log.WithError(err).Errorln("getResource failed to get creator details")
+			return
+		}
+
+		extended.Authors = append(extended.Authors, ResourceUserInfo{creator.PublicInfo(), true})
+	}
+
+	// Add the rest of the collaborators
+	{
+		authors := []User{}
+		if err := a.DB.SelectContext(ctx, &authors, "select u.* from resource_collaborators as c, users as u where c.accepted and c.resource_id = $1 and c.user_id = u.id", resource.ID); err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong."})
+			a.Log.WithError(err).Errorln("getResource failed to get creator details")
+			return
+		}
+
+		for _, a := range authors {
+			extended.Authors = append(extended.Authors, ResourceUserInfo{a.PublicInfo(), false})
+		}
+	}
+
+	ctx.JSON(http.StatusOK, extended)
 }
 
 func (a *API) voteResource(c *gin.Context) {

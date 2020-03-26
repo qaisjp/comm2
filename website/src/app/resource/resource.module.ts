@@ -4,6 +4,7 @@ import { ResourceViewComponent } from './view/view.component';
 import { ResourceCreateComponent } from './create/create.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MomentModule} from 'ngx-moment';
+import {RouterModule} from '@angular/router';
 
 
 
@@ -12,7 +13,8 @@ import {MomentModule} from 'ngx-moment';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MomentModule
+    MomentModule,
+    RouterModule
   ]
 })
 export class ResourceModule { }
