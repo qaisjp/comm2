@@ -13,8 +13,8 @@ export enum ResourceStatus {
 
 export interface Resource {
   readonly id: number;
-  readonly created_at: Date;
-  readonly updated_at: Date;
+  readonly created_at: string;
+  readonly updated_at: string;
   author_id: number;
   name: string;
   title: string;

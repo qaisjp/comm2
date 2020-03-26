@@ -9,13 +9,13 @@ import {Resource} from '../resource/resource.service';
 
 export interface User {
   readonly id: number;
-  readonly created_at: Date;
+  readonly created_at: string;
   username: string;
   gravatar: string;
 }
 
 export interface AuthenticatedUser extends User {
-  readonly updated_at: Date;
+  readonly updated_at: string;
 }
 
 export interface UserProfile extends User {
