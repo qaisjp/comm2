@@ -58,7 +58,7 @@ export class ResourceService {
 
   public create(name: string, title: string, description: string): Observable<ResourceCreateResponse> {
     return this.http.post(`${environment.api.baseurl}/v1/resources`, {name, title, description}).pipe(
-      tap(data => this.log.debug(`sending createResource with name ${name}`)),
+      tap(data => this.log.debug(`sending createResource with ${JSON.stringify({name, title, description})}`)),
       map(data => data as ResourceCreateResponse),
     );
   }
