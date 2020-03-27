@@ -24,10 +24,6 @@ const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'r/:resourceName',
-    component: ResourceViewComponent,
-  },
-  {
     path: 'create',
     component: ResourceCreateComponent,
   }

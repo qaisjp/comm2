@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Resource, ResourceService} from '../resource.service';
 import {AlertService} from '../../alert.service';
-import {pluck, switchMap} from 'rxjs/operators';
+import {pluck, switchMap, tap} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 
 @Component({
@@ -21,8 +21,7 @@ export class ResourceViewComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.pipe(
-      pluck('resourceName'),
-      switchMap(name => this.resources.get(name))
+      switchMap(params => this.resources.get(params.username, params.resource))
     ).subscribe((data: Resource) => {
       this.resource$.next(data);
     });

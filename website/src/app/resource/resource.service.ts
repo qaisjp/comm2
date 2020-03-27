@@ -5,7 +5,7 @@ import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {catchError, map, tap} from 'rxjs/operators';
 import {alertErrorReturnZero} from '../util';
-import {User} from '../user/user.service';
+import {User, UserID} from '../user/user.service';
 
 export enum ResourceStatus {
   PUBLIC = 'public',
@@ -28,21 +28,22 @@ interface ResourceCreateResponse {
   readonly id: number;
 }
 
+// ResourceID can either be the name of the resource, or its ID
+export type ResourceID = string | number;
+
 @Injectable({
   providedIn: 'root'
 })
 export class ResourceService {
-
-
   constructor(
     private http: HttpClient,
     private log: LogService,
   ) {
   }
 
-  public get(id: number | string): Observable<Resource> {
-    return this.http.get(`${environment.api.baseurl}/v1/resources/${encodeURIComponent(id)}`).pipe(
-      tap(data => this.log.debug(`getResource(${id})`)),
+  public get(userID: UserID, resourceID: ResourceID): Observable<Resource> {
+    return this.http.get(`${environment.api.baseurl}/v1/resources/${encodeURIComponent(userID)}/${encodeURIComponent(resourceID)}`).pipe(
+      tap(data => this.log.debug(`getResource(${userID}/${resourceID})`)),
       map(data => data as Resource),
     );
   }

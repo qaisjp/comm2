@@ -3,7 +3,7 @@
   <h1>{{ user.username }}</h1>
   <ul>
     <li *ngFor="let res of user.resources">
-      <a [routerLink]="['/r', res.name]">{{ res.name }} </a>
+      <a [routerLink]="['/u', res.author_id, res.name]">{{ res.name }} </a>
       <span *ngIf="user.hasPrivate">({{ res.status }})</span>
       <span> - Last updated {{ res.updated_at | amTimeAgo }}</span>
     </li>

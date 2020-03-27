@@ -3,11 +3,11 @@
 <div>
 
   <li *ngFor="let res of (latestResources$ | async); index as i">
-    <a [routerLink]="['r', res.name]">
+    <a [routerLink]="['/u', res.author_id, res.name]">
       {{ res.name }}
     </a>
     by
-    <a [routerLink]="['u', res.author_id]">
+    <a [routerLink]="['/u', res.author_id]">
       author{{ res.author_id }}
     </a>
     - <code style="color: green">{{res | json}}</code>

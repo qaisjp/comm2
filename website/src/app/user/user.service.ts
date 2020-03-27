@@ -22,6 +22,9 @@ export interface UserProfile extends User {
   readonly resources: Resource[];
 }
 
+// UserID can either be the name of the user, or its ID
+export type UserID = string | number;
+
 @Injectable({
   providedIn: 'root'
 })
