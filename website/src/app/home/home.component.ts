@@ -8,7 +8,7 @@ import {Observable} from 'rxjs';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  latestResources$: Observable<Resource>;
+  latestResources$: Observable<Resource[]>;
 
   constructor(
     private resources: ResourceService
