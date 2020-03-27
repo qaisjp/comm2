@@ -128,7 +128,7 @@ func NewAPI(
 
 	private := router.Group("/private", authMaybeRequired)
 	{
-		private.GET("/profile/:id", a.checkUser, a.getUserProfile)
+		private.GET("/profile/:user_id", a.checkUser, a.getUserProfile)
 	}
 
 	v1 := router.Group("/v1", authMaybeRequired)
