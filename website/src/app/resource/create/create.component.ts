@@ -1,14 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {ResourceService} from '../resource.service';
-import {catchError, tap} from 'rxjs/operators';
+import {catchError, switchMap, tap} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 import {AlertService} from '../../alert.service';
 import {HttpErrorResponse} from '@angular/common/http';
 import {Router} from '@angular/router';
+import {AuthService} from '../../auth/auth.service';
+import {AuthenticatedUser} from '../../user/user.service';
 
 interface ResourceInputControls {
   name: string;
+  title: string;
+  description: string;
 }
 
 @Component({
@@ -19,15 +23,19 @@ interface ResourceInputControls {
 export class ResourceCreateComponent implements OnInit {
 
   form: FormGroup;
+  titleInput = false;
 
   constructor(
     private resources: ResourceService,
     private formBuilder: FormBuilder,
     private alerts: AlertService,
+    private auth: AuthService,
     private router: Router,
   ) {
     this.form = this.formBuilder.group({
       name: '',
+      title: '',
+      description: '',
     } as ResourceInputControls);
   }
 
@@ -37,7 +45,7 @@ export class ResourceCreateComponent implements OnInit {
   onSubmit(input: ResourceInputControls) {
     this.form.disable();
 
-    this.resources.create(input.name).pipe(
+    this.resources.create(input.name, input.title, input.description).pipe(
       catchError((err: HttpErrorResponse) => {
         this.form.enable();
         let msg: string;
@@ -48,12 +56,23 @@ export class ResourceCreateComponent implements OnInit {
         }
         this.alerts.setAlert(msg);
         return throwError(msg);
-      })
-    ).subscribe(data => {
-      this.form.enable();
-      this.alerts.setAlert(JSON.stringify(data));
-      return this.router.navigate(['r', input.name]);
-    });
+      }),
+      switchMap(data => {
+        this.form.enable();
+        this.alerts.setAlert(JSON.stringify(data));
+        return this.auth.user$;
+      }),
+      switchMap((user: AuthenticatedUser) => this.router.navigate(['/u', user.username, input.name])),
+    ).subscribe();
+  }
+
+  updateTitle(title: string) {
+    // Don't update the title manually if the user has written stuff there
+    if (this.titleInput) {
+      return;
+    }
+
+    this.form.patchValue({title});
   }
 
 }

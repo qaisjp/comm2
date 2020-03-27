@@ -3,7 +3,17 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
     <label>
       Name
-      <input placeholder="race" type="text" formControlName="name" required>
+      <input placeholder="hedit" type="text" formControlName="name" required (ngModelChange)="updateTitle($event)">
+    </label>
+
+    <label>
+      Title
+      <input placeholder="Handling Editor" type="text" formControlName="title" required (input)="titleInput = true;">
+    </label>
+
+    <label>
+      Description (optional)
+      <input placeholder="The official ingame handling editor." type="text" formControlName="description">
     </label>
 
     <button class="button" type="submit" [disabled]="form.disabled || form.value.name.length === 0">Next</button>
