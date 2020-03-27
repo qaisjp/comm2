@@ -154,6 +154,11 @@ func (a *API) createResource(c *gin.Context) {
 		AuthorID:    user.ID,
 	}
 
+	// Default title to name
+	if r.Title == "" {
+		r.Title = r.Name
+	}
+
 	var count int
 	if err := a.DB.GetContext(c, &count, "select count(*) from resources where name=$1", r.Name); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
