@@ -70,7 +70,7 @@ func (a *API) getUserProfile(ctx *gin.Context) {
 
 	resources := []Resource{}
 	{
-		resourceQuery := "select * from resources where author_id = $1"
+		resourceQuery := "select r.* from resources r, resource_collaborators c where (r.author_id = $1) or (r.id = c.resource_id and c.user_id = $1)"
 		if !elevated {
 			resourceQuery += " and status = 'public'"
 		}
