@@ -179,7 +179,7 @@ CREATE TABLE public.resources (
     name character varying(254) NOT NULL,
     title text NOT NULL,
     description text NOT NULL,
-    status integer DEFAULT 1 NOT NULL
+    status text DEFAULT 'public'::text NOT NULL
 );
 
 
@@ -420,14 +420,6 @@ ALTER TABLE ONLY public.resource_votes
 
 
 --
--- Name: resources resources_name_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.resources
-    ADD CONSTRAINT resources_name_key UNIQUE (name);
-
-
---
 -- Name: resources resources_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -497,6 +489,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_username_key UNIQUE (username);
+
+
+--
+-- Name: resources_name_author_id_uindex; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX resources_name_author_id_uindex ON public.resources USING btree (name, author_id);
 
 
 --
