@@ -13,9 +13,9 @@ import (
 )
 
 func (a *API) checkUser(c *gin.Context) {
-	var fieldVal interface{} = c.Param("id")
+	var fieldVal interface{} = c.Param("user_id")
 	fieldName := "username"
-	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	userID, err := strconv.ParseUint(c.Param("user_id"), 10, 64)
 	if err == nil {
 		fieldVal = userID
 		fieldName = "id"

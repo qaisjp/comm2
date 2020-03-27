@@ -46,17 +46,19 @@ func (a *API) mustOwnResource(ctx *gin.Context) {
 }
 
 func (a *API) checkResource(c *gin.Context) {
-	var fieldVal interface{} = c.Param("id")
+	var fieldVal interface{} = c.Param("resource_id")
 	fieldName := "name"
-	resourceID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	resourceID, err := strconv.ParseUint(c.Param("resource_id"), 10, 64)
 	if err == nil {
 		fieldVal = resourceID
 		fieldName = "id"
 	}
 
+	user := c.MustGet("user").(*User)
+
 	// Check if the resource exists
 	var resource Resource
-	if err := a.DB.Get(&resource, "select * from resources where "+pq.QuoteIdentifier(fieldName)+" = $1", fieldVal); err != nil {
+	if err := a.DB.Get(&resource, "select * from resources where "+pq.QuoteIdentifier(fieldName)+" = $1 and author_id=$2", fieldVal, user.ID); err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{
 				"message": "That resource could not be found",

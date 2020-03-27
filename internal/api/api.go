@@ -142,7 +142,7 @@ func NewAPI(
 
 		v1.GET("/resources", a.listResources)
 		v1.POST("/resources", authRequired, a.createResource)
-		resources := v1.Group("/resources/:id", a.checkResource)
+		resources := v1.Group("/resources/:user_id/:resource_id", a.checkUser, a.checkResource)
 		{
 			resources.GET("", a.getResource)
 			resources.DELETE("", authRequired, a.mustOwnResource, a.deleteResource)
@@ -160,7 +160,7 @@ func NewAPI(
 			}
 		}
 
-		users := v1.Group("/users/:id", a.checkUser)
+		users := v1.Group("/users/:user_id", a.checkUser)
 		{
 			users.GET("", a.getUser)
 		}
