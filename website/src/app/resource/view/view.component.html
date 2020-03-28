@@ -13,5 +13,13 @@
     <li>Created at: {{ resource.created_at | amTimeAgo }}</li>
   </ul>
 
-
+  <div>
+    <strong>Packages</strong>
+    <ng-template #packagesLoading>
+      <div>Loading...</div>
+    </ng-template>
+    <ul *ngIf="packages$ | async as packages; else packagesLoading">
+      <li *ngFor="let pkg of packages">{{ pkg | json }}</li>
+    </ul>
+  </div>
 </div>
