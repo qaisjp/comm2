@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Resource, ResourcePackage, ResourceService} from '../resource.service';
 import {AlertService} from '../../alert.service';
-import {pluck, switchMap, tap} from 'rxjs/operators';
+import {pluck, single, switchMap, tap} from 'rxjs/operators';
 import {Observable, Subject} from 'rxjs';
 
 @Component({
@@ -13,6 +13,7 @@ import {Observable, Subject} from 'rxjs';
 export class ResourceViewComponent implements OnInit {
   public resource$ = new Subject<Resource>();
   public packages$: Observable<ResourcePackage[]>;
+  public downloadable = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -25,7 +26,12 @@ export class ResourceViewComponent implements OnInit {
       switchMap(params => this.resources.get(params.username, params.resource))
     ).subscribe((data: Resource) => {
       this.resource$.next(data);
-      this.packages$ = this.resources.getPackages(data.author_id, data.id);
+      this.packages$ = this.resources.getPackages(data.author_id, data.id).pipe(
+        single(),
+        tap(packages => {
+          this.downloadable = packages.some(pkg => !pkg.draft);
+        }),
+      );
     });
   }
 
