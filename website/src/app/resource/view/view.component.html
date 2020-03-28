@@ -1,7 +1,7 @@
 <div *ngIf="resource$ | async as resource">
   <h1>
-    {{ resource.title }} ({{ resource.name }})
-    <button [disabled]="!downloadable">Download</button>
+    {{ resource.title }}
+    <button [disabled]="!downloadable">Download <code>{{ resource.name }}.zip</code></button>
   </h1>
   <ul>
     <li>Rating: NONE</li>
