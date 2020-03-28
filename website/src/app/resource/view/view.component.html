@@ -17,12 +17,30 @@
   </ul>
 
   <div>
-    <strong>Packages</strong>
+    <strong>Version History</strong>
     <ng-template #packagesLoading>
       <div>Loading...</div>
     </ng-template>
-    <ul *ngIf="packages$ | async as packages; else packagesLoading">
-      <li *ngFor="let pkg of packages">{{ pkg | json }}</li>
-    </ul>
+    <table *ngIf="packages$ | async as packages; else packagesLoading" width="100%">
+      <thead>
+        <tr>
+          <th>Version</th>
+          <th>Publish Date</th>
+          <th>Changes</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pkg of packages">
+          <td>{{ pkg.version }} <ng-template [ngIf]="pkg.draft">(draft)</ng-template></td>
+          <td>{{ (pkg.draft ? pkg.updated_at : pkg.created_at) | amDateFormat: 'YYYY-MM-DD HH:mm' }}</td>
+          <td>{{ pkg.description }}</td>
+          <td>Download</td>
+          <td>Contents</td>
+          <td>Edit</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
