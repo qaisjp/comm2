@@ -48,7 +48,7 @@ export class ResourceService {
     );
   }
 
-  public getLatestResources(): Observable<Resource[]> {
+  public getLatest(): Observable<Resource[]> {
     return this.http.get(`${environment.api.baseurl}/v1/resources`, {headers: {'X-Authorization-None': ''}}).pipe(
       tap(data => this.log.debug(`getLatestResources response`, data)),
       catchError(alertErrorReturnZero<string>('ResourceService.getLatestResources')),

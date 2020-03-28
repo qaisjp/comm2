@@ -17,7 +17,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.latestResources$ = this.resources.getLatestResources();
+    this.latestResources$ = this.resources.getLatest();
   }
 
 }
