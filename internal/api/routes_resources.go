@@ -38,45 +38,66 @@ func (a *API) mustOwnResource(ctx *gin.Context) {
 		return
 	} else if !ok {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"message": "You don't own that resource",
+			"message": "You don't have permission to access that resource.",
 		})
 		ctx.Abort()
 		return
 	}
 }
 
-func (a *API) checkResource(c *gin.Context) {
-	var fieldVal interface{} = c.Param("resource_id")
+func (a *API) checkResource(ctx *gin.Context) {
+	var fieldVal interface{} = ctx.Param("resource_id")
 	fieldName := "name"
-	resourceID, err := strconv.ParseUint(c.Param("resource_id"), 10, 64)
+	resourceID, err := strconv.ParseUint(ctx.Param("resource_id"), 10, 64)
 	if err == nil {
 		fieldVal = resourceID
 		fieldName = "id"
 	}
 
-	user := c.MustGet("user").(*User)
+	user := ctx.MustGet("user").(*User)
 
 	// Check if the resource exists
 	var resource Resource
 	if err := a.DB.Get(&resource, "select * from resources where "+pq.QuoteIdentifier(fieldName)+" = $1 and author_id=$2", fieldVal, user.ID); err != nil {
 		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{
+			ctx.JSON(http.StatusNotFound, gin.H{
 				"message": "That resource could not be found",
 			})
-			c.Abort()
+			ctx.Abort()
 			return
 		}
 
 		a.Log.WithField("err", err).Errorln("Could not find resource")
-		c.JSON(http.StatusInternalServerError, gin.H{
+		ctx.JSON(http.StatusNotFound, gin.H{
 			"message": errors.Wrap(err, "Could not find resource"),
 		})
-		c.Abort()
+		ctx.Abort()
+		return
+	}
+
+	// Populate resource.CanManage field
+	currentUser := ctx.MustGet("current_user").(*User)
+	if currentUser != nil {
+		// Throw an error and abort if the author ID and user does not match
+		ok, err := a.canUserManageResource(ctx, user.ID, resource.ID)
+		if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+			ctx.Abort()
+			return
+		}
+		resource.CanManage = ok
+	}
+
+	if resource.Status != ResourceStatusPublic && !resource.CanManage {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "You don't have permission to access that resource.",
+		})
+		ctx.Abort()
 		return
 	}
 
 	// Store the resource
-	c.Set("resource", &resource)
+	ctx.Set("resource", &resource)
 }
 
 // listResources is an endpoint that allows you to list and search through resources.

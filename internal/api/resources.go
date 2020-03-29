@@ -22,6 +22,8 @@ type Resource struct {
 	// Downloads   int    `db:"downloads"`
 	// Type        int    `db:"type"` // todo: ResourceType
 	Status string `db:"status" json:"status"`
+
+	CanManage bool `db:"-" json:"can_manage"`
 }
 
 const (
