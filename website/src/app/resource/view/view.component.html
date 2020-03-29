@@ -1,6 +1,7 @@
 <div *ngIf="resource$ | async as resource">
   <h1>
     {{ resource.title }}
+    <a *ngIf="resource.can_manage" [routerLink]="['manage']">Manage</a>
     <button *ngIf="resource.can_manage">Upload new version</button>
     <button [disabled]="!downloadable">Download <code>{{ resource.name }}.zip</code></button>
   </h1>
