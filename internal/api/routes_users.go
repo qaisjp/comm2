@@ -12,6 +12,46 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func (a *API) parseUserID(param string, key string, mustParse bool) func(ctx *gin.Context) {
+	return func(ctx *gin.Context) {
+		var fieldVal interface{} = ctx.Param(param)
+		fieldName := "username"
+		userID, err := strconv.ParseUint(ctx.Param(param), 10, 64)
+		if err == nil {
+			fieldVal = userID
+			fieldName = "id"
+		}
+
+		// Initial key type
+		var user *User
+		ctx.Set(key, user)
+
+		// Check if the user exists
+		user = &User{}
+		if err := a.DB.Get(user, "select * from users where "+pq.QuoteIdentifier(fieldName)+" = $1", fieldVal); err != nil {
+			if err == sql.ErrNoRows {
+				if mustParse {
+					ctx.JSON(http.StatusNotFound, gin.H{
+						"message": "That user could not be found",
+					})
+					ctx.Abort()
+				}
+				return
+			}
+
+			a.Log.WithField("err", err).Errorln("Failed to find user")
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Failed to find user",
+			})
+			ctx.Abort()
+			return
+		}
+
+		// Store the resource
+		ctx.Set(key, user)
+	}
+}
+
 func (a *API) checkUser(c *gin.Context) {
 	var fieldVal interface{} = c.Param("user_id")
 	fieldName := "username"

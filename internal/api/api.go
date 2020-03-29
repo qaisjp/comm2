@@ -168,8 +168,17 @@ func NewAPI(
 		user := v1.Group("/user", authRequired)
 		{
 			user.GET("", a.getCurrentUser)
+			follow := user.Group("/follow/:target_user", a.parseUserID("target_user", "target_user", true))
+			follow.GET("", a.followUser)
+			follow.PUT("", a.followUser)
+			follow.DELETE("", a.followUser)
 		}
 	}
 
 	return a
+}
+
+func (a *API) somethingWentWrong(ctx *gin.Context, err error) *logrus.Entry {
+	ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong"})
+	return a.Log.WithError(err)
 }
