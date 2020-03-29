@@ -163,6 +163,8 @@ func NewAPI(
 		users := v1.Group("/users/:user_id", a.checkUser)
 		{
 			users.GET("", a.getUser)
+			users.GET("/followers", a.getUserFollowers)
+			users.GET("/following", a.getUserFollowing)
 		}
 
 		user := v1.Group("/user", authRequired)

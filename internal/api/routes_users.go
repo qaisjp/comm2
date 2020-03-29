@@ -213,3 +213,37 @@ func (a *API) createUser(c *gin.Context) {
 
 	c.Status(http.StatusCreated)
 }
+
+func (a *API) getUserFollowers(ctx *gin.Context) {
+	user := ctx.MustGet("user").(*User)
+
+	var rows []User
+	if err := a.DB.SelectContext(ctx, &rows, "select u.* from users u, user_followings f where f.target_user_id=$1 and f.source_user_id=u.id", user.ID); err != nil {
+		a.somethingWentWrong(ctx, err).WithField("user_id", user.ID).Errorln("could not get this user's followers")
+		return
+	}
+
+	output := []PublicUserInfo{}
+	for _, u := range rows {
+		output = append(output, u.PublicInfo())
+	}
+
+	ctx.JSON(http.StatusOK, output)
+}
+
+func (a *API) getUserFollowing(ctx *gin.Context) {
+	user := ctx.MustGet("user").(*User)
+
+	var rows []User
+	if err := a.DB.SelectContext(ctx, &rows, "select u.* from users u, user_followings f where f.source_user_id=$1 and f.target_user_id=u.id", user.ID); err != nil {
+		a.somethingWentWrong(ctx, err).WithField("user_id", user.ID).Errorln("could not get this user's following list")
+		return
+	}
+
+	output := []PublicUserInfo{}
+	for _, u := range rows {
+		output = append(output, u.PublicInfo())
+	}
+
+	ctx.JSON(http.StatusOK, output)
+}
