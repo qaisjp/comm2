@@ -11,6 +11,7 @@ import { AuthInterceptor } from './auth/auth.interceptor';
 import { LogService } from './log.service';
 import { NavbarComponent } from './navbar/navbar.component';
 import {ResourceModule} from './resource/resource.module';
+import { AdminModule } from './admin/admin.module';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import {ResourceModule} from './resource/resource.module';
     ProfileModule,
     ResourceModule,
     AuthModule,
+    AdminModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

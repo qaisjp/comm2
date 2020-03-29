@@ -9,5 +9,5 @@ import (
 func (a *API) getCurrentUser(c *gin.Context) {
 	user := c.MustGet("current_user").(*User)
 	// todo: support extra private info
-	c.JSON(http.StatusOK, user.PublicInfo())
+	c.JSON(http.StatusOK, user.PrivateInfo())
 }

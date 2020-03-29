@@ -33,6 +33,18 @@ func (u User) PublicInfo() PublicUserInfo {
 	}
 }
 
+type AuthenticatedUser struct {
+	PublicUserInfo
+	Level int `json:"level"`
+}
+
+func (u User) PrivateInfo() AuthenticatedUser {
+	return AuthenticatedUser{
+		PublicUserInfo: u.PublicInfo(),
+		Level:          u.Level,
+	}
+}
+
 // User represents a public user object
 type PublicUserInfo struct {
 	ID        uint64    `json:"id"`

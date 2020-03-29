@@ -12,6 +12,7 @@ export interface User {
   readonly created_at: string;
   readonly username: string;
   readonly gravatar: string;
+  readonly level: number;
 }
 
 export interface AuthenticatedUser extends User {
