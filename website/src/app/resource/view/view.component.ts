@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Resource, ResourcePackage, ResourceService} from '../resource.service';
 import {AlertService} from '../../alert.service';
-import {pluck, single, switchMap, tap} from 'rxjs/operators';
+import {single, switchMap, tap} from 'rxjs/operators';
 import {Observable, Subject} from 'rxjs';
 
 @Component({
@@ -19,7 +19,8 @@ export class ResourceViewComponent implements OnInit {
     private route: ActivatedRoute,
     private resources: ResourceService,
     private alerts: AlertService,
-  ) { }
+  ) {
+  }
 
   ngOnInit() {
     this.route.params.pipe(

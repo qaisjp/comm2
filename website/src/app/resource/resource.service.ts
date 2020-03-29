@@ -22,6 +22,7 @@ export interface Resource {
   description: string;
   status: ResourceStatus;
   authors: User[];
+  readonly can_manage: boolean;
 }
 
 interface ResourceCreateResponse {
