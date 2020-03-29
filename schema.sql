@@ -126,13 +126,13 @@ ALTER SEQUENCE public.resource_media_id_seq OWNED BY public.resource_media.id;
 CREATE TABLE public.resource_packages (
     id integer NOT NULL,
     resource_id integer NOT NULL,
-    filename text NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     description text DEFAULT ''::text NOT NULL,
     version character varying(10) NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     author_id integer NOT NULL,
-    draft boolean DEFAULT true NOT NULL
+    draft boolean DEFAULT true NOT NULL,
+    file_uploaded boolean DEFAULT false NOT NULL
 );
 
 

@@ -41,9 +41,12 @@ type ResourcePackage struct {
 	Version     string `db:"version" json:"version"`
 	Description string `db:"description" json:"description"`
 
-	Filename string `db:"filename" json:"filename"`
+	Draft        bool `db:"draft" json:"draft"`
+	FileUploaded bool `db:"file_uploaded" json:"file_uploaded"`
+}
 
-	Draft bool `db:"draft" json:"draft"`
+func (pkg *ResourcePackage) GetBucketFilename() string {
+	return fmt.Sprintf("res%d/pkg%d.zip", pkg.ResourceID, pkg.ID)
 }
 
 type ResourceRating struct {

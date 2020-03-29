@@ -17,16 +17,16 @@ import (
 
 // checkResourcePkg is a middleware that verifies that the package id
 // exists for the current resource being accessed.
-func (a *API) checkResourcePkg(c *gin.Context) {
-	resource := c.MustGet("resource").(*Resource)
+func (a *API) checkResourcePkg(ctx *gin.Context) {
+	resource := ctx.MustGet("resource").(*Resource)
 
 	// Parse pkg_id param
-	pkgID, err := strconv.ParseUint(c.Param("pkg_id"), 10, 64)
+	pkgID, err := strconv.ParseUint(ctx.Param("pkg_id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
-		c.Abort()
+		ctx.Abort()
 		return
 	}
 
@@ -34,31 +34,40 @@ func (a *API) checkResourcePkg(c *gin.Context) {
 	var pkg ResourcePackage
 	if err := a.DB.Get(&pkg, "select * from resource_packages where id = $1 and resource_id = $2", pkgID, resource.ID); err != nil {
 		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{
+			ctx.JSON(http.StatusNotFound, gin.H{
 				"message": "That resource package could not be found",
 			})
-			c.Abort()
+			ctx.Abort()
 			return
 		}
 
 		a.Log.WithField("err", err).Errorln("Could not find resource package")
-		c.JSON(http.StatusInternalServerError, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": errors.Wrap(err, "Could not find resource package"),
 		})
-		c.Abort()
 		return
 	}
 
 	// If draft, run mustOwnResource middleware
 	if pkg.Draft {
-		a.mustOwnResource(c)
-		if c.IsAborted() {
+		a.mustOwnResource(ctx)
+		if ctx.IsAborted() {
 			return
 		}
 	}
 
+	bucketFilename := pkg.GetBucketFilename()
+	pkg.FileUploaded, err = a.Bucket.Exists(ctx, bucketFilename)
+	if err != nil {
+		a.Log.WithError(err).WithField("filename", bucketFilename).WithField("pkg", pkg.ID).Errorln("could not check bucket for file existence")
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Something went wrong.",
+		})
+		return
+	}
+
 	// Store the resource package
-	c.Set("resource_pkg", &pkg)
+	ctx.Set("resource_pkg", &pkg)
 }
 
 // createResourcePackage is an endpoint that creates a resource package draft
@@ -112,31 +121,30 @@ func (a *API) getResourcePackage(c *gin.Context) {
 	c.JSON(http.StatusOK, pkg)
 }
 
-func (a *API) downloadResourcePackage(c *gin.Context) {
-	resource := c.MustGet("resource_pkg").(*ResourcePackage)
+func (a *API) downloadResourcePackage(ctx *gin.Context) {
+	resource := ctx.MustGet("resource").(*Resource)
+	pkg := ctx.MustGet("resource_pkg").(*ResourcePackage)
 
 	// c.Header("Content-Disposition",
 	// c.Header("Cache-Control", "no-store")
 
-	r, err := a.Bucket.NewReader(c, resource.Filename, nil)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+	if !pkg.FileUploaded {
+		ctx.Status(http.StatusNotFound)
+		return
 	}
 
-	c.DataFromReader(http.StatusOK, r.Size(), "application/zip", r, map[string]string{
-		"Cache-Control":       "no-store",
-		"Content-Disposition": fmt.Sprintf("attachment; filename=\"%s\"", resource.Filename),
-	})
-	// bytesWritten, copyErr := io.Copy(c.Writer, r)
-	// if copyErr != nil {
-	// 	fmt.Printf("Error copying file to the http response %s\n", copyErr.Error())
-	// 	return
-	// }
-	// fmt.Printf("%d bytes writte\n", bytesWritten)
+	bucketFilename := pkg.GetBucketFilename()
+	r, err := a.Bucket.NewReader(ctx, bucketFilename, nil)
+	if err != nil {
+		a.Log.WithError(err).WithField("filename", bucketFilename).WithField("pkg", pkg.ID).Errorln("could not create reader from bucket")
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
 
-	// c.JSON(http.StatusOK, resource)
+	ctx.DataFromReader(http.StatusOK, r.Size(), "application/zip", r, map[string]string{
+		"Cache-Control":       "no-store",
+		"Content-Disposition": fmt.Sprintf("attachment; filename=\"%s\"", resource.Name+".zip"),
+	})
 }
 
 // uploadResourcePackage is an endpoint that uploads a file to an existing resource package
@@ -155,8 +163,6 @@ func (a *API) uploadResourcePackage(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-
-	filename := "pkg" + strconv.FormatUint(pkg.ID, 10) + ".zip"
 
 	// Make sure the file is a zip
 	if typ := header.Header.Get("Content-Type"); typ != "application/zip" {
@@ -193,7 +199,7 @@ func (a *API) uploadResourcePackage(c *gin.Context) {
 		return
 	}
 
-	w, err := a.Bucket.NewWriter(c, filename, nil)
+	w, err := a.Bucket.NewWriter(c, pkg.GetBucketFilename(), nil)
 	if err != nil {
 		a.Log.WithError(err).Errorln("could not create new bucket writer when uploading package")
 		c.Status(http.StatusInternalServerError)
@@ -217,5 +223,5 @@ func (a *API) uploadResourcePackage(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, pkg)
+	c.Status(http.StatusOK)
 }
