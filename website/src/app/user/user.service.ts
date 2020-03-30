@@ -39,19 +39,33 @@ export class UserService {
   ) {
   }
 
-  public getUser(usernameOrID: string | number): Observable<User> {
-    const url = `${environment.api.baseurl}/v1/users/${encodeURIComponent(usernameOrID)}`;
+  public getUser(id: UserID): Observable<User> {
+    const url = `${environment.api.baseurl}/v1/users/${encodeURIComponent(id)}`;
     return this.http.get(url, {headers: {'X-Authorization-None': ''}}).pipe(
       tap(data => this.log.debug(`getUser response`, data)),
       map(data => data as User)
     );
   }
 
-  public getUserProfile(usernameOrID: string | number): Observable<UserProfile> {
-    const url = `${environment.api.baseurl}/private/profile/${encodeURIComponent(usernameOrID)}`;
+  public getUserProfile(id: UserID): Observable<UserProfile> {
+    const url = `${environment.api.baseurl}/private/profile/${encodeURIComponent(id)}`;
     return this.http.get(url).pipe(
       tap(data => this.log.debug(`getUserProfile response`, data)),
       map(data => data as UserProfile)
+    );
+  }
+
+  public followUser(id: UserID) {
+    const url = `${environment.api.baseurl}/v1/user/follow/${id}`;
+    return this.http.put(url, '').pipe(
+      tap(data => this.log.debug(`delete user follow on`, id))
+    );
+  }
+
+  public unfollowUser(id: UserID) {
+    const url = `${environment.api.baseurl}/v1/user/follow/${id}`;
+    return this.http.delete(url).pipe(
+      tap(data => this.log.debug(`delete user follow on`, id))
     );
   }
 }

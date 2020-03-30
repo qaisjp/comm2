@@ -1,6 +1,11 @@
-<div *ngIf="user$ | async as user">
+<div *ngIf="user$ | async as user;">
   <img [src]="user.gravatar">
-  <h1>{{ user.username }}</h1>
+  <h1>
+    {{ user.username }}
+    <button *ngIf="(auth.user$ | async).id !== user.id" (click)="toggleFollowState()" [disabled]="loading">
+      {{ (followed) ? "Unfollow" : "Follow" }}
+    </button>
+  </h1>
   <div>
     <h2>Resources</h2>
     <ul>

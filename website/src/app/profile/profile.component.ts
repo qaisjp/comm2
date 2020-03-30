@@ -4,7 +4,9 @@ import {ResourceStatus} from '../resource/resource.service';
 import {User, UserProfile, UserService} from '../user/user.service';
 import {AlertService} from '../alert.service';
 import {Location} from '@angular/common';
-import {Subject} from 'rxjs';
+import {Observable, of, ReplaySubject, Subject} from 'rxjs';
+import {AuthService} from '../auth/auth.service';
+import {delay, single, switchMap} from 'rxjs/operators';
 
 interface UserProfileExtended extends UserProfile {
   hasPrivate: boolean;
@@ -16,7 +18,9 @@ interface UserProfileExtended extends UserProfile {
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
-  public user$ = new Subject<UserProfileExtended>();
+  public user$ = new ReplaySubject<UserProfileExtended>(1);
+  public followed = false;
+  public loading = false; // HACK
 
   constructor(
     private route: ActivatedRoute,
@@ -24,6 +28,7 @@ export class ProfileComponent implements OnInit {
     private location: Location,
     private users: UserService,
     private alerts: AlertService,
+    public auth: AuthService,
   ) {
   }
 
@@ -46,6 +51,27 @@ export class ProfileComponent implements OnInit {
           ...data,
           hasPrivate,
         });
+
+        this.auth.user$.subscribe(
+          user => this.followed = data.followers.some(u => u.id === user.id)
+        );
+      });
+    });
+  }
+
+  toggleFollowState() {
+    // are we expected to subscribe in every single function? observables are annoying
+    this.user$.subscribe(user => {
+      this.loading = true;
+      let obs;
+      if (this.followed) {
+        obs = this.users.unfollowUser(user.id);
+      } else {
+        obs = this.users.followUser(user.id);
+      }
+      obs.subscribe(() => {
+        this.followed = !this.followed;
+        this.loading = false;
       });
     });
   }
