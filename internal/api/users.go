@@ -1,9 +1,12 @@
 package api
 
 import (
+	"context"
 	"crypto/md5"
 	"fmt"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 // User represents a user account
@@ -45,6 +48,16 @@ func (u User) PrivateInfo() AuthenticatedUser {
 	}
 }
 
+func (u User) GetFollowers(ctx context.Context, db *sqlx.DB) (rows []User, err error) {
+	err = db.SelectContext(ctx, &rows, "select u.* from users u, user_followings f where f.target_user_id=$1 and f.source_user_id=u.id", u.ID)
+	return
+}
+
+func (u User) GetFollowing(ctx context.Context, db *sqlx.DB) (rows []User, err error) {
+	err = db.SelectContext(ctx, &rows, "select u.* from users u, user_followings f where f.source_user_id=$1 and f.target_user_id=u.id", u.ID)
+	return
+}
+
 // User represents a public user object
 type PublicUserInfo struct {
 	ID        uint64    `json:"id"`
@@ -53,4 +66,14 @@ type PublicUserInfo struct {
 
 	Username string `json:"username"`
 	Gravatar string `json:"gravatar"`
+}
+
+type UserSlice []User
+
+func (s UserSlice) PublicInfo() []PublicUserInfo {
+	output := []PublicUserInfo{}
+	for _, u := range s {
+		output = append(output, u.PublicInfo())
+	}
+	return output
 }

@@ -122,13 +122,28 @@ func (a *API) getUserProfile(ctx *gin.Context) {
 		}
 	}
 
+	following, err := user.GetFollowing(ctx, a.DB)
+	if err != nil {
+		a.somethingWentWrong(ctx, err).WithField("user_id", user.ID).Errorln("could not get this user's following list")
+		return
+	}
+	followers, err := user.GetFollowers(ctx, a.DB)
+	if err != nil {
+		a.somethingWentWrong(ctx, err).WithField("user_id", user.ID).Errorln("could not get this user's followers")
+		return
+	}
+
 	type BaseProfileInfo struct {
 		PublicUserInfo
-		Resources []Resource `json:"resources"`
+		Resources []Resource       `json:"resources"`
+		Following []PublicUserInfo `json:"following"`
+		Followers []PublicUserInfo `json:"followers"`
 	}
 	base := BaseProfileInfo{
 		PublicUserInfo: pu,
 		Resources:      resources,
+		Following:      UserSlice(following).PublicInfo(),
+		Followers:      UserSlice(followers).PublicInfo(),
 	}
 
 	if elevated {
@@ -216,34 +231,20 @@ func (a *API) createUser(c *gin.Context) {
 
 func (a *API) getUserFollowers(ctx *gin.Context) {
 	user := ctx.MustGet("user").(*User)
-
-	var rows []User
-	if err := a.DB.SelectContext(ctx, &rows, "select u.* from users u, user_followings f where f.target_user_id=$1 and f.source_user_id=u.id", user.ID); err != nil {
+	rows, err := user.GetFollowers(ctx, a.DB)
+	if err != nil {
 		a.somethingWentWrong(ctx, err).WithField("user_id", user.ID).Errorln("could not get this user's followers")
 		return
 	}
-
-	output := []PublicUserInfo{}
-	for _, u := range rows {
-		output = append(output, u.PublicInfo())
-	}
-
-	ctx.JSON(http.StatusOK, output)
+	ctx.JSON(http.StatusOK, UserSlice(rows).PublicInfo())
 }
 
 func (a *API) getUserFollowing(ctx *gin.Context) {
 	user := ctx.MustGet("user").(*User)
-
-	var rows []User
-	if err := a.DB.SelectContext(ctx, &rows, "select u.* from users u, user_followings f where f.source_user_id=$1 and f.target_user_id=u.id", user.ID); err != nil {
+	rows, err := user.GetFollowers(ctx, a.DB)
+	if err != nil {
 		a.somethingWentWrong(ctx, err).WithField("user_id", user.ID).Errorln("could not get this user's following list")
 		return
 	}
-
-	output := []PublicUserInfo{}
-	for _, u := range rows {
-		output = append(output, u.PublicInfo())
-	}
-
-	ctx.JSON(http.StatusOK, output)
+	ctx.JSON(http.StatusOK, UserSlice(rows).PublicInfo())
 }
