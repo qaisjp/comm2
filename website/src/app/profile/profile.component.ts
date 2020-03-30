@@ -46,7 +46,6 @@ export class ProfileComponent implements OnInit {
           ...data,
           hasPrivate,
         });
-        this.alerts.setAlert( `${hasPrivate}` + JSON.stringify(data) );
       });
     });
   }

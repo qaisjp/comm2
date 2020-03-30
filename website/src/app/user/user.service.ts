@@ -21,6 +21,8 @@ export interface AuthenticatedUser extends User {
 
 export interface UserProfile extends User {
   readonly resources: Resource[];
+  readonly following: User[];
+  readonly followers: User[];
 }
 
 // UserID can either be the name of the user, or its ID
