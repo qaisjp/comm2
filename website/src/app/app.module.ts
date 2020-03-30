@@ -23,10 +23,8 @@ import { AdminModule } from './admin/admin.module';
     BrowserModule,
     HttpClientModule, // import HttpClientModule after BrowserModule
     AppRoutingModule,
-    ProfileModule,
     ResourceModule,
     AuthModule,
-    AdminModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

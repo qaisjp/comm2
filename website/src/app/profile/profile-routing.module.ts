@@ -7,15 +7,15 @@ import {ResourceManageComponent} from '../resource/manage/manage.component';
 
 const routes: Routes = [
   {
-    path: 'u/:username',
+    path: ':username',
     component: ProfileComponent,
   },
   {
-    path: 'u/:username/:resource',
+    path: ':username/:resource',
     component: ResourceViewComponent,
   },
   {
-    path: 'u/:username/:resource/manage',
+    path: ':username/:resource/manage',
     component: ResourceManageComponent,
   }
 ];

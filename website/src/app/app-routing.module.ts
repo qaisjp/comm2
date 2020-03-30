@@ -26,6 +26,14 @@ const routes: Routes = [
   {
     path: 'create',
     component: ResourceCreateComponent,
+  },
+  {
+    path: 'u',
+    loadChildren: 'src/app/profile/profile.module#ProfileModule'
+  },
+  {
+    path: 'admin',
+    loadChildren: 'src/app/admin/admin.module#AdminModule'
   }
 ];
 
