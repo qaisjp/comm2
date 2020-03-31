@@ -1,19 +1,34 @@
-<h1>Register</h1>
+<div class="Box Box--spacious col-6 mx-auto text-center">
+  <form>
+    <div class="Box-body">
+      <h3 class="f1-light">
+        Create an account
+        <!-- todo make this work and remove FormsModule from the auth module, please -->
+      </h3>
+      <div class="form-group mb-4">
+        <div class="form-group-header"><label for="mta-auth-register-username">Username</label></div>
+        <div class="form-group-body">
+          <input placeholder="username" class="form-control" type="text" autocomplete="username" required id="mta-auth-register-username">
+        </div>
+      </div>
 
-<p>
-todo make this work and remove FormsModule from the auth module, please
-</p>
+      <div class="form-group mb-4">
+        <div class="form-group-header"><label for="mta-auth-register-password">Password</label></div>
+        <div class="format-group-body">
+          <input placeholder="password" class="form-control" type="password" autocomplete="new-password" id="mta-auth-register-password" required>
+        </div>
+      </div>
 
-<form>
-  <label>
-    Username
-    <input placeholder="username" type="text" autocomplete="username" >
-  </label>
+      <div class="form-group mb-4">
+        <div class="form-group-header"><label for="mta-auth-register-email">Email</label></div>
+        <div class="format-group-body">
+          <input id="mta-auth-register-email" class="form-control" type="email" placeholder="staff@mtasa.com">
+        </div>
+      </div>
 
-  <label>
-    Password
-    <input placeholder="password" type="password" autocomplete="new-password" required>
-  </label>
+      <button class="btn btn-primary btn-block" type="submit">Register</button>
+    </div>
+  </form>
+</div>
 
-  <button class="button" type="submit">Register</button>
-</form>
+
