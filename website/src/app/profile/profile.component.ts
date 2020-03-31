@@ -43,6 +43,7 @@ export class ProfileComponent implements OnInit {
       const tab = map.get('tab');
       if (!['resources', 'followers', 'following'].includes(tab)) {
         this.tab = 'resources';
+        return;
       }
       this.tab = tab;
     });
