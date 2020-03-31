@@ -1,21 +1,33 @@
-<div>
-  <h1>Create a resource</h1>
+<div class="Box Box--spacious col-6 mx-auto text-center">
   <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
-    <label>
-      Name
-      <input placeholder="hedit" type="text" formControlName="name" required (ngModelChange)="updateTitle($event)">
-    </label>
+    <div class="Box-body">
+      <h3 class="f1-light">
+        Create a resource
+      </h3>
+      <div class="form-group mb-4">
+        <div class="form-group-header"><label for="mta-create--name">Name</label></div>
+        <div class="form-group-body">
+          <input class="form-control" type="text" id="mta-create--name" placeholder="hedit" formControlName="name" required (ngModelChange)="updateTitle($event)" />
+        </div>
+      </div>
 
-    <label>
-      Title
-      <input placeholder="Handling Editor" type="text" formControlName="title" required (input)="titleInput = true;">
-    </label>
+      <div class="form-group mb-4">
+        <div class="form-group-header"><label for="mta-create--title">Title</label></div>
+        <div class="format-group-body">
+          <input id="mta-create--title" class="form-control" placeholder="Handling Editor" type="text" formControlName="title" required (input)="titleInput = true;">
+        </div>
+      </div>
 
-    <label>
-      Description (optional)
-      <input placeholder="The official ingame handling editor." type="text" formControlName="description">
-    </label>
+      <div class="form-group mb-4">
+        <div class="form-group-header"><label for="mta-create--description">Description (optional)</label></div>
+        <div class="format-group-body">
+          <input id="mta-create--description" class="form-control" placeholder="The official ingame handling editor." type="text" formControlName="description">
+        </div>
+      </div>
 
-    <button class="button" type="submit" [disabled]="form.disabled || form.value.name.length === 0">Next</button>
+      <button class="btn btn-primary btn-block" type="submit" [disabled]="form.disabled || form.value.name.length === 0">
+        Next
+      </button>
+    </div>
   </form>
 </div>
