@@ -1,5 +1,5 @@
 <div class="Box Box--spacious col-6 mx-auto text-center">
-  <form>
+  <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
     <div class="Box-body">
       <h3 class="f1-light">
         Create an account
@@ -8,25 +8,25 @@
       <div class="form-group mb-4">
         <div class="form-group-header"><label for="mta-auth-register-username">Username</label></div>
         <div class="form-group-body">
-          <input placeholder="username" class="form-control" type="text" autocomplete="username" required id="mta-auth-register-username">
-        </div>
-      </div>
-
-      <div class="form-group mb-4">
-        <div class="form-group-header"><label for="mta-auth-register-password">Password</label></div>
-        <div class="format-group-body">
-          <input placeholder="password" class="form-control" type="password" autocomplete="new-password" id="mta-auth-register-password" required>
+          <input placeholder="username" class="form-control" type="text" autocomplete="username" formControlName="username" required id="mta-auth-register-username">
         </div>
       </div>
 
       <div class="form-group mb-4">
         <div class="form-group-header"><label for="mta-auth-register-email">Email</label></div>
         <div class="format-group-body">
-          <input id="mta-auth-register-email" class="form-control" type="email" placeholder="staff@mtasa.com">
+          <input id="mta-auth-register-email" class="form-control" type="email" placeholder="staff@mtasa.com" formControlName="email">
         </div>
       </div>
 
-      <button class="btn btn-primary btn-block" type="submit">Register</button>
+      <div class="form-group mb-4">
+        <div class="form-group-header"><label for="mta-auth-register-password">Password</label></div>
+        <div class="format-group-body">
+          <input placeholder="password" class="form-control" type="password" autocomplete="new-password" id="mta-auth-register-password" required formControlName="password">
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" type="submit" [disabled]="form.disabled">Register</button>
     </div>
   </form>
 </div>

@@ -25,6 +25,14 @@ type User struct {
 	// FollowingCount int    `db:"following_count"` // calculate on fly? feature necessary?
 }
 
+type UserProfile struct {
+	UserID       uint64 `db:"user_id" json:"-"`
+	Location     string `db:"location" json:"location"`
+	Organisation string `db:"organisation" json:"organisation"`
+	Website      string `db:"website" json:"website"`
+	Bio          string `db:"bio" json:"bio"`
+}
+
 func (u User) PublicInfo() PublicUserInfo {
 	return PublicUserInfo{
 		ID:        u.ID,

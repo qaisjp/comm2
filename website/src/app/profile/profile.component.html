@@ -7,14 +7,20 @@
       <h1>
         {{ user.username }}
       </h1>
-      <p>I'm a software engineer studying Computer Science at the University of Edinburgh.</p>
+      <p *ngIf="user.bio.length > 0">{{ user.bio }}</p>
       <div class="d-flex flex-column">
         <span class="d-flex mb-1" [title]="user.created_at | amDateFormat: 'YYYY-MM-DD HH:mm:ss'" >
           <i appOcticon="clock" class="mr-2"></i> Member for {{ user.created_at | amTimeAgo: true }}
         </span>
-        <span class="d-flex mb-1"><i appOcticon="location" class="mr-2"></i> United Kingdom</span>
-        <span class="d-flex mb-1"><i appOcticon="globe" class="mr-2"></i> <a href="https://google.com" rel="noreferrer">https://qaisjp.com</a> </span>
-        <span class="d-flex mb-1"><i appOcticon="octoface" class="mr-2"></i> <a href="https://github.com/qaisjp" rel="noreferrer">qaisjp</a> </span>
+        <span class="d-flex mb-1" *ngIf="user.location.length > 0">
+          <i appOcticon="location" class="mr-2"></i> {{ user.location }}
+        </span>
+        <span class="d-flex mb-1" *ngIf="user.website.length > 0">
+          <i appOcticon="globe" class="mr-2"></i> <a href="https://google.com" rel="noreferrer">{{ user.website }}</a>
+        </span>
+        <span class="d-flex mb-1" *ngIf="user.organisation.length > 0">
+          <i appOcticon="organization" class="mr-2"></i> {{ user.organisation }}
+        </span>
       </div>
     </div>
     <div class="col-2">

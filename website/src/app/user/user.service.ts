@@ -21,7 +21,14 @@ export interface AuthenticatedUser extends User {
   readonly updated_at: string;
 }
 
-export interface UserProfile extends User {
+export interface UserProfileData {
+  location: string;
+  organisation: string;
+  website: string;
+  bio: string;
+}
+
+export interface UserProfile extends User, UserProfileData {
   readonly resources: Resource[];
   readonly following: User[];
   readonly followers: User[];

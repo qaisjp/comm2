@@ -266,10 +266,10 @@ CREATE TABLE public.user_followings (
 
 CREATE TABLE public.user_profile (
     user_id integer NOT NULL,
-    location character varying(255),
-    organisation character varying(255),
-    website character varying(255),
-    bio character varying(255)
+    location text DEFAULT ''::text NOT NULL,
+    organisation text DEFAULT ''::text NOT NULL,
+    website text DEFAULT ''::text NOT NULL,
+    bio text DEFAULT ''::text NOT NULL
 );
 
 

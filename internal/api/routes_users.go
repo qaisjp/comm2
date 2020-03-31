@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -104,6 +105,12 @@ func (a *API) getUserProfile(ctx *gin.Context) {
 		elevated = user.ID == currentUser.ID
 	}
 
+	var profile UserProfile
+	if err := a.DB.GetContext(ctx, &profile, "select * from user_profile where user_id = $1", user.ID); err != nil {
+		a.somethingWentWrong(ctx, err).WithField("user_id", user.ID).Errorln("could not get user_profile data")
+		return
+	}
+
 	var result interface{}
 
 	pu := user.PublicInfo()
@@ -135,12 +142,14 @@ func (a *API) getUserProfile(ctx *gin.Context) {
 
 	type BaseProfileInfo struct {
 		PublicUserInfo
+		UserProfile
 		Resources []Resource       `json:"resources"`
 		Following []PublicUserInfo `json:"following"`
 		Followers []PublicUserInfo `json:"followers"`
 	}
 	base := BaseProfileInfo{
 		PublicUserInfo: pu,
+		UserProfile:    profile,
 		Resources:      resources,
 		Following:      UserSlice(following).PublicInfo(),
 		Followers:      UserSlice(followers).PublicInfo(),
@@ -226,12 +235,31 @@ func (a *API) createUser(c *gin.Context) {
 
 	u.Password = string(hashedPassword)
 
-	_, err = a.DB.NamedExec("insert into users (username, password, email, is_activated) values (:username, :password, :email, true)", &u)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": errors.Wrap(err, "could not insert").Error(),
-		})
+	// todo use transaction
 
+	named, err := a.DB.PrepareNamedContext(c, "insert into users (username, password, email, is_activated) values (:username, :password, :email, true) returning id")
+	if err != nil {
+		a.somethingWentWrong(c, err).WithFields(logrus.Fields{
+			"username": u.Username,
+			"email":    u.Email,
+		}).Errorln("could not prepare named user insert")
+		return
+	}
+
+	var id uint64
+	if err := named.GetContext(c, &id, &u); err != nil {
+		a.somethingWentWrong(c, err).WithFields(logrus.Fields{
+			"username": u.Username,
+			"email":    u.Email,
+		}).Errorln("could not get inserted row")
+		return
+	}
+
+	if _, err := a.DB.ExecContext(c, "insert into user_profile(user_id) values ($1)", id); err != nil {
+		a.somethingWentWrong(c, err).WithFields(logrus.Fields{
+			"username": u.Username,
+			"email":    u.Email,
+		}).Errorln("could not insert user profile row")
 		return
 	}
 

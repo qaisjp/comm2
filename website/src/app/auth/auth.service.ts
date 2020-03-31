@@ -88,6 +88,12 @@ export class AuthService {
 
   }
 
+  register(username: string, email: string, password: string) {
+    return this.http.post(`${environment.api.baseurl}/v1/auth/register`, {username, email, password}, {headers: {'X-Authorization-None': ''}}).pipe(
+      tap(data => this.log.debug(`register response`, data)),
+    );
+  }
+
   public logout(config: { silent: boolean } = {silent: false}) {
     this.accessToken = null;
     localStorage.removeItem('accessToken');
