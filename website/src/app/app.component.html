@@ -5,6 +5,17 @@
   {{ alert }}
   <a [routerLink]="" (click)="alerts.clearAlert()" style="color: white">(close)</a>
 </div>
-<div style="border: solid red 5px;">
+
+<div class="border col-8 mx-auto p-3">
   <router-outlet></router-outlet>
+</div>
+
+<div class="col-10 mx-auto">
+  <hr>
+
+</div>
+
+<div style="border: solid green 3px; padding: 5px">
+<pre>Debug
+Current user json: {{ auth.user$ | async | json }}</pre>
 </div>

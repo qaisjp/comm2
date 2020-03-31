@@ -1,15 +1,27 @@
-<h1>Latest resources</h1>
-<!-- todo: show spinner -->
 <div>
+  <p class="lead-mktg text-gray">Welcome to Multi Theft Auto Hub - the official platform to share and download resources.</p>
+  <p class="lead-mktg">
+    Multi Theft Auto is a multiplayer modification for Rockstar's Grand Theft Auto game series: a piece of software that adapts the game in such a way,
+    you can play Grand Theft Auto with your friends online and develop your own gamemodes.
+  </p>
+</div>
 
-  <li *ngFor="let res of (latestResources$ | async); index as i">
-    <a [routerLink]="['/u', res.author_id, res.name]">
-      {{ res.name }}
-    </a>
-    by
-    <a [routerLink]="['/u', res.author_id]">
-      author{{ res.author_id }}
-    </a>
-    - <code style="color: green">{{res | json}}</code>
-  </li>
+<div>
+  <h1>Latest resources</h1>
+  <p>
+    MTA Hub features a Resource center that allows you to upload and share your latest developed resources with other members of our community.
+  </p>
+  <!-- todo: show spinner -->
+  <div>
+    <div *ngFor="let res of (latestResources$ | async); index as i">
+      <a [routerLink]="['/u', res.author_id, res.name]">
+        {{ res.name }}
+      </a>
+      by
+      <a [routerLink]="['/u', res.author_id]">
+        author{{ res.author_id }}
+      </a>
+      - <code style="color: green">{{res | json}}</code>
+    </div>
+  </div>
 </div>

@@ -1,24 +1,45 @@
-<div style="border: solid green 3px; padding: 5px">
-<pre>Debug
-Current user json: {{ user$ | async | json }}</pre>
-</div>
-
-<div style="width: 100%; border: solid cyan 2px;">
-  <h1 style="display: inline">Nav</h1>
-  <div *ngIf="user$ | async as user; else loggedOut" style="display: inline-block">
-    <ul style="display: inline-block">
-      <li style="display: inline;"><a [routerLink]="['/']">home</a></li>
-      <li style="display: inline; padding-left: 1em;" *ngIf="user.level > 0"><a [routerLink]="['/admin/dashboard']">admin</a></li>
-      <li style="display: inline; padding-left: 1em;"><a [routerLink]="['/u', user.username]">profile</a></li>
-      <li style="display: inline; padding-left: 1em;"><a [routerLink]="['create']">create resource</a></li>
-      <li style="display: inline; padding-left: 1em;"><a [routerLink]="" (click)="auth.logout()">logout ({{ user.username }})</a></li>
-    </ul>
+<div class="bg-gray-dark">
+  <div class="Header col-8 mx-auto">
+    <div class="Header-item">
+      <a class="Header-link" routerLink="/">MTAHub</a>
+    </div>
+    <div class="Header-item">
+      <input type="search" class="form-control input-dark"/>
+    </div>
+    <div class="Header-item">
+      <a class="Header-link" href="https://www.multitheftauto.com">about</a>
+    </div>
+    <div class="Header-item">
+      <a class="Header-link" href="https://forum.mtasa.com">forum</a>
+    </div>
+    <div class="Header-item">
+      <a class="Header-link" href="https://wiki.mtasa.com">wiki</a>
+    </div>
+    <div class="Header-item">
+      <a class="Header-link" routerLink="/resources">resources</a>
+    </div>
+    <div class="Header-item Header-item--full"></div>
+    <ng-container *ngIf="user$ | async as user; else loggedOutHeader">
+      <div class="Header-item" *ngIf="user.level > 0">
+        <a class="Header-link" routerLink="/admin/dashboard">admin</a>
+      </div>
+      <div class="Header-item">
+        <a class="Header-link" routerLink="/create">create resource</a>
+      </div>
+      <div class="Header-item">
+        <a class="Header-link" [routerLink]="['/u', user.username]">{{ user.username }}</a>
+      </div>
+      <div class="Header-item mr-0">
+        <a class="Header-link" routerLink="" (click)="auth.logout()">logout</a>
+      </div>
+    </ng-container>
+    <ng-template #loggedOutHeader>
+      <div class="Header-item">
+        <a class="Header-link" routerLink="/login">login</a>
+      </div>
+      <div class="Header-item mr-0">
+        <a class="Header-link" routerLink="/register">register</a>
+      </div>
+    </ng-template>
   </div>
-  <ng-template #loggedOut>
-    <ul style="display: inline-block">
-      <li style="display: inline;"><a [routerLink]="['/']">home</a></li>
-      <li style="display: inline; padding-left: 1em"><a [routerLink]="['/login']">login</a></li>
-      <li style="display: inline; padding-left: 1em;"><a [routerLink]="['/register']">register</a></li>
-    </ul>
-  </ng-template>
 </div>

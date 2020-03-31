@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {Resource, ResourceService} from '../resource/resource.service';
 import {Observable} from 'rxjs';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +12,7 @@ export class HomeComponent implements OnInit {
   latestResources$: Observable<Resource[]>;
 
   constructor(
-    private resources: ResourceService
+    private resources: ResourceService,
   ) {
 
   }

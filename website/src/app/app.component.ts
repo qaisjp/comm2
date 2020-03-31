@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from './auth/auth.service';
 import {AlertService} from './alert.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 
@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
   title = 'mtahub';
 
   constructor(
-    private auth: AuthService,
+    public auth: AuthService,
     public alerts: AlertService,
   ) {
   }

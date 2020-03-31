@@ -1,11 +1,30 @@
-<div *ngIf="user$ | async as user;">
-  <img [src]="user.gravatar">
-  <h1>
-    {{ user.username }}
-    <button *ngIf="(auth.user$ | async).id !== user.id" (click)="toggleFollowState()" [disabled]="loading">
-      {{ (followed) ? "Unfollow" : "Follow" }}
-    </button>
-  </h1>
+<ng-container *ngIf="user$ | async as user;">
+  <div class="d-flex">
+    <div class="col-2">
+      <img [src]="user.gravatar + '?size=150'">
+    </div>
+    <div class="col-8">
+      <h1>
+        {{ user.username }}
+      </h1>
+      <p>Here goes the user's bio bio bio bio biob iob iob iob io</p>
+      <div class="d-flex flex-column">
+        <span class="d-flex mb-1"><i appOcticon="clock" class="mr-2"></i> Member for {{ user.created_at | amTimeAgo: true }}</span>
+        <span class="d-flex mb-1"><i appOcticon="location" class="mr-2"></i> Unknown</span>
+        <span class="d-flex mb-1"><i appOcticon="globe" class="mr-2"></i> <a href="https://google.com" rel="noreferrer">https://qaisjp.com</a> </span>
+      </div>
+    </div>
+    <div class="col-2">
+      <!-- HACK TODO: this uses float right. we should use flex properly but it's not working properly and i don't wanna debug -->
+      <button *ngIf="(auth.user$ | async).id !== user.id" (click)="toggleFollowState()" [attr.aria-disabled]="loading"
+              class="btn float-right" type="button">
+        {{ (followed) ? "Unfollow" : "Follow" }}
+      </button>
+      <button *ngIf="(auth.user$ | async).id === user.id" routerLink="/account" class="btn float-right d-flex" type="button">
+        <i appOcticon="pencil" class="mr-2"></i> Edit Profile
+      </button>
+    </div>
+  </div>
   <div>
     <h2>Resources</h2>
     <ul>
@@ -24,4 +43,4 @@
     <h2>Following ({{ user.following.length }})</h2>
     <li *ngFor="let follower of user.following"><code>{{ follower | json }}</code></li>
   </div>
-</div>
+</ng-container>
