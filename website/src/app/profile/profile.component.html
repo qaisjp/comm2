@@ -7,7 +7,7 @@
       <h1>
         {{ user.username }}
       </h1>
-      <p>Here goes the user's bio bio bio bio biob iob iob iob io</p>
+      <p>I'm a software engineer studying Computer Science at the University of Edinburgh.</p>
       <div class="d-flex flex-column">
         <span class="d-flex mb-1" [title]="user.created_at | amDateFormat: 'YYYY-MM-DD HH:mm:ss'" >
           <i appOcticon="clock" class="mr-2"></i> Member for {{ user.created_at | amTimeAgo: true }}
@@ -41,19 +41,30 @@
     </div>
     <div class="col-10">
       <div *ngIf="tab === 'resources'">
-        <div class="d-flex flex-row paginate-container">
-          <div *ngFor="let res of user.resources; let i = index;" class="col-12">
+        <div class="d-flex flex-row">
+          <div *ngIf="user.resources.length === 0 && (auth.user$ | async).id === user.id" class="blankslate col-12">
+            <h3 class="mb-1">You don't seem to have any resources.</h3>
+            <p>Sharing resources with the community can help improve the community as a whole.</p>
+            <button class="btn btn-primary my-3" type="button" routerLink="/create">Create resource</button>
+
+          </div>
+          <div *ngFor="let res of user.resources; let i = index;" class="col-8 bg-gray-light mr-2 mb-2">
             <a [routerLink]="['/u', res.author_id, res.name]">{{ res.name }} </a>
             <span *ngIf="user.hasPrivate">({{ res.status }})</span>
             <span> - Last updated {{ res.updated_at | amTimeAgo }}</span>
           </div>
         </div>
       </div>
+      <!-- Probably refactor this into its own template or element -->
       <div *ngIf="tab === 'followers'">
         <li *ngFor="let follower of user.followers"><code>{{ follower | json }}</code></li>
       </div>
       <div *ngIf="tab === 'following'">
-        <li *ngFor="let follower of user.following"><code>{{ follower | json }}</code></li>
+        <div *ngFor="let follower of user.following">
+          <img [src]="follower.gravatar + '?size=125'">
+          <h4>{{ follower.username }}</h4>
+          <code>{{ follower | json }}</code>
+        </div>
       </div>
 
     </div>
