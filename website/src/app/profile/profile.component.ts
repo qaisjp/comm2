@@ -19,9 +19,9 @@ interface UserProfileExtended extends UserProfile {
 })
 export class ProfileComponent implements OnInit {
   public user$ = new ReplaySubject<UserProfileExtended>(1);
-  public followed = false;
+  public followed = false; // ALSO PROBABLY A HACK
   public loading = false; // HACK
-  public tab = 'resources';
+  public tab = 'resources'; // VERY MUCH A HACK
   public tabs = [
     {key: 'resources', name: 'Resources'},
     {key: 'followers', name: 'Followers'},
@@ -39,6 +39,8 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
+    // TODO: fix problem where clicking on a profile page from the followers tab will result in weird routing issues
+    // potential fix is to just use routing rather than this queryParamMap hax
     this.route.queryParamMap.subscribe(map => {
       const tab = map.get('tab');
       if (!['resources', 'followers', 'following'].includes(tab)) {

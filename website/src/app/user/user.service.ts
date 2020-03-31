@@ -13,6 +13,8 @@ export interface User {
   readonly username: string;
   readonly gravatar: string;
   readonly level: number;
+
+  readonly follows_you?: boolean;
 }
 
 export interface AuthenticatedUser extends User {

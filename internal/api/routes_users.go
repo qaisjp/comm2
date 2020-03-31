@@ -147,6 +147,15 @@ func (a *API) getUserProfile(ctx *gin.Context) {
 	}
 
 	if elevated {
+		followersMap := make(map[uint64]struct{})
+		for _, f := range base.Followers {
+			followersMap[f.ID] = struct{}{}
+		}
+		for i, f := range base.Following {
+			_, ok := followersMap[f.ID]
+			base.Following[i].FollowsYou = &ok
+		}
+
 		result = struct {
 			BaseProfileInfo
 		}{base}

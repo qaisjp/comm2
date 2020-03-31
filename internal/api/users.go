@@ -66,6 +66,8 @@ type PublicUserInfo struct {
 
 	Username string `json:"username"`
 	Gravatar string `json:"gravatar"`
+
+	FollowsYou *bool `json:"follows_you,omitempty"`
 }
 
 type UserSlice []User
