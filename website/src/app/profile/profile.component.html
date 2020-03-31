@@ -40,33 +40,41 @@
       </nav>
     </div>
     <div class="col-10">
-      <div *ngIf="tab === 'resources'">
-        <div class="d-flex flex-row">
-          <ng-container *ngIf="user.resources.length === 0">
-            <div *ngIf="(auth.user$ | async).id === user.id; else noResourcesOther" class="blankslate col-12" >
-              <h3 class="mb-1">You don't seem to have any resources.</h3>
-              <p>Sharing resources with the community can help improve the community as a whole.</p>
-              <button class="btn btn-primary my-3" type="button" routerLink="/create">Create resource</button>
-            </div>
-            <ng-template #noResourcesOther>
-              <div *ngIf="(auth.user$ | async).id !== user.id" class="col-12">
-                <h3>This user doesn't seem to have any resources.</h3>
-              </div>
-            </ng-template>
-          </ng-container>
-          <div *ngFor="let res of user.resources; let i = index;" class="col-8 bg-gray-light mr-2 mb-2">
-            <a [routerLink]="['/u', res.author_id, res.name]">{{ res.name }} </a>
-            <span *ngIf="user.hasPrivate">({{ res.status }})</span>
-            <span> - Last updated {{ res.updated_at | amTimeAgo }}</span>
+      <div *ngIf="tab === 'resources'" class="d-flex flex-wrap">
+        <ng-container *ngIf="user.resources.length === 0">
+          <div *ngIf="(auth.user$ | async).id === user.id; else noResourcesOther" class="blankslate col-12" >
+            <h3 class="mb-1">You don't seem to have any resources.</h3>
+            <p>Sharing resources with the community can help improve the community as a whole.</p>
+            <button class="btn btn-primary my-3" type="button" routerLink="/create">Create resource</button>
           </div>
+          <ng-template #noResourcesOther>
+            <div *ngIf="(auth.user$ | async).id !== user.id" class="col-12">
+              <h3>This user doesn't seem to have any resources.</h3>
+            </div>
+          </ng-template>
+        </ng-container>
+        <div *ngFor="let res of user.resources; let i = index;" class="mr-2 mb-2 Box col-3" [routerLink]="['/u', res.author_id, res.name]">
+          <div class="Box-header">
+            <h3 class="Box-title">
+              {{ res.name }}
+              <span *ngIf="user.hasPrivate" class="Label Label--outline ml-2">{{ res.status }}</span>
+            </h3>
+          </div>
+          <div class="Box-body">Last updated {{ res.updated_at | amTimeAgo }}</div>
         </div>
       </div>
       <!-- Probably refactor this into its own template or element -->
-      <div *ngIf="tab === 'followers'">
-        <li *ngFor="let follower of user.followers"><code>{{ follower | json }}</code></li>
+      <div *ngIf="tab === 'followers'" class="d-flex flex-wrap">
+        <div *ngFor="let follower of user.followers" class="col-3 d-flex flex-items-center flex-column" [routerLink]="['/u', follower.username]" style="cursor: pointer">
+          <img [src]="follower.gravatar + '?size=125'" class="mb-2">
+          <h4>
+            {{ follower.username }}
+            <span *ngIf="follower.follows_you" class="Label Label--gray">follows you</span>
+          </h4>
+        </div>
       </div>
-      <div *ngIf="tab === 'following'" class="d-flex">
-        <div *ngFor="let follower of user.following" class="d-flex flex-items-center flex-column" [routerLink]="['/u', follower.username]" style="cursor: pointer">
+      <div *ngIf="tab === 'following'" class="d-flex flex-wrap">
+        <div *ngFor="let follower of user.following" class="col-3 d-flex flex-items-center flex-column" [routerLink]="['/u', follower.username]" style="cursor: pointer">
           <img [src]="follower.gravatar + '?size=125'" class="mb-2">
           <h4>
             {{ follower.username }}
