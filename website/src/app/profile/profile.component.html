@@ -1,7 +1,7 @@
 <ng-container *ngIf="user$ | async as user;">
   <div class="d-flex">
-    <div class="col-2">
-      <img [src]="user.gravatar + '?size=150'">
+    <div class="col-2 mr-3">
+      <img [src]="user.gravatar + '?size=150'" class="width-full">
     </div>
     <div class="col-8">
       <h1>
@@ -12,8 +12,9 @@
         <span class="d-flex mb-1" [title]="user.created_at | amDateFormat: 'YYYY-MM-DD HH:mm:ss'" >
           <i appOcticon="clock" class="mr-2"></i> Member for {{ user.created_at | amTimeAgo: true }}
         </span>
-        <span class="d-flex mb-1"><i appOcticon="location" class="mr-2"></i> Unknown</span>
+        <span class="d-flex mb-1"><i appOcticon="location" class="mr-2"></i> United Kingdom</span>
         <span class="d-flex mb-1"><i appOcticon="globe" class="mr-2"></i> <a href="https://google.com" rel="noreferrer">https://qaisjp.com</a> </span>
+        <span class="d-flex mb-1"><i appOcticon="octoface" class="mr-2"></i> <a href="https://github.com/qaisjp" rel="noreferrer">qaisjp</a> </span>
       </div>
     </div>
     <div class="col-2">
@@ -27,22 +28,34 @@
       </button>
     </div>
   </div>
-  <div>
-    <h2>Resources</h2>
-    <ul>
-      <li *ngFor="let res of user.resources">
-        <a [routerLink]="['/u', res.author_id, res.name]">{{ res.name }} </a>
-        <span *ngIf="user.hasPrivate">({{ res.status }})</span>
-        <span> - Last updated {{ res.updated_at | amTimeAgo }}</span>
-      </li>
-    </ul>
-  </div>
-  <div>
-    <h2>Followers ({{ user.followers.length }})</h2>
-    <li *ngFor="let follower of user.followers"><code>{{ follower | json }}</code></li>
-  </div>
-  <div>
-    <h2>Following ({{ user.following.length }})</h2>
-    <li *ngFor="let follower of user.following"><code>{{ follower | json }}</code></li>
+  <hr>
+  <div class="d-flex">
+    <div class="col-2 mr-3">
+      <nav class="SideNav border">
+        <a *ngFor="let t of tabs" class="SideNav-item d-flex flex-justify-between" routerLink="./" [queryParams]="{tab: t.key}"
+           [attr.aria-current]="this.tab === t.key ? 'page' : null"
+        >
+          {{ t.name }} <span class="Counter bg-gray-2 ml-1 d-flex flex-items-center">{{ user[t.key].length }}</span>
+        </a>
+      </nav>
+    </div>
+    <div class="col-10">
+      <div *ngIf="tab === 'resources'">
+        <div class="d-flex flex-row paginate-container">
+          <div *ngFor="let res of user.resources; let i = index;" class="col-12">
+            <a [routerLink]="['/u', res.author_id, res.name]">{{ res.name }} </a>
+            <span *ngIf="user.hasPrivate">({{ res.status }})</span>
+            <span> - Last updated {{ res.updated_at | amTimeAgo }}</span>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="tab === 'followers'">
+        <li *ngFor="let follower of user.followers"><code>{{ follower | json }}</code></li>
+      </div>
+      <div *ngIf="tab === 'following'">
+        <li *ngFor="let follower of user.following"><code>{{ follower | json }}</code></li>
+      </div>
+
+    </div>
   </div>
 </ng-container>

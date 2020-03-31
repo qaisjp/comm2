@@ -21,6 +21,12 @@ export class ProfileComponent implements OnInit {
   public user$ = new ReplaySubject<UserProfileExtended>(1);
   public followed = false;
   public loading = false; // HACK
+  public tab = 'resources';
+  public tabs = [
+    {key: 'resources', name: 'Resources'},
+    {key: 'followers', name: 'Followers'},
+    {key: 'following', name: 'Following'},
+  ];
 
   constructor(
     private route: ActivatedRoute,
@@ -33,6 +39,13 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.route.queryParamMap.subscribe(map => {
+      const tab = map.get('tab');
+      if (!['resources', 'followers', 'following'].includes(tab)) {
+        this.tab = 'resources';
+      }
+      this.tab = tab;
+    });
     this.route.params.subscribe(params => {
       this.users.getUserProfile(params.username).subscribe((data: UserProfile) => {
         // Update url from ID to username if necessary without causing a page reload
