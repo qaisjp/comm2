@@ -9,7 +9,9 @@
       </h1>
       <p>Here goes the user's bio bio bio bio biob iob iob iob io</p>
       <div class="d-flex flex-column">
-        <span class="d-flex mb-1"><i appOcticon="clock" class="mr-2"></i> Member for {{ user.created_at | amTimeAgo: true }}</span>
+        <span class="d-flex mb-1" [title]="user.created_at | amDateFormat: 'YYYY-MM-DD HH:mm:ss'" >
+          <i appOcticon="clock" class="mr-2"></i> Member for {{ user.created_at | amTimeAgo: true }}
+        </span>
         <span class="d-flex mb-1"><i appOcticon="location" class="mr-2"></i> Unknown</span>
         <span class="d-flex mb-1"><i appOcticon="globe" class="mr-2"></i> <a href="https://google.com" rel="noreferrer">https://qaisjp.com</a> </span>
       </div>
