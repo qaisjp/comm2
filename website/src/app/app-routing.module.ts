@@ -5,6 +5,7 @@ import { LoginPageComponent } from './auth/login-page/login-page.component';
 import {RegisterPageComponent} from './auth/register-page/register-page.component';
 import {ResourceViewComponent} from './resource/view/view.component';
 import {ResourceCreateComponent} from './resource/create/create.component';
+import {AccountComponent} from './profile/account/account.component';
 
 
 const routes: Routes = [
@@ -35,6 +36,10 @@ const routes: Routes = [
   {
     path: 'admin',
     loadChildren: 'src/app/admin/admin.module#AdminModule'
+  },
+  {
+    path: 'account',
+    component: AccountComponent,
   }
 ];
 
