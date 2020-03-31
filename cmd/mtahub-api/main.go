@@ -7,9 +7,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/gops/agent"
 	"github.com/multitheftauto/community/internal/api"
 	"github.com/multitheftauto/community/internal/config"
 	"github.com/multitheftauto/community/internal/database"
+	"github.com/pkg/errors"
 	"gocloud.dev/blob/fileblob"
 
 	"github.com/jmoiron/sqlx"
@@ -35,6 +37,10 @@ func main() {
 	logger.WithFields(logrus.Fields{
 		"module": "init",
 	}).Info("Starting up the application")
+
+	if err := agent.Listen(agent.Options{}); err != nil {
+		logger.Fatal(errors.Wrap(err, "could not start gops agent"))
+	}
 
 	// Initialize the database
 	var db *sqlx.DB
