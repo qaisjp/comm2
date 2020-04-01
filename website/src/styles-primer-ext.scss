@@ -1,0 +1,249 @@
+
+
+// Extension to Primer - see https://github.com/primer/css/issues/569#issuecomment-422505558
+.pagehead {
+  position: relative;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e1e4e8
+}
+
+//.pagehead.admin {
+//  background: url('assets/background-yellowhatch-v3.png') 0 0 repeat-x
+//}
+
+.pagehead ul.pagehead-actions {
+  position: relative;
+  z-index: 31;
+  float: right;
+  margin: 0
+}
+
+.pagehead .path-divider {
+  margin: 0 .25em
+}
+
+.pagehead h1 {
+  min-height: 32px;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 20px;
+  font-weight: 400
+}
+
+.pagehead h1 .avatar {
+  margin-top: -2px;
+  margin-right: 9px;
+  margin-bottom: -2px
+}
+
+.pagehead .account-switcher {
+  margin-top: -3px;
+  margin-bottom: -3px
+}
+
+.pagehead .underline-nav {
+  height: 69px;
+  margin-top: -20px;
+  margin-bottom: -20px
+}
+
+.pagehead-heading {
+  color: inherit
+}
+
+.pagehead-actions > li {
+  float: left;
+  margin: 0 10px 0 0;
+  font-size: 11px;
+  color: #24292e;
+  list-style-type: none
+}
+
+.pagehead-actions > li:last-child {
+  margin-right: 0
+}
+
+.pagehead-actions .octicon-mute {
+  color: #cb2431
+}
+
+.pagehead-actions .select-menu {
+  position: relative
+}
+
+.pagehead-actions .select-menu:before {
+  display: table;
+  content: ""
+}
+
+.pagehead-actions .select-menu:after {
+  display: table;
+  clear: both;
+  content: ""
+}
+
+.pagehead-actions .select-menu-modal-holder {
+  top: 100%
+}
+
+.pagehead-tabs-item {
+  float: left;
+  padding: 8px 15px 11px;
+  color: #586069;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-top: 3px solid transparent;
+  border-radius: 3px 3px 0 0
+}
+
+.pagehead-tabs-item .octicon {
+  color: rgba(27, 31, 35, .3)
+}
+
+.pagehead-tabs-item .Counter {
+  color: #444d56
+}
+
+.pagehead-tabs-item:hover {
+  color: #24292e;
+  text-decoration: none
+}
+
+.pagehead-tabs-item.selected {
+  font-weight: 600;
+  color: #24292e;
+  background-color: #fff;
+  border-color: #e36209 #e1e4e8 transparent
+}
+
+.pagehead-tabs-item.selected > .octicon {
+  color: inherit
+}
+
+.repohead.fork h1, .repohead.mirror h1 {
+  height: auto;
+  margin-top: -5px;
+  margin-bottom: 15px
+}
+
+.repohead h1 {
+  position: relative;
+  min-height: 32px;
+  font-size: 18px;
+  color: #586069
+}
+
+.repohead h1.private .octicon {
+  color: rgba(27, 31, 35, .5)
+}
+
+.repohead h1 .octicon {
+  color: #959da5
+}
+
+.repohead .octicon-mirror {
+  left: -3px
+}
+
+.repohead .octicon-lock {
+  top: 10px
+}
+
+.repohead .fork-flag, .repohead .mirror-flag {
+  display: block;
+  font-size: 11px;
+  line-height: 10px;
+  white-space: nowrap
+}
+
+.reponav {
+  position: relative;
+  top: 1px;
+  margin-top: -5px
+}
+
+.reponav:after, .reponav:before {
+  display: table;
+  content: ""
+}
+
+.reponav:after {
+  clear: both
+}
+
+.reponav-dropdown {
+  position: relative;
+  float: left
+}
+
+.reponav-item {
+  float: left;
+  padding: 7px 15px 8px;
+  color: #586069;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-top: 3px solid transparent;
+  border-radius: 3px 3px 0 0
+}
+
+.reponav-item .octicon {
+  color: rgba(27, 31, 35, .3)
+}
+
+.reponav-item .Counter {
+  color: #444d56
+}
+
+.reponav-item:focus, .reponav-item:hover {
+  color: #24292e;
+  text-decoration: none
+}
+
+.reponav-item.selected {
+  color: #24292e;
+  background-color: #fff;
+  border-color: #e36209 #e1e4e8 transparent
+}
+
+.reponav-item.selected .octicon {
+  color: inherit
+}
+
+.reponav-wrapper {
+  position: relative;
+  z-index: 2;
+  overflow-y: hidden;
+  background-color: #24292e
+}
+
+.reponav-wrapper .reponav {
+  top: 0;
+  padding-right: 8px;
+  padding-left: 8px;
+  margin-top: 0;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  color: hsla(0, 0%, 100%, .75)
+}
+
+.reponav-wrapper .reponav-item {
+  display: inline-block;
+  float: none;
+  padding: 4px 8px 16px;
+  color: hsla(0, 0%, 100%, .75);
+  border: 0
+}
+
+.reponav-wrapper .reponav-item .Counter {
+  color: inherit;
+  background-color: hsla(0, 0%, 100%, .15)
+}
+
+.reponav-wrapper .reponav-item.selected {
+  font-weight: 600;
+  color: #fff;
+  background-color: initial;
+  border: 0
+}
