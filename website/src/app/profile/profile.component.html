@@ -59,7 +59,8 @@
             </div>
           </ng-template>
         </ng-container>
-        <div *ngFor="let res of user.resources; let i = index;" class="mr-2 mb-2 Box col-3 cursor-pointer" [routerLink]="['/u', res.author_id, res.name]">
+        <div *ngFor="let res of user.resources; let i = index;" class="mr-2 mb-2 Box col-3 cursor-pointer"
+             [routerLink]="['/u', user.username, res.name]">
           <div class="Box-header">
             <h3 class="Box-title">
               {{ res.name }}

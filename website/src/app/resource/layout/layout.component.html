@@ -20,6 +20,8 @@
       </span>
       <span class="path-divider">{{ ' / ' }}</span>
       <strong class="mr-2"><a [routerLink]="['/u', creator.username, resource.name]">{{ resource.name }}</a></strong>
+      <!-- todo: hack: enum harcoded -->
+      <span *ngIf="resource.status !== 'public'" class="Label Label--outline ml-2">{{ resource.status }}</span>
     </h1>
     <nav class="mt-3 clearfix" role="navigation">
       <ng-container *ngFor="let child of route.routeConfig.children">
