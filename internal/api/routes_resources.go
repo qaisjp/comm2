@@ -296,6 +296,20 @@ func (a *API) voteResource(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+func (a *API) patchResource(ctx *gin.Context) {
+	var fields struct {
+		Name        *string `json:"name,omitempty"`
+		Title       *string `json:"name,omitempty"`
+		Description *string `json:"name,omitempty"`
+	}
+	if err := ctx.BindJSON(&fields); err != nil {
+		a.somethingWentWrong(ctx, err).Warnln("potential client error in patching resource")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
 func (a *API) listResourcePackages(ctx *gin.Context) {
 	resource := ctx.MustGet("resource").(*Resource)
 	user := ctx.MustGet("current_user").(*User)

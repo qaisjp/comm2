@@ -145,6 +145,7 @@ func NewAPI(
 		resources := v1.Group("/resources/:user_id/:resource_id", a.checkUser, a.checkResource)
 		{
 			resources.GET("", a.getResource)
+			resource.PATCH("", a.mustOwnResource, a.patchResource)
 			resources.DELETE("", authRequired, a.mustOwnResource, a.deleteResource)
 
 			resources.POST("/vote", authRequired, a.voteResource)
