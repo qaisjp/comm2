@@ -1,11 +1,17 @@
 <div *ngIf="view.resource$ | async as resource">
-  <div class="pagehead pt-2 pb-2">
-    <ul class="pagehead-actions">
+  <div class="pagehead pt-0 pt-md-2 pb-md-2">
+    <ul class="pagehead-actions mb-2 mb-md-0">
       <li>
         <button class="btn btn-sm" *ngIf="resource.can_manage">Upload new version</button>
       </li>
       <li>
-        <button class="btn btn-sm btn-primary" [disabled]="!view.downloadable">Download <code>{{ resource.name }}.zip</code></button>
+        <button
+          [disabled]="!view.downloadable"
+          [className]="'btn btn-sm btn-primary ' + (view.downloadable ? '' : 'tooltipped tooltipped-sw')"
+          [attr.aria-label]="!view.downloadable && 'Release a non-draft version first'"
+        >
+          Download <code>{{ resource.name }}.zip</code>
+        </button>
       </li>
     </ul>
     <h1 *ngFor="let creator of [resource.authors[0]]">
@@ -23,6 +29,7 @@
            [class.selected]="child.path === route.firstChild.snapshot.routeConfig.path">
           <i [appOcticon]="child.data.icon" class="mr-2"></i>
           <span>{{ child.data.title }}</span>
+          <!-- todo: make octicon bold too -->
           <span class="ml-1 Counter d-flex flex-items-center" *ngIf="child.data.counter">
             3
           </span>

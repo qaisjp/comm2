@@ -7,6 +7,11 @@
   align-items: center;
 }
 
+// Hack
+.Box-body {
+  border-bottom: none;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }

@@ -1,1 +1,5 @@
-<p>people works!</p>
+<div *ngIf="(view.resource$ | async) as resource">
+  <div *ngFor="let author of resource.authors; let first = first;">
+    {{ author | json }} - {{ first }}
+  </div>
+</div>
