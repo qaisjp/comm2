@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginPageComponent } from './auth/login-page/login-page.component';
 import {RegisterPageComponent} from './auth/register-page/register-page.component';
-import {ResourceViewComponent} from './resource/view/view.component';
+import {ResourceLayoutComponent} from './resource/layout/layout.component';
 import {ResourceCreateComponent} from './resource/create/create.component';
 import {AccountComponent} from './profile/account/account.component';
 import {AdminDashboardComponent} from './admin/dashboard/dashboard.component';

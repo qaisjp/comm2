@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import {ResourceViewService} from '../resource-view.service';
 
 @Component({
-  selector: 'app-manage',
-  templateUrl: './manage.component.html',
-  styleUrls: ['./manage.component.scss']
+  selector: 'app-people',
+  templateUrl: './people.component.html',
+  styleUrls: ['./people.component.scss']
 })
-export class ResourceManageComponent implements OnInit {
+export class ResourcePeopleComponent implements OnInit {
 
   constructor(
     public view: ResourceViewService,

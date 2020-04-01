@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ProfileComponent } from './profile.component';
-import {ResourceViewComponent} from '../resource/view/view.component';
+import {ResourceLayoutComponent} from '../resource/layout/layout.component';
 import {ResourceManageComponent} from '../resource/manage/manage.component';
 
 
@@ -12,12 +12,8 @@ const routes: Routes = [
   },
   {
     path: ':username/:resource',
-    component: ResourceViewComponent,
+    loadChildren: 'src/app/resource/resource.module#ResourceModule'
   },
-  {
-    path: ':username/:resource/manage',
-    component: ResourceManageComponent,
-  }
 ];
 
 @NgModule({
