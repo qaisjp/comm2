@@ -1,10 +1,53 @@
 <div *ngIf="resource$ | async as resource">
-  <h1>
-    {{ resource.title }}
-    <a *ngIf="resource.can_manage" [routerLink]="['manage']">Manage</a>
-    <button *ngIf="resource.can_manage">Upload new version</button>
-    <button [disabled]="!downloadable">Download <code>{{ resource.name }}.zip</code></button>
-  </h1>
+  <div class="pagehead pt-2 pb-2">
+    <ul class="pagehead-actions">
+      <li>
+        <button class="btn btn-sm" *ngIf="resource.can_manage">Upload new version</button>
+      </li>
+      <li>
+        <button class="btn btn-sm btn-primary" [disabled]="!downloadable">Download <code>{{ resource.name }}.zip</code></button>
+      </li>
+    </ul>
+    <h1 *ngFor="let creator of [resource.authors[0]]">
+      <span class="author">
+        <a class="url fn" rel="author" [routerLink]="['/u', creator.username]">{{ creator.username }}</a>
+      </span>
+      <span class="path-divider">{{ ' / ' }}</span>
+      <strong class="mr-2"><a [routerLink]="['/u', creator.username, resource.name]">{{ resource.name }}</a></strong>
+      &middot;
+      <strong class="ml-2">{{ resource.title }}</strong>
+    </h1>
+    <nav class="mt-3 clearfix" role="navigation">
+      <a class="pagehead-tabs-item d-flex selected" href="#url">
+        <i appOcticon="repo" class="mr-2"></i>
+        <span>About</span>
+      </a>
+      <a class="pagehead-tabs-item d-flex" href="#url">
+        <i appOcticon="bug" class="mr-2"></i>
+        <span>Versions</span>
+        <span class="ml-1 Counter d-flex flex-items-center">3</span>
+      </a>
+      <a class="pagehead-tabs-item d-flex" href="#url">
+        <i appOcticon="comment-discussion" class="mr-2"></i>
+        <span>Reviews</span>
+        <span class="ml-1 Counter d-flex flex-items-center">3</span>
+      </a>
+      <a class="pagehead-tabs-item d-flex" href="#url">
+        <i appOcticon="person" class="mr-2"></i>
+        <span>People</span>
+        <span class="ml-1 Counter d-flex flex-items-center">1</span>
+      </a>
+      <a class="pagehead-tabs-item d-flex" href="#url" *ngIf="resource.can_manage" [routerLink]="['manage']">
+        <i appOcticon="gear" class="mr-2"></i>
+        <span>Settings</span>
+        <span class="ml-1 Counter d-flex flex-items-center">2</span>
+      </a>
+    </nav>
+  </div>
+
+  <div>
+    {{ resource.description }}
+  </div>
   <ul>
     <li>Rating: NONE</li>
     <li>Authors:

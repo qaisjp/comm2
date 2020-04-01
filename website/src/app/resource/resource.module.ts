@@ -6,6 +6,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {MomentModule} from 'ngx-moment';
 import {RouterModule} from '@angular/router';
 import { ResourceManageComponent } from './manage/manage.component';
+import {OcticonModule} from '../octicon/octicon.module';
 
 
 
@@ -15,7 +16,8 @@ import { ResourceManageComponent } from './manage/manage.component';
     CommonModule,
     ReactiveFormsModule,
     MomentModule,
-    RouterModule
+    RouterModule,
+    OcticonModule
   ]
 })
 export class ResourceModule { }
