@@ -179,7 +179,8 @@ CREATE TABLE public.resources (
     name character varying(254) NOT NULL,
     title text NOT NULL,
     description text NOT NULL,
-    visibility text DEFAULT 'public'::text NOT NULL
+    visibility text DEFAULT 'public'::text NOT NULL,
+    archived boolean DEFAULT false NOT NULL
 );
 
 

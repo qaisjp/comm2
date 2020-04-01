@@ -396,6 +396,20 @@ func (a *API) patchResource(ctx *gin.Context) {
 		}
 	}
 
+	// Allow ops if (not_currently_archived || !*fields.Archived)
+	shouldAllowChange := !resource.Archived
+	if !shouldAllowChange && fields.Archived != nil {
+		shouldAllowChange = !*fields.Archived
+	}
+	if !shouldAllowChange && len(clauses) != 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "You can't perform that operation on an archived resource."})
+		return
+	}
+
+	if fields.Archived != nil {
+		clauses["archived"] = *fields.Archived
+	}
+
 	if len(clauses) == 0 {
 		ctx.Status(http.StatusNotModified)
 		return
