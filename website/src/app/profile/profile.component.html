@@ -59,7 +59,7 @@
             </div>
           </ng-template>
         </ng-container>
-        <div *ngFor="let res of user.resources; let i = index;" class="mr-2 mb-2 Box col-3" [routerLink]="['/u', res.author_id, res.name]">
+        <div *ngFor="let res of user.resources; let i = index;" class="mr-2 mb-2 Box col-3 cursor-pointer" [routerLink]="['/u', res.author_id, res.name]">
           <div class="Box-header">
             <h3 class="Box-title">
               {{ res.name }}
@@ -73,7 +73,7 @@
       </div>
       <!-- Probably refactor this into its own template or element -->
       <div *ngIf="tab === 'followers'" class="d-flex flex-wrap">
-        <div *ngFor="let follower of user.followers" class="col-3 d-flex flex-items-center flex-column" [routerLink]="['/u', follower.username]" style="cursor: pointer">
+        <div *ngFor="let follower of user.followers" class="col-3 d-flex flex-items-center flex-column cursor-pointer" [routerLink]="['/u', follower.username]">
           <img [src]="follower.gravatar + '?size=125'" class="mb-2">
           <h4>
             {{ follower.username }}
@@ -82,7 +82,7 @@
         </div>
       </div>
       <div *ngIf="tab === 'following'" class="d-flex flex-wrap">
-        <div *ngFor="let follower of user.following" class="col-3 d-flex flex-items-center flex-column" [routerLink]="['/u', follower.username]" style="cursor: pointer">
+        <div *ngFor="let follower of user.following" class="col-3 d-flex flex-items-center flex-column cursor-pointer" [routerLink]="['/u', follower.username]">
           <img [src]="follower.gravatar + '?size=125'" class="mb-2">
           <h4>
             {{ follower.username }}
