@@ -77,8 +77,8 @@ func NewAPI(
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:           "multitheftauto.com",
 		Key:             []byte(conf.JWTSecret),
-		Timeout:         time.Hour * 6,
-		MaxRefresh:      time.Hour * 24 * 3,
+		Timeout:         time.Hour * 24 * 7, // todo fix refresh in the frontend (this should be time.Hour * 6)
+		MaxRefresh:      time.Hour * 24 * 3, // refresh is probably fine as it is though, since we're not using it yet
 		IdentityKey:     "current_user",
 		PayloadFunc:     a.jwtPayloadFunc,
 		IdentityHandler: a.jwtIdentityHandler,
