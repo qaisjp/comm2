@@ -1,0 +1,23 @@
+<nav aria-label="Administration" class="mb-2">
+  <ol>
+    <li class="breadcrumb-item"><a routerLink="/admin">Administration</a></li>
+    <li class="breadcrumb-item" *ngFor="let child of route.children; let last = last" [attr.aria-current]="last ? 'page' : null">
+      {{ child.snapshot.data.title }}
+    </li>
+  </ol>
+</nav>
+
+<div class="d-flex container-xl">
+  <nav class="menu col-2" aria-label="Admin pages">
+    <ng-container *ngFor="let child of route.routeConfig.children">
+      <a class="menu-item" *ngIf="child.data.title !== undefined" [routerLink]="child.path" [attr.aria-current]="(child.path === route.firstChild.snapshot.routeConfig.path) ? 'page' : null">
+        {{ child.data.title }}
+      </a>
+    </ng-container>
+  </nav>
+
+  <div class="col-10 p-2">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>

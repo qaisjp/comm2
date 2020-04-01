@@ -6,6 +6,8 @@ import {RegisterPageComponent} from './auth/register-page/register-page.componen
 import {ResourceViewComponent} from './resource/view/view.component';
 import {ResourceCreateComponent} from './resource/create/create.component';
 import {AccountComponent} from './profile/account/account.component';
+import {AdminDashboardComponent} from './admin/dashboard/dashboard.component';
+import {AdminLayoutComponent} from './admin/layout/layout.component';
 
 
 const routes: Routes = [
@@ -35,7 +37,7 @@ const routes: Routes = [
   },
   {
     path: 'admin',
-    loadChildren: 'src/app/admin/admin.module#AdminModule'
+    loadChildren: 'src/app/admin/admin.module#AdminModule',
   },
   {
     path: 'account',
