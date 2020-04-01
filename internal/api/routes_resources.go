@@ -88,7 +88,7 @@ func (a *API) checkResource(ctx *gin.Context) {
 		resource.CanManage = ok
 	}
 
-	if resource.Status != ResourceStatusPublic && !resource.CanManage {
+	if resource.Visibility != ResourceVisibilityPublic && !resource.CanManage {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"message": "You don't have permission to access that resource.",
 		})

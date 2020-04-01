@@ -119,7 +119,7 @@ func (a *API) getUserProfile(ctx *gin.Context) {
 	{
 		resourceQuery := "select r.* from resources r, resource_collaborators c where (r.author_id = $1) or (r.id = c.resource_id and c.user_id = $1) and c.accepted"
 		if !elevated {
-			resourceQuery += " and status = 'public'"
+			resourceQuery += " and visibility = " + pq.QuoteLiteral(ResourceVisibilityPublic)
 		}
 		if err := a.DB.SelectContext(ctx, &resources, resourceQuery, user.ID); err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong."})

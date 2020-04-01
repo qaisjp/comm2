@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ResourceStatus} from '../resource/resource.service';
+import {ResourceVisibility} from '../resource/resource.service';
 import {User, UserProfile, UserService} from '../user/user.service';
 import {AlertService} from '../alert.service';
 import {Location} from '@angular/common';
@@ -61,7 +61,7 @@ export class ProfileComponent implements OnInit {
         }
 
         const hasPrivate = undefined !==
-          data.resources.find(r => r.status === ResourceStatus.PRIVATE);
+          data.resources.find(r => r.visibility === ResourceVisibility.PRIVATE);
 
         this.user$.next({
           ...data,

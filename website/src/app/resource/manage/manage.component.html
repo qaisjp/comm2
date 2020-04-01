@@ -13,13 +13,13 @@
 
   <div class="Box col col-md-5 m-1">
     <div class="Box-header">
-      <!-- todo: hack: warning: harcoded ResourceStatus enum values -->
+      <!-- todo: hack: warning: harcoded ResourceVisibility enum values -->
       <h3 class="Box-title">Change visibility</h3>
     </div>
     <div class="Box-body">
-      <p *ngIf="resource.status === 'private'; else settingsMakePrivate">Your resource will be public for the world to see.</p>
+      <p *ngIf="resource.visibility === 'private'; else settingsMakePrivate">Your resource will be public for the world to see.</p>
       <ng-template #settingsMakePrivate><p>Hides your resource from the public eye — only other authors will be able to access your resource.</p></ng-template>
-      <button class="btn">Make {{ resource.status === 'private' ? 'public' : 'private' }}</button>
+      <button class="btn">Make {{ resource.visibility === 'private' ? 'public' : 'private' }}</button>
     </div>
   </div>
 

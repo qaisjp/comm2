@@ -21,14 +21,14 @@ type Resource struct {
 	// Rating      int    `db:"rating"`
 	// Downloads   int    `db:"downloads"`
 	// Type        int    `db:"type"` // todo: ResourceType
-	Status string `db:"status" json:"status"`
+	Visibility string `db:"visibility" json:"visibility"`
 
 	CanManage bool `db:"-" json:"can_manage"`
 }
 
 const (
-	ResourceStatusPublic  string = "public"
-	ResourceStatusPrivate string = "private"
+	ResourceVisibilityPublic  string = "public"
+	ResourceVisibilityPrivate string = "private"
 )
 
 type ResourcePackage struct {

@@ -7,7 +7,7 @@ import {catchError, map, tap} from 'rxjs/operators';
 import {alertErrorReturnZero} from '../util';
 import {User, UserID} from '../user/user.service';
 
-export enum ResourceStatus {
+export enum ResourceVisibility {
   PUBLIC = 'public',
   PRIVATE = 'private',
 }
@@ -20,7 +20,7 @@ export interface Resource {
   name: string;
   title: string;
   description: string;
-  status: ResourceStatus;
+  visibility: ResourceVisibility;
   authors: User[];
   readonly can_manage: boolean;
 }
