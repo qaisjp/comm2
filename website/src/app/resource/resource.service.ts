@@ -114,4 +114,18 @@ export class ResourceService {
         map(data => data as {new_username: string}),
     );
   }
+
+  delete(userID: UserID, resourceID: ResourceID) {
+    return this.http.delete(this.getResourceURL(userID, resourceID)).pipe(
+        tap(data => this.log.debug(`deleteResource(${userID}, ${resourceID})`)),
+        catchError((err: HttpErrorResponse) => {
+          let reason = 'Something went wrong';
+          if (err.status === BAD_REQUEST) {
+            reason = err.error.message;
+          }
+          return throwError(reason);
+        }),
+        map(data => void 0),
+    )
+  }
 }

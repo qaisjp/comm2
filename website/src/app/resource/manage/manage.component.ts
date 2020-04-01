@@ -61,6 +61,21 @@ export class ResourceManageComponent implements OnInit {
     });
   }
 
+  submitDelete() {
+    if (!confirm('Are you sure you want to delete this resource?')) {
+      return;
+    }
+
+    this.resources.delete(this.resource.author_id, this.resource.id).pipe(
+      catchError((reason: string) => {
+        this.alerts.setAlert(reason);
+        return throwError(reason);
+      }),
+    ).subscribe((data) => {
+      this.router.navigate(['/u', this.resource.authors[0].username]);
+    });
+  }
+
   toggleVisibility() {
     const newVisibility = (this.resource.visibility === ResourceVisibility.PRIVATE) ?
       ResourceVisibility.PUBLIC : ResourceVisibility.PRIVATE;
