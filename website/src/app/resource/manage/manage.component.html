@@ -1,15 +1,16 @@
+<script src="../create/create.component.ts"></script>
 <div *ngIf="view.resource$ | async as resource" class="d-flex flex-wrap flex-justify-center">
 
-  <div class="Box col col-md-5 m-1">
+  <form class="Box col col-md-5 m-1" [formGroup]="renameForm" (ngSubmit)="submitRename(renameForm.value)">
     <div class="Box-header">
       <h3 class="Box-title">Rename resource</h3>
     </div>
     <div class="Box-body">
       <p>No redirections will be set up, and all future downloads will use the the new name.</p>
-      <input class="form-control" aria-label="New resource name" type="text" placeholder="new resource name">
+      <input class="form-control" aria-label="New resource name" type="text" placeholder="new resource name" formControlName="name">
       {{' '}} <button class="btn">Rename</button>
     </div>
-  </div>
+  </form>
 
   <div class="Box col col-md-5 m-1">
     <div class="Box-header">
@@ -17,22 +18,22 @@
       <h3 class="Box-title">Change visibility</h3>
     </div>
     <div class="Box-body">
-      <p *ngIf="resource.visibility === 'private'; else settingsMakePrivate">Your resource will be public for the world to see.</p>
+      <p *ngIf="resource.visibility === 'private'; else settingsMakePrivate">Your resource will be public for the world to see. Anyone can download your resource.</p>
       <ng-template #settingsMakePrivate><p>Hides your resource from the public eye — only other authors will be able to access your resource.</p></ng-template>
-      <button class="btn">Make {{ resource.visibility === 'private' ? 'public' : 'private' }}</button>
+      <button class="btn" (click)="toggleVisibility()">Make {{ resource.visibility === 'private' ? 'public' : 'private' }}</button>
     </div>
   </div>
 
-  <div class="Box col col-md-5 m-1">
+  <form class="Box col col-md-5 m-1" [formGroup]="transferOwnerForm" (ngSubmit)="submitTransfer(transferOwnerForm.value)">
     <div class="Box-header">
       <h3 class="Box-title">Transfer ownership</h3>
     </div>
     <div class="Box-body">
       <p>Transferring ownership is permanent and you will no longer have full access to this resource.</p>
-      <input class="form-control" aria-label="New author username" type="text" placeholder="New author username">
+      <input class="form-control" aria-label="New author username" type="text" placeholder="New author username" formControlName="username">
       {{' '}} <button class="btn">Transfer...</button>
     </div>
-  </div>
+  </form>
 
   <div class="Box col col-md-5 m-1">
     <div class="Box-header">

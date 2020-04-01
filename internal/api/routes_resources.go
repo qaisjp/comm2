@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
@@ -256,6 +257,47 @@ func (a *API) getResource(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, extended)
 }
 
+func (a *API) transferResource(ctx *gin.Context) {
+	resource := ctx.MustGet("resource").(*Resource)
+
+	// todo: fix inconsistencies where sometimes we use user id and sometimes user name?
+	var fields struct {
+		NewOwner string `json:"new_owner,omitempty"`
+	}
+	if err := ctx.BindJSON(&fields); err != nil {
+		return
+	}
+
+	if fields.NewOwner == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Name owner username cannot be empty"})
+		return
+	}
+
+	var rows []struct {
+		ID       string `db:"id"`
+		Username string `db:"username"`
+	}
+	err := a.DB.SelectContext(ctx, &rows, "select id, username from users where lower(username) = $1", strings.ToLower(fields.NewOwner))
+	if err != nil {
+		a.somethingWentWrong(ctx, err).WithField("new-owner", fields.NewOwner).Errorln("could not get username")
+		return
+	}
+
+	if len(rows) == 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "That user does not exist."})
+		return
+	} else if len(rows) > 1 {
+		panic("not possible to have more than user row here")
+	}
+
+	_, err = a.QB.Update("resources").Set("author_id", rows[0].ID).Where(squirrel.Eq{"id": resource.ID}).ExecContext(ctx)
+	if err != nil {
+		a.somethingWentWrong(ctx, err).WithField("new-owner", fields.NewOwner).Errorln("could not set new owner")
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"new_username": rows[0].Username})
+}
+
 func (a *API) voteResource(c *gin.Context) {
 	user := c.MustGet("current_user").(*User)
 	resource := c.MustGet("resource").(*Resource)
@@ -311,9 +353,34 @@ func (a *API) patchResource(ctx *gin.Context) {
 	}
 
 	clauses := make(map[string]interface{})
+	if fields.Title != nil {
+		title := *fields.Title
+		clauses["title"] = title
+		if title == "" {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Title cannot be empty"})
+			return
+		}
+	}
+	if fields.Description != nil {
+		clauses["description"] = *fields.Description
+	}
+	if fields.Visibility != nil {
+		vis := *fields.Visibility
+		// todo: use ResourceVisibility enum and give an unmarshaller/marshaller
+		if vis != ResourceVisibilityPrivate && vis != ResourceVisibilityPublic {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad 'visibility' field provided"})
+			return
+		}
+		clauses["visibility"] = vis
+	}
 	if fields.Name != nil {
 		name := *fields.Name
 		clauses["name"] = name
+
+		if name == "" {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Name cannot be empty"})
+			return
+		}
 
 		var count int
 		err := a.DB.GetContext(ctx, &count, "select count(*) from resources where author_id=$1 and name=$2", resource.AuthorID, name)
@@ -327,21 +394,6 @@ func (a *API) patchResource(ctx *gin.Context) {
 			ctx.JSON(http.StatusConflict, gin.H{"message": "A resource with that name already exists"})
 			return
 		}
-	}
-	if fields.Title != nil {
-		clauses["title"] = *fields.Title
-	}
-	if fields.Description != nil {
-		clauses["description"] = *fields.Description
-	}
-	if fields.Visibility != nil {
-		vis := *fields.Visibility
-		// todo: use ResourceVisibility enum and give an unmarshaller/marshaller
-		if vis != ResourceVisibilityPrivate && vis != ResourceVisibilityPublic {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad 'visibility' field provided"})
-			return
-		}
-		clauses["visibility"] = vis
 	}
 
 	if len(clauses) == 0 {

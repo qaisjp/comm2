@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {LogService} from '../log.service';
-import {Observable} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {catchError, map, tap} from 'rxjs/operators';
 import {alertErrorReturnZero} from '../util';
 import {User, UserID} from '../user/user.service';
+import {BAD_REQUEST} from 'http-status-codes';
 
 export enum ResourceVisibility {
   PUBLIC = 'public',
@@ -79,10 +80,38 @@ export class ResourceService {
     );
   }
 
+  public patch(userID: UserID, resourceID: ResourceID, reqData: ResourcePatchRequest): Observable<void> {
+    return this.http.patch(this.getResourceURL(userID, resourceID), reqData).pipe(
+        tap(data => this.log.debug(`patch(${userID}, ${resourceID}) with req ${JSON.stringify(reqData)}`)),
+        catchError((err: HttpErrorResponse) => {
+          let reason = 'Something went wrong';
+          if (err.status === BAD_REQUEST) {
+            reason = err.error.message;
+          }
+          return throwError(reason);
+        }),
+        map(() => void 0),
+    );
+  }
+
   public getPackages(userID: UserID, resourceID: ResourceID): Observable<ResourcePackage[]> {
     return this.http.get(`${this.getResourceURL(userID, resourceID)}/pkg`).pipe(
       tap(data => this.log.debug(`getResourcePackages(${userID}, ${resourceID}`)),
       map(data => data as ResourcePackage[])
+    );
+  }
+
+  transfer(userID: UserID, resourceID: ResourceID, username: string) {
+    return this.http.post(this.getResourceURL(userID, resourceID) + '/transfer', {new_owner: username}).pipe(
+        tap(data => this.log.debug(`transferResource(${userID}, ${resourceID}) to username ${username}`)),
+        catchError((err: HttpErrorResponse) => {
+          let reason = 'Something went wrong';
+          if (err.status === BAD_REQUEST) {
+            reason = err.error.message;
+          }
+          return throwError(reason);
+        }),
+        map(data => data as {new_username: string}),
     );
   }
 }

@@ -142,11 +142,14 @@ func NewAPI(
 
 		v1.GET("/resources", a.listResources)
 		v1.POST("/resources", authRequired, a.createResource)
+		// todo: make it possible to resolve user_id on its own. Dummy `_` user id can be used, with a resolveUser middleware
 		resources := v1.Group("/resources/:user_id/:resource_id", a.checkUser, a.checkResource)
 		{
 			resources.GET("", a.getResource)
-			resources.PATCH("", a.mustOwnResource, a.patchResource)
+			resources.PATCH("", authRequired, a.mustOwnResource, a.patchResource)
 			resources.DELETE("", authRequired, a.mustOwnResource, a.deleteResource)
+
+			resources.POST("/transfer", authRequired, a.mustOwnResource, a.transferResource)
 
 			resources.POST("/vote", authRequired, a.voteResource)
 
