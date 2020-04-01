@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -297,17 +298,74 @@ func (a *API) voteResource(c *gin.Context) {
 }
 
 func (a *API) patchResource(ctx *gin.Context) {
+	resource := ctx.MustGet("resource").(*Resource)
 	var fields struct {
 		Name        *string `json:"name,omitempty"`
-		Title       *string `json:"name,omitempty"`
-		Description *string `json:"name,omitempty"`
+		Title       *string `json:"title,omitempty"`
+		Description *string `json:"description,omitempty"`
+		Visibility  *string `json:"visibility,omitempty"`
+		Archived    *bool   `json:"archived,omitempty"`
 	}
 	if err := ctx.BindJSON(&fields); err != nil {
-		a.somethingWentWrong(ctx, err).Warnln("potential client error in patching resource")
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	clauses := make(map[string]interface{})
+	if fields.Name != nil {
+		name := *fields.Name
+		clauses["name"] = name
+
+		var count int
+		err := a.DB.GetContext(ctx, &count, "select count(*) from resources where author_id=$1 and name=$2", resource.AuthorID, name)
+		if err != nil {
+			a.somethingWentWrong(ctx, err).WithField("id", resource.ID).WithField("new-name", name).
+				Errorln("could not figure out if resource rename exists")
+			return
+		}
+
+		if count > 0 {
+			ctx.JSON(http.StatusConflict, gin.H{"message": "A resource with that name already exists"})
+			return
+		}
+	}
+	if fields.Title != nil {
+		clauses["title"] = *fields.Title
+	}
+	if fields.Description != nil {
+		clauses["description"] = *fields.Description
+	}
+	if fields.Visibility != nil {
+		vis := *fields.Visibility
+		// todo: use ResourceVisibility enum and give an unmarshaller/marshaller
+		if vis != ResourceVisibilityPrivate && vis != ResourceVisibilityPublic {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad 'visibility' field provided"})
+			return
+		}
+		clauses["visibility"] = vis
+	}
+
+	if len(clauses) == 0 {
+		ctx.Status(http.StatusNotModified)
+		return
+	}
+
+	result, err := a.QB.Update("resources").Where(squirrel.Eq{"id": resource.ID}).SetMap(clauses).ExecContext(ctx)
+	if err != nil {
+		a.somethingWentWrong(ctx, err).Errorln("could not update resource")
+		return
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		a.somethingWentWrong(ctx, err).Errorln("could not get number of rows affected")
+	}
+
+	// todo: rows is always 1. we prolly don't need this code.
+	if rows == 0 {
+		ctx.Status(http.StatusNotModified)
+	} else {
+		ctx.Status(http.StatusOK)
+	}
 }
 
 func (a *API) listResourcePackages(ctx *gin.Context) {
