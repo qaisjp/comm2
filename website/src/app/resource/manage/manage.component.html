@@ -8,7 +8,7 @@
     <div class="Box-body">
       <p>No redirections will be set up, and all future downloads will use the the new name.</p>
       <input class="form-control" aria-label="New resource name" type="text" placeholder="new resource name" formControlName="name">
-      {{' '}} <button class="btn">Rename</button>
+      {{' '}} <button class="btn" [disabled]="resource.archived">Rename</button>
     </div>
   </form>
 
@@ -20,7 +20,9 @@
     <div class="Box-body">
       <p *ngIf="resource.visibility === 'private'; else settingsMakePrivate">Your resource will be public for the world to see. Anyone can download your resource.</p>
       <ng-template #settingsMakePrivate><p>Hides your resource from the public eye — only other authors will be able to access your resource.</p></ng-template>
-      <button class="btn" (click)="toggleVisibility()">Make {{ resource.visibility === 'private' ? 'public' : 'private' }}</button>
+      <button class="btn" (click)="toggleVisibility()" [disabled]="resource.archived">
+        Make {{ resource.visibility === 'private' ? 'public' : 'private' }}
+      </button>
     </div>
   </div>
 
@@ -37,11 +39,11 @@
 
   <div class="Box col col-md-5 m-1">
     <div class="Box-header">
-      <h3 class="Box-title">Archive resource</h3>
+      <h3 class="Box-title">{{ resource.archived ? 'Unarchive' : 'Archive' }} resource</h3>
     </div>
     <div class="Box-body">
-      <p>Mark this resource as archived and read-only. Nobody will be able to review.</p>
-      <button class="btn">Archive</button>
+      <p>{{ resource.archived ? 'Unmark' : 'Mark' }}} this resource as archived and read-only. {{ resource.archived ? 'Everyone' : 'Nobody' }} will be able to review.</p>
+      <button class="btn" (click)="toggleArchive()">{{ resource.archived ? 'Unarchive' : 'Archive' }}</button>
     </div>
   </div>
 

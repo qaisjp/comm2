@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import {Observable, ReplaySubject} from 'rxjs';
+import {Observable, of, ReplaySubject} from 'rxjs';
 import {Resource, ResourcePackage, ResourceService} from './resource.service';
-import {single, tap} from 'rxjs/operators';
+import {map, single, tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +23,17 @@ export class ResourceViewService {
         }),
       ).subscribe(this.packages$);
     });
+  }
+
+  getKeyCounter(key: string): Observable<number> {
+    if (key === 'people') {
+      return this.resource$.pipe(map(r => r.authors.length));
+    } else if (key === 'reviews') {
+
+    } else if (key === 'versions') {
+      return this.packages$.pipe(map(ps => ps.length));
+    }
+    return of(1337);
   }
 
 }

@@ -91,4 +91,17 @@ export class ResourceManageComponent implements OnInit {
     });
   }
 
+  toggleArchive() {
+    const newArchived = !this.resource.archived;
+    this.resources.patch(this.resource.author_id, this.resource.id, {
+      archived: newArchived,
+    }).pipe(
+      catchError((reason: string) => {
+        this.alerts.setAlert(reason);
+        return throwError(reason);
+      }),
+    ).subscribe(() => {
+      this.resource.archived = newArchived;
+    });
+  }
 }

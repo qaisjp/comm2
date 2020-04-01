@@ -22,12 +22,13 @@ export interface Resource {
   title: string;
   description: string;
   visibility: ResourceVisibility;
+  archived: boolean;
   authors: User[];
   readonly can_manage: boolean;
 }
 
 export type ResourceCreateResponse = Readonly<Pick<Resource, 'id'>>;
-export type ResourcePatchRequest = Partial<Pick<Resource, 'name' | 'title' | 'description' | 'visibility'>>;
+export type ResourcePatchRequest = Partial<Pick<Resource, 'name' | 'title' | 'description' | 'visibility' | 'archived'>>;
 
 // ResourceID can either be the name of the resource, or its ID
 export type ResourceID = Resource['id'] | Resource['name'];
