@@ -25,12 +25,11 @@ export interface Resource {
   readonly can_manage: boolean;
 }
 
-interface ResourceCreateResponse {
-  readonly id: number;
-}
+export type ResourceCreateResponse = Readonly<Pick<Resource, 'id'>>;
+export type ResourcePatchRequest = Partial<Pick<Resource, 'name' | 'title' | 'description' | 'visibility'>>;
 
 // ResourceID can either be the name of the resource, or its ID
-export type ResourceID = string | number;
+export type ResourceID = Resource['id'] | Resource['name'];
 
 export interface ResourcePackage {
   readonly id: number;
