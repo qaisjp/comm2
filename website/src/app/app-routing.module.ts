@@ -5,9 +5,12 @@ import { LoginPageComponent } from './auth/login-page/login-page.component';
 import {RegisterPageComponent} from './auth/register-page/register-page.component';
 import {ResourceLayoutComponent} from './resource/layout/layout.component';
 import {ResourceCreateComponent} from './resource/create/create.component';
-import {AccountComponent} from './profile/account/account.component';
 import {AdminDashboardComponent} from './admin/dashboard/dashboard.component';
 import {AdminLayoutComponent} from './admin/layout/layout.component';
+import {SettingsLayoutComponent} from './settings/layout.component';
+import {ProfileComponent} from './profile/profile.component';
+import {SettingsProfileComponent} from './settings/profile.component';
+import {SettingsAccountComponent} from './settings/account.component';
 
 
 const routes: Routes = [
@@ -40,8 +43,26 @@ const routes: Routes = [
     loadChildren: 'src/app/admin/admin.module#AdminModule',
   },
   {
-    path: 'account',
-    component: AccountComponent,
+    path: 'settings',
+    component: SettingsLayoutComponent,
+    children: [
+      {
+        path: '',
+        redirectTo: 'profile',
+        pathMatch: 'full',
+        data: {},
+      },
+      {
+        path: 'profile',
+        component: SettingsProfileComponent,
+        data: {title: 'Profile'},
+      },
+      {
+        path: 'account',
+        component: SettingsAccountComponent,
+        data: {title: 'Account'},
+      },
+    ]
   }
 ];
 

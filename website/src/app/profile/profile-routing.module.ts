@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { ProfileComponent } from './profile.component';
 import {ResourceLayoutComponent} from '../resource/layout/layout.component';
 import {ResourceManageComponent} from '../resource/manage/manage.component';
+import {SettingsLayoutComponent} from '../settings/layout.component';
 
 
 const routes: Routes = [

@@ -29,7 +29,7 @@
               class="btn float-right" type="button">
         {{ (followed) ? "Unfollow" : "Follow" }}
       </button>
-      <button *ngIf="(auth.user$ | async).id === user.id" routerLink="/account" class="btn float-right d-flex" type="button">
+      <button *ngIf="(auth.user$ | async).id === user.id" routerLink="/settings/profile" class="btn float-right d-flex" type="button">
         <i appOcticon="pencil" class="mr-2"></i> Edit Profile
       </button>
     </div>

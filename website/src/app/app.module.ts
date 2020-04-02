@@ -13,12 +13,17 @@ import { NavbarComponent } from './navbar/navbar.component';
 import {ResourceModule} from './resource/resource.module';
 import { AdminModule } from './admin/admin.module';
 import {OcticonModule} from './octicon/octicon.module';
+import { SettingsProfileComponent } from './settings/profile.component';
+import { SettingsAccountComponent } from './settings/account.component';
+import {ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     NavbarComponent,
+    SettingsProfileComponent,
+    SettingsAccountComponent,
   ],
   imports: [
     BrowserModule,
@@ -27,6 +32,7 @@ import {OcticonModule} from './octicon/octicon.module';
     OcticonModule,
     ResourceModule,
     AuthModule,
+    ReactiveFormsModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

@@ -1,0 +1,18 @@
+<div class="d-flex container-xl">
+  <div class="col-3">
+    <nav class="menu" aria-labelledby="menu-heading">
+      <span class="menu-heading" id="menu-heading">Your account</span>
+      <ng-container *ngFor="let child of route.routeConfig.children">
+        <a class="menu-item" *ngIf="child.data.title !== undefined" [routerLink]="child.path"
+           [attr.aria-current]="(child.path === route.firstChild.snapshot.routeConfig.path) ? 'page' : null">
+          {{ child.data.title }}
+        </a>
+      </ng-container>
+    </nav>
+  </div>
+
+  <div class="col-9 px-4">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>

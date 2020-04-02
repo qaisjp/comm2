@@ -1,11 +1,12 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {LogService} from '../log.service';
-import {Observable} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {catchError, map, tap} from 'rxjs/operators';
 import {alertErrorReturnZero} from '../util';
-import {Resource} from '../resource/resource.service';
+import {Resource, ResourceID} from '../resource/resource.service';
+import {UNAUTHORIZED as HTTP_STATUS_UNAUTHORIZED, CONFLICT as HTTP_STATUS_CONFLICT} from 'http-status-codes';
 
 export interface User {
   readonly id: number;
@@ -48,6 +49,46 @@ export class UserService {
   ) {
   }
 
+  // CURRENT USER ONLY
+  // todo: probably move to AuthenticatedUserService (?)
+  delete() {
+    return this.http.delete(`${environment.api.baseurl}/private/account`).pipe(
+      tap(data => this.log.debug(`deleteMyAccount()`)),
+      map(data => void 0),
+    );
+  }
+
+  chgPass(password: string, newPassword: string) {
+    const body = {password, new_password: newPassword};
+    return this.http.post( `${environment.api.baseurl}/private/account/password`, body).pipe(
+      tap(data => this.log.debug(`changePassword()`)),
+      catchError((err: HttpErrorResponse) => {
+        let reason = 'Something went wrong';
+        if (err.status === HTTP_STATUS_UNAUTHORIZED) {
+          reason = err.error.message;
+        }
+        return throwError(reason);
+      }),
+      map(data => void 0),
+    );
+  }
+
+  rename(username: string) {
+    const body = {username};
+    return this.http.post( `${environment.api.baseurl}/private/account/username`, body).pipe(
+      tap(data => this.log.debug(`changeUsername(to=${username})`)),
+      catchError((err: HttpErrorResponse) => {
+        let reason = 'Something went wrong';
+        if (err.status === HTTP_STATUS_CONFLICT) {
+          reason = err.error.message;
+        }
+        return throwError(reason);
+      }),
+      map(data => void 0),
+    );
+  }
+
+  // ALL USERS
   public getUser(id: UserID): Observable<User> {
     const url = `${environment.api.baseurl}/v1/users/${encodeURIComponent(id)}`;
     return this.http.get(url, {headers: {'X-Authorization-None': ''}}).pipe(

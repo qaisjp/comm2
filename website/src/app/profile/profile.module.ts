@@ -5,11 +5,11 @@ import { ProfileRoutingModule } from './profile-routing.module';
 import { ProfileComponent } from './profile.component';
 import {MomentModule} from 'ngx-moment';
 import {OcticonModule} from '../octicon/octicon.module';
-import { AccountComponent } from './account/account.component';
+import { SettingsLayoutComponent } from '../settings/layout.component';
 
 
 @NgModule({
-  declarations: [ProfileComponent, AccountComponent],
+  declarations: [ProfileComponent, SettingsLayoutComponent],
   imports: [
     CommonModule,
     ProfileRoutingModule,

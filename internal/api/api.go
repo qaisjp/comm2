@@ -128,7 +128,10 @@ func NewAPI(
 
 	private := router.Group("/private", authMaybeRequired)
 	{
-		private.GET("/profile/:user_id", a.checkUser, a.getUserProfile)
+		private.GET("profile/:user_id", a.checkUser, a.getUserProfile)
+		private.DELETE("account", authRequired, a.deleteCurrentUser)
+		private.POST("account/username", authRequired, a.changeCurrentUserUsername)
+		private.POST("account/password", authRequired, a.changeCurrentUserPassword)
 	}
 
 	v1 := router.Group("/v1", authMaybeRequired)
