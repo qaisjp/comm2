@@ -1,5 +1,7 @@
 <form [formGroup]="passwordForm" (ngSubmit)="submitChangePassword(passwordForm.value)">
   <h2>Change password</h2>
+  <!-- todo include a username field here with the latest username returned by server -->
+  <!-- see https://www.chromium.org/developers/design-documents/form-styles-that-chromium-understands -->
   <div class="form-group">
     <div class="form-group-header"><label for="currpwd">Current password</label></div>
     <div class="form-group-body">
