@@ -7,7 +7,7 @@
       <h1>
         {{ user.username }}
       </h1>
-      <p *ngIf="user.bio.length > 0">{{ user.bio }}</p>
+      <p *ngIf="user.bio.length > 0" class="break-word">{{ user.bio }}</p>
       <div class="d-flex flex-column">
         <span class="d-flex mb-1" [title]="user.created_at | amDateFormat: 'YYYY-MM-DD HH:mm:ss'" >
           <i appOcticon="clock" class="mr-2"></i> Member for {{ user.created_at | amTimeAgo: true }}
@@ -60,7 +60,7 @@
           </ng-template>
         </ng-container>
         <div *ngFor="let res of user.resources; let i = index;" class="mr-2 mb-2 Box col-3 cursor-pointer"
-             [routerLink]="['/u', user.username, res.name]">
+             [routerLink]="['/u', res.author_id, res.name]">
           <div class="Box-header">
             <h3 class="Box-title">
               {{ res.name }}

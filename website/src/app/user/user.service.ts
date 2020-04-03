@@ -6,7 +6,7 @@ import {environment} from '../../environments/environment';
 import {catchError, map, tap} from 'rxjs/operators';
 import {alertErrorReturnZero} from '../util';
 import {Resource, ResourceID} from '../resource/resource.service';
-import {UNAUTHORIZED as HTTP_STATUS_UNAUTHORIZED, CONFLICT as HTTP_STATUS_CONFLICT} from 'http-status-codes';
+import {BAD_REQUEST as HTTP_STATUS_BAD_REQUEST, UNAUTHORIZED as HTTP_STATUS_UNAUTHORIZED, CONFLICT as HTTP_STATUS_CONFLICT} from 'http-status-codes';
 
 export interface User {
   readonly id: number;
@@ -23,10 +23,10 @@ export interface AuthenticatedUser extends User {
 }
 
 export interface UserProfileData {
+  bio: string;
   location: string;
   organisation: string;
   website: string;
-  bio: string;
 }
 
 export interface UserProfile extends User, UserProfileData {
@@ -85,6 +85,28 @@ export class UserService {
         return throwError(reason);
       }),
       map(data => void 0),
+    );
+  }
+
+  patchProfile(profileData: UserProfileData) {
+    return this.http.patch( `${environment.api.baseurl}/v1/user/profile`, profileData).pipe(
+      tap(data => this.log.debug(`patchProfile(data=${JSON.stringify(data)})`)),
+      catchError((err: HttpErrorResponse) => {
+        let reason = 'Something went wrong';
+        if (err.status === HTTP_STATUS_BAD_REQUEST) {
+          reason = err.error.message;
+        }
+        return throwError(reason);
+      }),
+      map(data => void 0),
+    );
+  }
+
+  public getProfile(): Observable<UserProfileData> {
+    const url = `${environment.api.baseurl}/v1/user/profile`;
+    return this.http.get(url).pipe(
+      tap(data => this.log.debug(`getCurrentUserProfile response`, data)),
+      map(data => data as UserProfileData)
     );
   }
 

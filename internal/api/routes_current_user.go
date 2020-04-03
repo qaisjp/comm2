@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
@@ -123,6 +124,64 @@ func (a *API) deleteCurrentUser(ctx *gin.Context) {
 	_, err := a.QB.Delete("users").Where(squirrel.Eq{"id": user.ID}).ExecContext(ctx)
 	if err != nil {
 		a.somethingWentWrong(ctx, err).WithField("uid", user.ID).Errorln("could not delete account")
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
+
+func (a *API) getCurrentUserProfile(ctx *gin.Context) {
+	user := ctx.MustGet("current_user").(*User)
+	var profile UserProfile
+	if err := a.DB.GetContext(ctx, &profile, "select * from user_profile where user_id=$1", user.ID); err != nil {
+		a.somethingWentWrong(ctx, err).WithField("uid", user.ID).Errorln("could not get user profile")
+		return
+	}
+	ctx.JSON(http.StatusOK, profile)
+}
+
+func (a *API) patchCurrentUserProfile(ctx *gin.Context) {
+	user := ctx.MustGet("current_user").(*User)
+	var fields struct {
+		Bio          *string `json:"bio,omitempty"`
+		Location     *string `json:"location,omitempty"`
+		Organisation *string `json:"organisation,omitempty"`
+		Website      *string `json:"website,omitempty"`
+	}
+	if err := ctx.BindJSON(&fields); err != nil {
+		return
+	}
+
+	clauses := make(map[string]interface{})
+	if fields.Bio != nil {
+		clauses["bio"] = *fields.Bio
+	}
+	if fields.Location != nil {
+		clauses["location"] = *fields.Location
+	}
+	if fields.Organisation != nil {
+		clauses["organisation"] = *fields.Organisation
+	}
+	if fields.Website != nil {
+		clauses["website"] = *fields.Website
+	}
+
+	if len(clauses) == 0 {
+		ctx.Status(http.StatusNotModified)
+		return
+	}
+
+	for k, s := range clauses {
+		if len(s.(string)) > 255 {
+			message := strings.ToUpper(k[:1]) + k[1:] + " is too long"
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": message})
+			return
+		}
+	}
+
+	_, err := a.QB.Update("user_profile").Where(squirrel.Eq{"user_id": user.ID}).SetMap(clauses).ExecContext(ctx)
+	if err != nil {
+		a.somethingWentWrong(ctx, err).Errorln("could not update user profile")
 		return
 	}
 

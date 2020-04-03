@@ -128,10 +128,10 @@ func NewAPI(
 
 	private := router.Group("/private", authMaybeRequired)
 	{
-		private.GET("profile/:user_id", a.checkUser, a.getUserProfile)
-		private.DELETE("account", authRequired, a.deleteCurrentUser)
-		private.POST("account/username", authRequired, a.changeCurrentUserUsername)
-		private.POST("account/password", authRequired, a.changeCurrentUserPassword)
+		private.GET("/profile/:user_id", a.checkUser, a.getUserProfile)
+		private.DELETE("/account", authRequired, a.deleteCurrentUser)
+		private.POST("/account/username", authRequired, a.changeCurrentUserUsername)
+		private.POST("/account/password", authRequired, a.changeCurrentUserPassword)
 	}
 
 	v1 := router.Group("/v1", authMaybeRequired)
@@ -177,10 +177,16 @@ func NewAPI(
 		user := v1.Group("/user", authRequired)
 		{
 			user.GET("", a.getCurrentUser)
+
+			user.GET("/profile", a.getCurrentUserProfile)
+			user.PATCH("/profile", a.patchCurrentUserProfile)
+
 			follow := user.Group("/follow/:target_user", a.parseUserID("target_user", "target_user", true))
-			follow.GET("", a.followUser)
-			follow.PUT("", a.followUser)
-			follow.DELETE("", a.followUser)
+			{
+				follow.GET("", a.followUser)
+				follow.PUT("", a.followUser)
+				follow.DELETE("", a.followUser)
+			}
 		}
 	}
 
