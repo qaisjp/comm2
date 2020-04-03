@@ -6,6 +6,8 @@ import {ResourceAboutComponent} from './about/about.component';
 import {ResourceVersionsComponent} from './versions/versions.component';
 import {ResourcePeopleComponent} from './people/people.component';
 import {ResourceReviewsComponent} from './reviews/reviews.component';
+import {ResourceUploadComponent} from './upload/upload.component';
+import {ResourcePackageResolverService} from './package-resolver.service';
 
 
 const routes: Routes = [
@@ -20,13 +22,27 @@ const routes: Routes = [
   },
   {
     path: 'versions',
-    component: ResourceVersionsComponent,
     data: {
       key: 'versions',
       title: 'Versions',
       icon: 'bug',
       counter: true,
     },
+    children: [
+      {
+        path: '',
+        component: ResourceVersionsComponent,
+      },
+      {
+        path: 'upload',
+        component: ResourceUploadComponent,
+      },
+      {
+        path: 'edit/:pkg_id',
+        resolve: {pkg: ResourcePackageResolverService},
+        component: ResourceUploadComponent,
+      }
+    ]
   },
   {
     path: 'reviews',

@@ -2,7 +2,7 @@
   <div class="pagehead pt-0 pt-md-2 pb-md-2">
     <ul class="pagehead-actions mb-2 mb-md-0">
       <li>
-        <button class="btn btn-sm" [disabled]="resource.archived" *ngIf="resource.can_manage">Upload new version</button>
+        <button class="btn btn-sm" [disabled]="resource.archived" *ngIf="resource.can_manage" routerLink="versions/upload">Upload new version</button>
       </li>
       <li>
         <button
@@ -31,8 +31,8 @@
         <a class="pagehead-tabs-item d-flex"
            *ngIf="child.data.title !== undefined && (!child.data.elevated || resource.can_manage)"
            [routerLink]="child.path === '' ? './' : child.path"
-           [class.selected]="child.path === route.firstChild.snapshot.routeConfig.path">
-          <i [appOcticon]="child.data.icon" class="mr-2"></i>
+           [class.selected]="(child.path === route.firstChild.snapshot.routeConfig.path) || (child.data.tabPath === route.firstChild.snapshot.routeConfig.path)">
+          <i [appOcticon]="child.data.icon"></i>
           <span>{{ child.data.title }}</span>
           <!-- todo: make octicon bold too -->
           <span class="ml-1 Counter d-flex flex-items-center" *ngIf="child.data.counter">

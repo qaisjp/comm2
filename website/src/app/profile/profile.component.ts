@@ -52,6 +52,7 @@ export class ProfileComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.users.getUserProfile(params.username).subscribe((data: UserProfile) => {
         // Update url from ID to username if necessary without causing a page reload
+        // todo: move higher so it applies to resources too
         if (data.username !== params.username) {
           this.router.navigate(['u', data.username], {
             preserveFragment: true,

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpEvent, HttpRequest} from '@angular/common/http';
 import {LogService} from '../log.service';
 import {Observable, throwError} from 'rxjs';
 import {environment} from '../../environments/environment';
@@ -33,6 +33,8 @@ export type ResourcePatchRequest = Partial<Pick<Resource, 'name' | 'title' | 'de
 // ResourceID can either be the name of the resource, or its ID
 export type ResourceID = Resource['id'] | Resource['name'];
 
+export type PackageID = number;
+
 export interface ResourcePackage {
   readonly id: number;
   readonly created_at: string;
@@ -43,6 +45,7 @@ export interface ResourcePackage {
   version: string;
   description: string;
   draft: boolean;
+  file_uploaded: boolean;
 }
 
 @Injectable({
@@ -102,6 +105,13 @@ export class ResourceService {
     );
   }
 
+  public getPackage(userID: UserID, resourceID: ResourceID, packageID: PackageID): Observable<ResourcePackage> {
+    return this.http.get(`${this.getResourceURL(userID, resourceID)}/pkg/${encodeURIComponent(packageID)}`).pipe(
+      tap(data => this.log.debug(`getResourcePackage(${userID}, ${resourceID}, ${packageID}`)),
+      map(data => data as ResourcePackage)
+    );
+  }
+
   transfer(userID: UserID, resourceID: ResourceID, username: string) {
     return this.http.post(this.getResourceURL(userID, resourceID) + '/transfer', {new_owner: username}).pipe(
         tap(data => this.log.debug(`transferResource(${userID}, ${resourceID}) to username ${username}`)),
@@ -127,6 +137,14 @@ export class ResourceService {
           return throwError(reason);
         }),
         map(data => void 0),
-    )
+    );
+  }
+
+  download(userID: UserID, resourceID: ResourceID, packageID: PackageID): Observable<HttpEvent<any>> {
+    const url = this.getResourceURL(userID, resourceID) + `/pkg/${encodeURIComponent(packageID)}/download`;
+    const req = new HttpRequest('GET', url, {reportProgress: true});
+    return this.http.request(req).pipe(
+      tap(data => this.log.debug(`downloadResource(${userID}, ${resourceID}, ${packageID}) - length is ${data}`))
+    );
   }
 }

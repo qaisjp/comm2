@@ -1,0 +1,5 @@
+<h2>
+  <ng-container *ngIf="editMode">Edit resource version</ng-container>
+  <ng-container *ngIf="!editMode">Upload a new version</ng-container>
+  <button class="btn btn-sm float-right" [routerLink]="editMode ? '../..' : '..'"><i appOcticon="chevron-left"></i>Back to version list</button>
+</h2>

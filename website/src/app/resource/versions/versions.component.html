@@ -15,14 +15,22 @@
     </thead>
     <tbody>
     <tr *ngFor="let pkg of packages">
-      <td>{{ pkg.version }}
-        <ng-template [ngIf]="pkg.draft">(draft)</ng-template>
+      <td>
+        {{ pkg.version }}
+        <span class="Label Label--outline ml-1" *ngIf="pkg.draft">draft</span>
       </td>
       <td>{{ (pkg.draft ? pkg.updated_at : pkg.created_at) | amDateFormat: 'YYYY-MM-DD HH:mm' }}</td>
       <td>{{ pkg.description }}</td>
-      <td>Download</td>
-      <td>Contents</td>
-      <td>Edit</td>
+      <td>
+        <button class="btn btn-sm" (click)="view.download(pkg).subscribe()"
+                [title]="pkg.file_uploaded ? null : 'No file has been uploaded'"
+                [disabled]="!pkg.file_uploaded">Download</button></td>
+      <td>
+        <button class="btn btn-sm" (click)="view.download(pkg).subscribe()"
+                [title]="pkg.file_uploaded ? null : 'No file has been uploaded'"
+                [disabled]="!pkg.file_uploaded">Contents</button></td>
+      <td>
+        <button class="btn btn-sm" [routerLink]="['edit', pkg.id]">Edit</button></td>
     </tr>
     </tbody>
   </table>
