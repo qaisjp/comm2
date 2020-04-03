@@ -3,8 +3,8 @@
 @import "styles-primer-ext.scss";
 
 .octicon-parent {
-  display: flex;
-  align-items: center;
+  display: inline-block;
+  margin-right: .5rem;
 }
 
 // Hack
