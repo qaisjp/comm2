@@ -142,9 +142,9 @@ export class ResourceService {
 
   download(userID: UserID, resourceID: ResourceID, packageID: PackageID): Observable<HttpEvent<any>> {
     const url = this.getResourceURL(userID, resourceID) + `/pkg/${encodeURIComponent(packageID)}/download`;
-    const req = new HttpRequest('GET', url, {reportProgress: true});
+    const req = new HttpRequest('GET', url, {reportProgress: true, responseType: 'blob'});
     return this.http.request(req).pipe(
-      tap(data => this.log.debug(`downloadResource(${userID}, ${resourceID}, ${packageID}) - length is ${data}`))
+      tap(data => this.log.debug(`downloadResource(${userID}, ${resourceID}, ${packageID})`))
     );
   }
 }

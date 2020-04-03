@@ -1,5 +1,6 @@
-<div>
+<div *ngIf="view.resource$ | async as resource;">
   <h2>Version History</h2>
+  <a aria-hidden="true" class="d-none" #downloadAnchor></a>
   <ng-template #packagesLoading>
     <div>Loading...</div>
   </ng-template>
@@ -12,14 +13,17 @@
         <div class="TimelineItem-body d-flex flex-column flex-lg-row">
           <div class="d-flex flex-column mr-2 flex-items-center flex-lg-items-baseline" style="flex: 0 1 auto;">
             <div>
+              <span class="Label Label--gray-darker" *ngIf="pkg.draft">draft</span>
               {{ pkg.version }}
               {{ pkg.draft ? 'updated' : 'published' }} at
               {{ (pkg.draft ? pkg.updated_at : pkg.created_at) | amDateFormat: 'YYYY-MM-DD HH:mm' }}
             </div>
             <div class="d-flex mt-1">
-              <button class="btn btn-sm" (click)="view.download(pkg).subscribe()"
+              <button class="btn btn-sm" (click)="download(resource, pkg, downloadAnchor)"
                       [title]="pkg.file_uploaded ? null : 'No file has been uploaded'"
-                      [disabled]="!pkg.file_uploaded">Download
+                      [disabled]="!pkg.file_uploaded || view.downloadProgress[pkg.id] !== undefined">
+                <ng-container *ngIf="view.downloadProgress[pkg.id] === undefined; else showDownloadProgress">Download</ng-container>
+                <ng-template #showDownloadProgress>{{ view.downloadProgress[pkg.id] }}% downloaded</ng-template>
               </button>
               <button class="btn btn-sm mx-1" (click)="view.download(pkg).subscribe()"
                       [title]="pkg.file_uploaded ? null : 'No file has been uploaded'"

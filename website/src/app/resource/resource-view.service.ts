@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import {Observable, of, ReplaySubject, throwError} from 'rxjs';
+import {Injectable} from '@angular/core';
+import {EMPTY, Observable, of, ReplaySubject, throwError} from 'rxjs';
 import {Resource, ResourcePackage, ResourceService} from './resource.service';
-import {catchError, last, map, single, switchMap, tap} from 'rxjs/operators';
+import {catchError, first, last, map, single, switchMap, takeUntil, takeWhile, tap} from 'rxjs/operators';
 import {HttpEvent, HttpEventType} from '@angular/common/http';
 import {AlertService} from '../alert.service';
 import {LogService} from '../log.service';
@@ -10,10 +10,6 @@ import {LogService} from '../log.service';
   providedIn: 'root'
 })
 export class ResourceViewService {
-
-  public resource$: ReplaySubject<Resource> = new ReplaySubject(1);
-  public packages$: ReplaySubject<ResourcePackage[]> = new ReplaySubject(1);
-  public downloadable = false;
 
   constructor(
     private resources: ResourceService,
@@ -30,6 +26,12 @@ export class ResourceViewService {
     });
   }
 
+  public resource$: ReplaySubject<Resource> = new ReplaySubject(1);
+  public packages$: ReplaySubject<ResourcePackage[]> = new ReplaySubject(1);
+  public downloadable = false;
+
+  downloadProgress: { [key: number]: number } = {}
+
   getKeyCounter(key: string): Observable<number> {
     if (key === 'people') {
       return this.resource$.pipe(map(r => r.authors.length));
@@ -41,31 +43,41 @@ export class ResourceViewService {
     return of(1337);
   }
 
-  private getDownloadEventMessage(event: HttpEvent<any>, pkg: ResourcePackage) {
+  private getDownloadEventMessage(event: HttpEvent<any>, pkg: ResourcePackage): [boolean, string, Blob?] {
     switch (event.type) {
       case HttpEventType.Sent:
-        return `Downloading version ${pkg.version}.`;
+        this.downloadProgress[pkg.id] = 0;
+        return [false, `Downloading version ${pkg.version}.`, null];
 
-      case HttpEventType.UploadProgress:
+      case HttpEventType.ResponseHeader:
+        return [false, `Receiving ${pkg.version}...`, null];
+
+      case HttpEventType.DownloadProgress:
         // Compute and show the % done:
         const percentDone = Math.round(100 * event.loaded / event.total);
-        return `Version "${pkg.version}" is ${percentDone}% downloaded.`;
+        this.downloadProgress[pkg.id] = percentDone;
+        return [false, `Version "${pkg.version}" is ${percentDone}% downloaded.`, null];
 
       case HttpEventType.Response:
-        return `Version "${pkg.version}" was completely download!`;
+        delete this.downloadProgress[pkg.id];
+        return [true, `Version "${pkg.version}" was completely downloaded!`, event.body];
 
       default:
-        return `Version "${pkg.version}" surprising download event: ${event.type}.`;
+        delete this.downloadProgress[pkg.id];
+        return [true, `Version "${pkg.version}" surprising download event: ${event.type}.`, null];
     }
   }
 
-  download(pkg: ResourcePackage) {
+  download(pkg: ResourcePackage): Observable<Blob> {
     return this.resource$.pipe(
       switchMap(r => this.resources.download(r.author_id, r.id, pkg.id)),
       map(event => this.getDownloadEventMessage(event, pkg)),
-      tap(message => this.alerts.setAlert(message)),
-      last(),
+      tap(message => console.log(message[0], message[1], message[2])),
+      // todo: last() was not working, so we have first() and this 'done' message[0] bool
+      first(msg => msg[0] ),
+      map(data => data[2]),
       catchError(err => {
+        console.log(err);
         this.alerts.setAlert(`Failed to download v${pkg.version}`);
         this.log.error(`failed to download v${pkg.version}`, err);
         return throwError(err);
