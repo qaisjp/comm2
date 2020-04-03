@@ -1,6 +1,12 @@
-<div *ngIf="(view.resource$ | async) as resource">
-  <h2>People</h2>
-  <div *ngFor="let author of resource.authors; let first = first;">
-    {{ author | json }} - {{ first }}
+<h2 class="mb-2">People</h2>
+<div *ngIf="(view.resource$ | async) as resource" class="d-flex flex-wrap">
+  <div *ngFor="let author of resource.authors;"
+       class="d-flex flex-items-center flex-column cursor-pointer mr-1 mr-md-4"
+       [routerLink]="['/u', author.username]">
+    <img [src]="author.gravatar + '?size=125'" class="mb-2">
+    <h4>
+      {{ author.username }}
+<!--      <span *ngIf="follower.follows_you" class="Label Label&#45;&#45;gray">follows you</span>-->
+    </h4>
   </div>
 </div>
