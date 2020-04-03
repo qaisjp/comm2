@@ -35,7 +35,7 @@
 
           <div style="flex: 1;" class="mt-2 mt-lg-0">
             <ng-container *ngIf="pkg.description.length > 0; else defaultPkgDescription">
-              {{ pkg.description }} {{ pkg.description }} {{ pkg.description }}
+              {{ pkg.description }}
             </ng-container>
             <ng-template #defaultPkgDescription><em>no description provided</em></ng-template>
           </div>
