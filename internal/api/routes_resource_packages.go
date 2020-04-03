@@ -76,7 +76,9 @@ func (a *API) createResourcePackage(c *gin.Context) {
 	resource := c.MustGet("resource").(*Resource)
 
 	var input struct {
+		Version     string `json:"version"`
 		Description string `json:"description"`
+		Draft       bool   `json:"bool"`
 	}
 
 	if err := c.BindJSON(&input); err != nil {
@@ -85,8 +87,8 @@ func (a *API) createResourcePackage(c *gin.Context) {
 
 	var id uint64
 	err := a.QB.Insert("resource_packages").
-		Columns("resource_id", "author_id", "description", "draft", "filename", "version").
-		Values(resource.ID, user.ID, input.Description, true, "", "").Suffix("RETURNING id").
+		Columns("resource_id", "author_id", "description", "draft", "version").
+		Values(resource.ID, user.ID, input.Description, input.Draft, input.Version).Suffix("RETURNING id").
 		ScanContext(c, &id)
 
 	if err != nil {
