@@ -5,10 +5,12 @@
         <button class="btn btn-sm" [disabled]="resource.archived" *ngIf="resource.can_manage" routerLink="versions/upload">Upload new version</button>
       </li>
       <li>
+        <a aria-hidden="true" class="d-none" #downloadAnchor></a>
         <button
           [disabled]="!view.downloadable"
           [className]="'btn btn-sm btn-primary ' + (view.downloadable ? '' : 'tooltipped tooltipped-sw')"
           [attr.aria-label]="!view.downloadable && 'Release a non-draft version first'"
+          (click)="downloadLatestPackage(resource, downloadAnchor)"
         >
           Download <code>{{ resource.name }}.zip</code>
         </button>

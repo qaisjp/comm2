@@ -26,4 +26,22 @@ export class ResourceLayoutComponent implements OnInit {
     ).subscribe(this.view.resource$);
   }
 
+  downloadLatestPackage(res: Resource, anchor: HTMLAnchorElement) {
+    this.view.packages$.pipe(
+      single(),
+    ).subscribe(packages => {
+      const pkg = packages.filter(p => p.published_at)[0];
+      this.view.download(pkg).subscribe((blob: Blob) => {
+        // duplicated in versions.component.ts
+        const url = URL.createObjectURL(blob);
+        console.log('we have', pkg.version, blob);
+
+        anchor.href = url;
+        anchor.download = res.name + '.zip';
+        anchor.click();
+        anchor.href = '';
+      });
+  });
+  }
+
 }

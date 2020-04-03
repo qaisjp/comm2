@@ -454,8 +454,9 @@ func (a *API) listResourcePackages(ctx *gin.Context) {
 
 	q := a.QB.Select("*").From("resource_packages").Where("resource_id = $1", resource.ID)
 	if user == nil {
-		q = q.Where("not draft")
+		q = q.Where("published_at is not null")
 	}
+	q = q.OrderBy("published_at desc nulls first", "updated_at desc")
 
 	query, values, err := q.ToSql()
 	if err != nil {

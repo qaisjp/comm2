@@ -13,10 +13,10 @@
         <div class="TimelineItem-body d-flex flex-column flex-lg-row">
           <div class="d-flex flex-column mr-2 flex-items-center flex-lg-items-baseline" style="flex: 0 1 auto;">
             <div>
-              <span class="Label Label--gray-darker" *ngIf="pkg.draft">draft</span>
+              <span class="Label Label--gray-darker" *ngIf="!pkg.published_at">draft</span>
               {{ pkg.version }}
-              {{ pkg.draft ? 'updated' : 'published' }} at
-              {{ (pkg.draft ? pkg.updated_at : pkg.created_at) | amDateFormat: 'YYYY-MM-DD HH:mm' }}
+              {{ pkg.published_at ? 'published' : 'updated' }} at
+              {{ (pkg.published_at || pkg.updated_at) | amDateFormat: 'YYYY-MM-DD HH:mm' }}
             </div>
             <div class="d-flex mt-1">
               <button class="btn btn-sm" (click)="download(resource, pkg, downloadAnchor)"
@@ -26,7 +26,7 @@
                 <ng-template #showDownloadProgress>{{ view.downloadProgress[pkg.id] }}% downloaded</ng-template>
               </button>
               <button class="btn btn-sm mx-1" (click)="view.download(pkg).subscribe()"
-                      [title]="pkg.file_uploaded ? null : 'No file has been uploaded'"
+                      [title]="pkg.file_uploaded ? '' : 'No file has been uploaded'"
                       [disabled]="!pkg.file_uploaded">Contents
               </button>
               <button class="btn btn-sm" [routerLink]="['edit', pkg.id]">Edit</button>
@@ -34,7 +34,7 @@
           </div>
 
           <div style="flex: 1;" class="mt-2 mt-lg-0">
-            <ng-container *ngIf="pkg.description.length > 0" #defaultPkgDescription>
+            <ng-container *ngIf="pkg.description.length > 0; else defaultPkgDescription">
               {{ pkg.description }} {{ pkg.description }} {{ pkg.description }}
             </ng-container>
             <ng-template #defaultPkgDescription><em>no description provided</em></ng-template>

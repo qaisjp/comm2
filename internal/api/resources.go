@@ -42,12 +42,16 @@ type ResourcePackage struct {
 	Version     string `db:"version" json:"version"`
 	Description string `db:"description" json:"description"`
 
-	Draft        bool `db:"draft" json:"draft"`
-	FileUploaded bool `db:"file_uploaded" json:"file_uploaded"`
+	PublishedAt  *time.Time `db:"published_at" json:"published_at"`
+	FileUploaded bool       `db:"file_uploaded" json:"file_uploaded"`
 }
 
 func (pkg *ResourcePackage) GetBucketFilename() string {
 	return fmt.Sprintf("res%d/pkg%d.zip", pkg.ResourceID, pkg.ID)
+}
+
+func (pkg *ResourcePackage) IsDraft() bool {
+	return pkg.PublishedAt == nil
 }
 
 type ResourceRating struct {

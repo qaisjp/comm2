@@ -20,7 +20,7 @@ export class ResourceViewService {
       this.resources.getPackages(data.author_id, data.id).pipe(
         single(),
         tap(packages => {
-          this.downloadable = packages.some(pkg => !pkg.draft);
+          this.downloadable = packages.some(pkg => pkg.published_at);
         }),
       ).subscribe(this.packages$);
     });

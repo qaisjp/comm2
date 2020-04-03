@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
 	"github.com/multitheftauto/community/internal/resource"
 
 	"github.com/gin-gonic/gin"
@@ -49,7 +51,7 @@ func (a *API) checkResourcePkg(ctx *gin.Context) {
 	}
 
 	// If draft, run mustOwnResource middleware
-	if pkg.Draft {
+	if pkg.IsDraft() {
 		a.mustOwnResource(ctx)
 		if ctx.IsAborted() {
 			return
@@ -85,10 +87,15 @@ func (a *API) createResourcePackage(c *gin.Context) {
 		return
 	}
 
+	var publishedAt interface{} = pq.NullTime{}
+	if !input.Draft {
+		publishedAt = squirrel.Expr("now()")
+	}
+
 	var id uint64
 	err := a.QB.Insert("resource_packages").
-		Columns("resource_id", "author_id", "description", "draft", "version").
-		Values(resource.ID, user.ID, input.Description, input.Draft, input.Version).Suffix("RETURNING id").
+		Columns("resource_id", "author_id", "description", "published_at", "version").
+		Values(resource.ID, user.ID, input.Description, publishedAt, input.Version).Suffix("RETURNING id").
 		ScanContext(c, &id)
 
 	if err != nil {
@@ -103,7 +110,7 @@ func (a *API) createResourcePackage(c *gin.Context) {
 func (a *API) getResourcePackage(c *gin.Context) {
 	pkg := c.MustGet("resource_pkg").(*ResourcePackage)
 	user := c.MustGet("current_user").(*User)
-	if pkg.Draft {
+	if pkg.IsDraft() {
 		ok := false
 		if user != nil {
 			var err error

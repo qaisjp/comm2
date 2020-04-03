@@ -39,12 +39,12 @@ export interface ResourcePackage {
   readonly id: number;
   readonly created_at: string;
   readonly updated_at: string;
+  published_at?: string;
 
   readonly resource_id: number;
   readonly author_id: number;
   version: string;
   description: string;
-  draft: boolean;
   file_uploaded: boolean;
 }
 

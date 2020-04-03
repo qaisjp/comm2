@@ -17,6 +17,7 @@ export class ResourceVersionsComponent implements OnInit {
 
   download(res: Resource, pkg: ResourcePackage, anchor: HTMLAnchorElement) {
     this.view.download(pkg).subscribe((blob: Blob) => {
+      // duplicated in layout.component.ts
       const url = URL.createObjectURL(blob);
       console.log('we have', pkg.version, blob);
 
