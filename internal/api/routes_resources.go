@@ -109,18 +109,37 @@ func (a *API) checkResource(ctx *gin.Context) {
 // - exclude hidden stuff for unauthenticated requests
 // - support search/filter fields
 // - support pagination / cursors
-func (a *API) listResources(c *gin.Context) {
+func (a *API) listResources(ctx *gin.Context) {
 	resources := []*Resource{}
-	err := a.DB.SelectContext(c, &resources, "select * from resources;")
+	user := ctx.MustGet("current_user").(*User)
+
+	suffix := "where visibility = $1"
+	args := []interface{}{ResourceVisibilityPublic}
+	if user != nil {
+		args = append(args, user.ID)
+		suffix = `
+			, resource_collaborators as c
+			where
+			(r.visibility = $1) or
+			(r.author_id = $2) or
+			(
+				(c.resource_id = r.id) and
+				(c.user_id = $2)
+				-- should probably check if accepted too, but it's fine
+			)
+		`
+	}
+
+	err := a.DB.SelectContext(ctx, &resources, "select r.* from resources as r "+suffix, args...)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
+		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal server error",
 		})
 		a.Log.WithError(err).Errorln("could not select resources for listResources")
 		return
 	}
 
-	c.JSON(http.StatusOK, resources)
+	ctx.JSON(http.StatusOK, resources)
 }
 
 func (a *API) deleteResource(ctx *gin.Context) {
