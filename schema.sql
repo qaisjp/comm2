@@ -51,10 +51,10 @@ CREATE TABLE public.resource_reviews (
 
 
 --
--- Name: resource_comments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: resource_reviews_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.resource_comments_id_seq
+CREATE SEQUENCE public.resource_reviews_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -64,10 +64,10 @@ CREATE SEQUENCE public.resource_comments_id_seq
 
 
 --
--- Name: resource_comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: resource_reviews_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.resource_comments_id_seq OWNED BY public.resource_reviews.id;
+ALTER SEQUENCE public.resource_reviews_id_seq OWNED BY public.resource_reviews.id;
 
 
 --
@@ -347,7 +347,7 @@ ALTER TABLE ONLY public.resource_packages ALTER COLUMN id SET DEFAULT nextval('p
 -- Name: resource_reviews id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.resource_reviews ALTER COLUMN id SET DEFAULT nextval('public.resource_comments_id_seq'::regclass);
+ALTER TABLE ONLY public.resource_reviews ALTER COLUMN id SET DEFAULT nextval('public.resource_reviews_id_seq'::regclass);
 
 
 --
@@ -380,11 +380,11 @@ ALTER TABLE ONLY public.resource_collaborators
 
 
 --
--- Name: resource_reviews resource_comments_pk; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: resource_reviews resource_reviews_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resource_reviews
-    ADD CONSTRAINT resource_comments_pk PRIMARY KEY (id);
+    ADD CONSTRAINT resource_reviews_pk PRIMARY KEY (id);
 
 
 --
@@ -515,27 +515,27 @@ ALTER TABLE ONLY public.resource_collaborators
 
 
 --
--- Name: resource_reviews resource_comments_resource_comments_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: resource_reviews resource_reviews_resource_reviews_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resource_reviews
-    ADD CONSTRAINT resource_comments_resource_comments_id_fk FOREIGN KEY (parent_comment_id) REFERENCES public.resource_reviews(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT resource_reviews_resource_reviews_id_fk FOREIGN KEY (parent_comment_id) REFERENCES public.resource_reviews(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: resource_reviews resource_comments_resources_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.resource_reviews
-    ADD CONSTRAINT resource_comments_resources_id_fk FOREIGN KEY (resource_id) REFERENCES public.resources(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: resource_reviews resource_comments_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: resource_reviews resource_reviews_resources_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.resource_reviews
-    ADD CONSTRAINT resource_comments_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT resource_reviews_resources_id_fk FOREIGN KEY (resource_id) REFERENCES public.resources(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: resource_reviews resource_reviews_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resource_reviews
+    ADD CONSTRAINT resource_reviews_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
