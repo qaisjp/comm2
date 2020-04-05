@@ -34,43 +34,6 @@ CREATE TABLE public.resource_collaborators (
 
 
 --
--- Name: resource_reviews; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.resource_reviews (
-    id integer NOT NULL,
-    resource_id integer NOT NULL,
-    author_id integer NOT NULL,
-    review_message text NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    deleted_at timestamp without time zone DEFAULT now() NOT NULL,
-    parent_comment_id integer,
-    responded_at timestamp without time zone,
-    vote boolean NOT NULL
-);
-
-
---
--- Name: resource_reviews_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.resource_reviews_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: resource_reviews_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.resource_reviews_id_seq OWNED BY public.resource_reviews.id;
-
-
---
 -- Name: resource_followings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -153,6 +116,42 @@ CREATE SEQUENCE public.resource_packages_id_seq
 --
 
 ALTER SEQUENCE public.resource_packages_id_seq OWNED BY public.resource_packages.id;
+
+
+--
+-- Name: resource_reviews; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.resource_reviews (
+    id integer NOT NULL,
+    resource_id integer NOT NULL,
+    author_id integer NOT NULL,
+    review_message text NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp without time zone DEFAULT now() NOT NULL,
+    responded_at timestamp without time zone,
+    vote boolean NOT NULL
+);
+
+
+--
+-- Name: resource_reviews_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.resource_reviews_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: resource_reviews_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.resource_reviews_id_seq OWNED BY public.resource_reviews.id;
 
 
 --
@@ -380,14 +379,6 @@ ALTER TABLE ONLY public.resource_collaborators
 
 
 --
--- Name: resource_reviews resource_reviews_pk; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.resource_reviews
-    ADD CONSTRAINT resource_reviews_pk PRIMARY KEY (id);
-
-
---
 -- Name: resource_followings resource_followings_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -409,6 +400,14 @@ ALTER TABLE ONLY public.resource_media
 
 ALTER TABLE ONLY public.resource_packages
     ADD CONSTRAINT resource_packages_pk PRIMARY KEY (id);
+
+
+--
+-- Name: resource_reviews resource_reviews_pk; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resource_reviews
+    ADD CONSTRAINT resource_reviews_pk PRIMARY KEY (id);
 
 
 --
@@ -515,30 +514,6 @@ ALTER TABLE ONLY public.resource_collaborators
 
 
 --
--- Name: resource_reviews resource_reviews_resource_reviews_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.resource_reviews
-    ADD CONSTRAINT resource_reviews_resource_reviews_id_fk FOREIGN KEY (parent_comment_id) REFERENCES public.resource_reviews(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: resource_reviews resource_reviews_resources_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.resource_reviews
-    ADD CONSTRAINT resource_reviews_resources_id_fk FOREIGN KEY (resource_id) REFERENCES public.resources(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: resource_reviews resource_reviews_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.resource_reviews
-    ADD CONSTRAINT resource_reviews_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: resource_followings resource_followings_resources_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -584,6 +559,22 @@ ALTER TABLE ONLY public.resource_packages
 
 ALTER TABLE ONLY public.resource_packages
     ADD CONSTRAINT resource_packages_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: resource_reviews resource_reviews_resources_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resource_reviews
+    ADD CONSTRAINT resource_reviews_resources_id_fk FOREIGN KEY (resource_id) REFERENCES public.resources(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: resource_reviews resource_reviews_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resource_reviews
+    ADD CONSTRAINT resource_reviews_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
