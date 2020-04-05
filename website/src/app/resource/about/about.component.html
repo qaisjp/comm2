@@ -1,20 +1,30 @@
-<div *ngIf="view.resource$ | async as resource">
-  <h2>{{ resource.title }}</h2>
+<form *ngIf="view.resource$ | async as resource" [formGroup]="form" (ngSubmit)="onSave(form.value)">
+  <div class="d-flex flex-justify-between">
+    <h2 *ngIf="!editing">
+      {{ resource.title }}
+    </h2>
+    <input class="form-control width-full mr-1"
+           formControlName="title" aria-label="Title"
+           type="text" *ngIf="editing">
+    <div *ngIf="resource.can_manage">
+      <button class="btn" *ngIf="!editing" (click)="onLoad()" [disabled]="form.disabled">
+        Edit
+      </button>
+      <button class="btn btn-primary" type="submit" *ngIf="editing" [disabled]="form.disabled">
+        Save
+      </button>
+    </div>
+  </div>
   <div class="text-gray mb-1">
     Created {{ resource.created_at | amTimeAgo }},
     last updated {{ resource.updated_at | amTimeAgo }}
   </div>
-  <div class="border border-gray-dark p-2">
+  <textarea aria-label="Description"
+    formControlName="description"
+    class="form-control width-full" *ngIf="editing">
     {{ resource.description }}
-    dsfd
-    ds
-    saddaf
-    df
-    f
-    sda
-    d
-    f
-    sd
-    f
+  </textarea>
+  <div *ngIf="!editing" markdown class="border border-gray-dark p-2" ngPreserveWhitespaces>
+    {{ resource.description}}
   </div>
-</div>
+</form>
