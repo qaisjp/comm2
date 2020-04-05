@@ -21,6 +21,7 @@ export class ResourceLayoutComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.view.reinit();
     this.route.params.pipe(
       switchMap(params => this.resources.get(params.username, params.resource))
     ).subscribe(this.view.resource$);

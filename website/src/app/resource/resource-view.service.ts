@@ -30,9 +30,17 @@ export class ResourceViewService {
   public resource$: ReplaySubject<Resource> = new ReplaySubject(1);
   public packages$: ReplaySubject<ResourcePackage[]> = new ReplaySubject(1);
   public downloadable = false;
-
   downloadProgress: { [key: number]: number } = {};
   uploadProgress = 0;
+
+  reinit() {
+    this.resource$ = new ReplaySubject(1);
+    this.packages$ = new ReplaySubject(1);
+    this.downloadable = false;
+    this.downloadProgress = {};
+    this.uploadProgress = 0;
+  }
+
 
   getKeyCounter(key: string): Observable<number> {
     if (key === 'people') {

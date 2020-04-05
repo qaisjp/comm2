@@ -28,6 +28,12 @@ export class ResourceAboutComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.view.resource$.subscribe(r => {
+      this.form.setValue({
+        title: r.title,
+        description: r.description,
+      });
+    });
   }
 
   onLoad() {
