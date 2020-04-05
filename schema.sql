@@ -34,20 +34,19 @@ CREATE TABLE public.resource_collaborators (
 
 
 --
--- Name: resource_comments; Type: TABLE; Schema: public; Owner: -
+-- Name: resource_reviews; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.resource_comments (
+CREATE TABLE public.resource_reviews (
     id integer NOT NULL,
     resource_id integer NOT NULL,
-    author_id integer,
-    message text NOT NULL,
-    deleted boolean DEFAULT false NOT NULL,
+    author_id integer NOT NULL,
+    review_message text NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    edited_at timestamp without time zone DEFAULT now() NOT NULL,
     deleted_at timestamp without time zone DEFAULT now() NOT NULL,
-    parent_comment_id integer
+    parent_comment_id integer,
+    responded_at timestamp without time zone,
+    vote boolean NOT NULL
 );
 
 
@@ -68,7 +67,7 @@ CREATE SEQUENCE public.resource_comments_id_seq
 -- Name: resource_comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.resource_comments_id_seq OWNED BY public.resource_comments.id;
+ALTER SEQUENCE public.resource_comments_id_seq OWNED BY public.resource_reviews.id;
 
 
 --
@@ -331,13 +330,6 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- Name: resource_comments id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.resource_comments ALTER COLUMN id SET DEFAULT nextval('public.resource_comments_id_seq'::regclass);
-
-
---
 -- Name: resource_media id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -349,6 +341,13 @@ ALTER TABLE ONLY public.resource_media ALTER COLUMN id SET DEFAULT nextval('publ
 --
 
 ALTER TABLE ONLY public.resource_packages ALTER COLUMN id SET DEFAULT nextval('public.resource_packages_id_seq'::regclass);
+
+
+--
+-- Name: resource_reviews id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resource_reviews ALTER COLUMN id SET DEFAULT nextval('public.resource_comments_id_seq'::regclass);
 
 
 --
@@ -381,10 +380,10 @@ ALTER TABLE ONLY public.resource_collaborators
 
 
 --
--- Name: resource_comments resource_comments_pk; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: resource_reviews resource_comments_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.resource_comments
+ALTER TABLE ONLY public.resource_reviews
     ADD CONSTRAINT resource_comments_pk PRIMARY KEY (id);
 
 
@@ -516,26 +515,26 @@ ALTER TABLE ONLY public.resource_collaborators
 
 
 --
--- Name: resource_comments resource_comments_resource_comments_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: resource_reviews resource_comments_resource_comments_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.resource_comments
-    ADD CONSTRAINT resource_comments_resource_comments_id_fk FOREIGN KEY (parent_comment_id) REFERENCES public.resource_comments(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public.resource_reviews
+    ADD CONSTRAINT resource_comments_resource_comments_id_fk FOREIGN KEY (parent_comment_id) REFERENCES public.resource_reviews(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: resource_comments resource_comments_resources_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: resource_reviews resource_comments_resources_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.resource_comments
+ALTER TABLE ONLY public.resource_reviews
     ADD CONSTRAINT resource_comments_resources_id_fk FOREIGN KEY (resource_id) REFERENCES public.resources(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: resource_comments resource_comments_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: resource_reviews resource_comments_users_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.resource_comments
+ALTER TABLE ONLY public.resource_reviews
     ADD CONSTRAINT resource_comments_users_id_fk FOREIGN KEY (author_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
