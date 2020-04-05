@@ -1,20 +1,20 @@
 <div *ngIf="view.resource$ | async as resource">
-  <div>
-    {{ resource.description }}
-  </div>
-  <ul>
-    <li>Rating: NONE</li>
-    <li>Authors:
-      <ng-container *ngFor="let author of resource.authors; let last = last;">
-        <a [routerLink]="['/u', author.username]">{{ author.username }}</a>
-        <ng-container *ngIf="!last">,</ng-container>
-      </ng-container>
-    </li>
-    <li>Description: {{ resource.description }}</li>
-    <li>Last updated: {{ resource.updated_at | amTimeAgo }}</li>
-    <li>Created at: {{ resource.created_at | amTimeAgo }}</li>
-  </ul>
-
-
   <h2>{{ resource.title }}</h2>
+  <div class="text-gray mb-1">
+    Created {{ resource.created_at | amTimeAgo }},
+    last updated {{ resource.updated_at | amTimeAgo }}
+  </div>
+  <div class="border border-gray-dark p-2">
+    {{ resource.description }}
+    dsfd
+    ds
+    saddaf
+    df
+    f
+    sda
+    d
+    f
+    sd
+    f
+  </div>
 </div>

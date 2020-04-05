@@ -1,5 +1,5 @@
 <div *ngIf="view.resource$ | async as resource">
-  <div class="pagehead pt-0 pt-md-2 pb-md-2">
+  <div class="pagehead pt-0 pt-md-2 mb-2 pb-0">
     <ul class="pagehead-actions mb-2 mb-md-0">
       <li>
         <button class="btn btn-sm" [disabled]="resource.archived" *ngIf="resource.can_manage" routerLink="versions/upload">Upload new version</button>
