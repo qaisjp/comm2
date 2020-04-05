@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {EMPTY, Observable, of, ReplaySubject, throwError} from 'rxjs';
-import {Resource, ResourcePackage, ResourceService} from './resource.service';
+import {PackageID, Resource, ResourcePackage, ResourceService} from './resource.service';
 import {catchError, first, last, map, single, switchMap, takeUntil, takeWhile, tap} from 'rxjs/operators';
-import {HttpEvent, HttpEventType} from '@angular/common/http';
+import {HttpErrorResponse, HttpEvent, HttpEventType} from '@angular/common/http';
 import {AlertService} from '../alert.service';
 import {LogService} from '../log.service';
+import {INTERNAL_SERVER_ERROR} from 'http-status-codes';
 
 @Injectable({
   providedIn: 'root'
@@ -85,4 +86,18 @@ export class ResourceViewService {
     );
   }
 
+  createPackage(blob: Blob): Observable<PackageID> {
+    return this.resource$.pipe(
+      switchMap(r => this.resources.createPackage(r.author_id, r.id, blob)),
+      catchError((err: HttpErrorResponse) => {
+        console.log(err);
+        let reason = 'Something went wrong';
+        if (err.status !== INTERNAL_SERVER_ERROR) {
+          reason = err.error.message;
+        }
+        this.alerts.setAlert(reason);
+        return throwError(reason);
+      })
+    );
+  }
 }

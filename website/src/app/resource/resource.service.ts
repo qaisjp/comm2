@@ -49,6 +49,8 @@ export interface ResourcePackage {
   file_uploaded: boolean;
 }
 
+export type ResourceCreatePackageResponse = Pick<ResourcePackage, 'id'>;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -82,6 +84,14 @@ export class ResourceService {
     return this.http.post(`${environment.api.baseurl}/v1/resources`, {name, title, description}).pipe(
       tap(data => this.log.debug(`sending createResource with ${JSON.stringify({name, title, description})}`)),
       map(data => data as ResourceCreateResponse),
+    );
+  }
+
+  public createPackage(userID: UserID, resourceID: ResourceID, blob: Blob): Observable<PackageID> {
+    const formData = new FormData();
+    formData.append('file', blob);
+    return this.http.post(`${this.getResourceURL(userID, resourceID)}/pkg`, formData).pipe(
+      map((data: ResourceCreatePackageResponse) => data.id),
     );
   }
 

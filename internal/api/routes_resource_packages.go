@@ -179,7 +179,7 @@ func (a *API) createResourcePackage(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"package_id": pkg.ID})
+	c.JSON(http.StatusCreated, gin.H{"id": pkg.ID})
 }
 
 func (a *API) getResourcePackage(c *gin.Context) {
