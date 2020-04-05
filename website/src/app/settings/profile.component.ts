@@ -7,18 +7,21 @@ import {AlertService} from '../alert.service';
 import {AuthService} from '../auth/auth.service';
 import {Router} from '@angular/router';
 
+const zeroUserProfileData: UserProfileData = {
+  bio: '',
+  location: '',
+  organisation: '',
+  website: '',
+};
+
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
 export class SettingsProfileComponent implements OnInit {
-  form: FormGroup = this.formBuilder.group({
-      bio: '',
-      location: '',
-      organisation: '',
-      website: '',
-    } as UserProfileData);
+  form: FormGroup = this.formBuilder.group({...zeroUserProfileData});
 
   constructor(
     private formBuilder: FormBuilder,

@@ -3,3 +3,56 @@
   <ng-container *ngIf="!editMode">Upload a new version</ng-container>
   <button class="btn btn-sm float-right" [routerLink]="editMode ? '../..' : '..'"><i appOcticon="chevron-left"></i>Back to version list</button>
 </h2>
+
+<form [formGroup]="form" class="d-flex container-lg flex-wrap">
+  <div class="col col-lg-7">
+    <div class="form-group">
+      <div class="form-group-header">
+        <label for="pkg-version">
+          Version
+          <p class="note">
+            Update the version tag to update this field <code>&lt;info version=""&gt;</code>
+          </p>
+        </label>
+      </div>
+      <div class="form-group-body">
+        <input id="pkg-version" type="text" disabled
+               class="form-control" formControlName="version"
+               placeholder="1.0.0">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-group-header"><label for="pkg-description">Description</label></div>
+      <div class="form-group-body">
+        <textarea id="pkg-description" type="text" style="min-height: initial; height: initial"
+                  class="form-control" formControlName="description" rows="3"
+                  placeholder="A description of what this update brings"></textarea>
+      </div>
+    </div>
+
+    <div class="form-action-spacious form-actions">
+      <button type="submit" class="btn btn-primary">Publish</button>
+      <button type="button" class="btn">Save as draft</button>
+    </div>
+
+
+  </div>
+  <div class="col col-lg-5 pl-lg-4">
+    <div class="form-group">
+      <div class="form-group-header">
+        <label for="pkg-upload" class="d-flex flex-lg-items-center flex-column flex-lg-row">
+          <span class="mb-1 mb-lg-0">Upload</span>
+          <span class="Progress d-inline-flex width-full ml-lg-2">
+            <div class="bg-green" style="width: 25%"></div>
+          </span>
+        </label>
+      </div>
+      <div class="form-group-body">
+        <input id="pkg-upload" type="file"
+               class="form-control" formControlName="version"
+               placeholder="1.0.0">
+      </div>
+    </div>
+  </div>
+</form>

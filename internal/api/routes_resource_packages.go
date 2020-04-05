@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 	"github.com/multitheftauto/community/internal/resource"
+	"gocloud.dev/blob"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -77,6 +79,15 @@ func (a *API) createResourcePackage(c *gin.Context) {
 	user := c.MustGet("current_user").(*User)
 	resource := c.MustGet("resource").(*Resource)
 
+	_, err := c.FormFile("file")
+	if err == nil {
+		c.JSON(http.StatusNotImplemented, gin.H{"message": "todo"})
+		return
+	} else if err != http.ErrNotMultipart {
+		a.somethingWentWrong(c, err).Errorln("ctx.FormFile failed unexpectedly")
+		return
+	}
+
 	var input struct {
 		Version     string `json:"version"`
 		Description string `json:"description"`
@@ -93,7 +104,7 @@ func (a *API) createResourcePackage(c *gin.Context) {
 	}
 
 	var id uint64
-	err := a.QB.Insert("resource_packages").
+	err = a.QB.Insert("resource_packages").
 		Columns("resource_id", "author_id", "description", "published_at", "version").
 		Values(resource.ID, user.ID, input.Description, publishedAt, input.Version).Suffix("RETURNING id").
 		ScanContext(c, &id)
@@ -156,81 +167,92 @@ func (a *API) downloadResourcePackage(ctx *gin.Context) {
 	})
 }
 
-// uploadResourcePackage is an endpoint that uploads a file to an existing resource package
-func (a *API) uploadResourcePackage(c *gin.Context) {
-	pkg := c.MustGet("resource_pkg").(*ResourcePackage)
-	header, err := c.FormFile("file")
-	if err == http.ErrNotMultipart {
-		c.Status(http.StatusUnsupportedMediaType)
-		c.JSON(http.StatusUnsupportedMediaType, gin.H{"message": err.Error()})
-		return
-	} else if err == http.ErrMissingFile {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "missing file"})
-		return
-	} else if err != nil {
-		a.Log.WithError(err).Errorln("could not upload package")
-		c.Status(http.StatusInternalServerError)
-		return
-	}
+func (a *API) uploadResourcePackageWithHeader(ctx *gin.Context, header *multipart.FileHeader) (status int, message string, err error) {
+	pkg := ctx.MustGet("resource_pkg").(*ResourcePackage)
+
+	status = http.StatusInternalServerError
+	message = "Something went wrong"
 
 	// Make sure the file is a zip
 	if typ := header.Header.Get("Content-Type"); typ != "application/zip" {
-		c.Status(http.StatusUnsupportedMediaType)
-		c.JSON(http.StatusUnsupportedMediaType, gin.H{"message": "Expected zip, got " + typ})
+		status = http.StatusUnsupportedMediaType
+		message = "Expected zip, got " + typ
 		return
 	}
 
 	var zipBody []byte
-	if f, err := header.Open(); err != nil {
+	var fzip multipart.File
+	if fzip, err = header.Open(); err != nil {
 		a.Log.WithError(err).Errorln("could not open file header's associated file when uploading package")
-		c.Status(http.StatusInternalServerError)
 		return
-	} else if zipBody, err = ioutil.ReadAll(f); err != nil {
+	} else if zipBody, err = ioutil.ReadAll(fzip); err != nil {
 		a.Log.WithError(err).Errorln("could not read zip body when uploading package")
-		c.Status(http.StatusInternalServerError)
 		return
-	} else if err := f.Close(); err != nil {
+	} else if err = fzip.Close(); err != nil {
 		a.Log.WithError(err).Errorln("could not close input file when uploading package")
-		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	f := bytes.NewReader(zipBody)
-
-	if ok, reason, err := resource.CheckResourceZip(f, int64(len(zipBody))); err != nil {
+	var ok bool
+	if ok, message, err = resource.CheckResourceZip(f, int64(len(zipBody))); err != nil {
 		a.Log.WithError(err).Errorln("failed to check resource zip when uploading package")
-		c.Status(http.StatusInternalServerError)
 		return
 	} else if !ok {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"message": reason,
-		}) // todo(report): explain we picked this status code because https://httpstatuses.com/422
+		status = http.StatusUnprocessableEntity
 		return
 	}
 
-	w, err := a.Bucket.NewWriter(c, pkg.GetBucketFilename(), nil)
+	var w *blob.Writer
+	w, err = a.Bucket.NewWriter(ctx, pkg.GetBucketFilename(), nil)
 	if err != nil {
 		a.Log.WithError(err).Errorln("could not create new bucket writer when uploading package")
-		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	if _, err := f.Seek(0, io.SeekStart); err != nil {
+	if _, err = f.Seek(0, io.SeekStart); err != nil {
 		a.Log.WithError(err).Errorln("could not seek to start of file when uploading package")
-		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	if _, err := io.Copy(w, f); err != nil {
+	if _, err = io.Copy(w, f); err != nil {
 		a.Log.WithError(err).Errorln("could not copy from request to bucket when uploading package")
-		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	if err := w.Close(); err != nil {
+	if err = w.Close(); err != nil {
 		a.Log.WithError(err).Errorln("could not close writer when uploading package")
-		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.Status(http.StatusOK)
+
+	return http.StatusOK, "", nil
+}
+
+// uploadResourcePackage is an endpoint that uploads a file to an existing resource package
+func (a *API) uploadResourcePackage(ctx *gin.Context) {
+	header, err := ctx.FormFile("file")
+	if err == http.ErrNotMultipart {
+		ctx.Status(http.StatusUnsupportedMediaType)
+		ctx.JSON(http.StatusUnsupportedMediaType, gin.H{"message": err.Error()})
+		return
+	} else if err == http.ErrMissingFile {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "missing file"})
+		return
+	} else if err != nil {
+		a.Log.WithError(err).Errorln("could not upload package")
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
+
+	status, message, err := a.uploadResourcePackageWithHeader(ctx, header)
+	if status != http.StatusOK {
+		if status == http.StatusInternalServerError {
+			a.somethingWentWrong(ctx, err).Errorln("could not upload resource package")
+			return
+		}
+		ctx.JSON(status, gin.H{"message": message})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }
