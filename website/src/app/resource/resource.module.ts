@@ -13,6 +13,7 @@ import {ResourceVersionsComponent} from './versions/versions.component';
 import {ResourcePeopleComponent} from './people/people.component';
 import { ResourceReviewsComponent } from './reviews/reviews.component';
 import { ResourceUploadComponent } from './upload/upload.component';
+import {MarkdownModule} from 'ngx-markdown';
 
 
 @NgModule({
@@ -24,6 +25,7 @@ import { ResourceUploadComponent } from './upload/upload.component';
     RouterModule,
     OcticonModule,
     ResourceRoutingModule,
+    MarkdownModule.forRoot(),
   ]
 })
 export class ResourceModule { }

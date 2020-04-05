@@ -22,6 +22,7 @@
     "@primer/css": "^14.3.0",
     "http-status-codes": "^1.4.0",
     "moment": "^2.24.0",
+    "ngx-markdown": "^9.0.0",
     "ngx-moment": "^3.5.0",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
