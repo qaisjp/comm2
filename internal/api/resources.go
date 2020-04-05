@@ -43,7 +43,8 @@ type ResourcePackage struct {
 	Description string `db:"description" json:"description"`
 
 	PublishedAt  *time.Time `db:"published_at" json:"published_at"`
-	FileUploaded bool       `db:"file_uploaded" json:"file_uploaded"`
+	FileUploaded bool       `db:"-" json:"file_uploaded"`
+	UploadedAt   *time.Time `db:"uploaded_at" json:"uploaded_at"`
 }
 
 func (pkg *ResourcePackage) GetBucketFilename() string {

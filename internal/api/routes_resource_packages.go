@@ -124,9 +124,14 @@ func (a *API) createResourcePackage(c *gin.Context) {
 		publishedAt = squirrel.Expr("now()")
 	}
 
+	var uploadedAt interface{} = pq.NullTime{}
+	if fileUploadMode {
+		uploadedAt = squirrel.Expr("now()")
+	}
+
 	query, args, err := a.QB.Insert("resource_packages").
-		Columns("resource_id", "author_id", "description", "published_at", "version", "file_uploaded").
-		Values(res.ID, user.ID, input.Description, publishedAt, input.Version, fileUploadMode).Suffix("RETURNING *").
+		Columns("resource_id", "author_id", "description", "published_at", "version", "uploaded_at").
+		Values(res.ID, user.ID, input.Description, publishedAt, input.Version, uploadedAt).Suffix("RETURNING *").
 		ToSql()
 	if err != nil {
 		a.somethingWentWrong(c, err).Errorln("database error creating resource package sql")

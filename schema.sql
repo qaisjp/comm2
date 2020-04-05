@@ -131,8 +131,8 @@ CREATE TABLE public.resource_packages (
     version character varying(10) NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     author_id integer NOT NULL,
-    file_uploaded boolean DEFAULT false NOT NULL,
-    published_at timestamp without time zone
+    published_at timestamp without time zone,
+    uploaded_at timestamp without time zone
 );
 
 

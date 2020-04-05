@@ -40,6 +40,7 @@ export interface ResourcePackage {
   readonly created_at: string;
   readonly updated_at: string;
   published_at?: string;
+  uploaded_at?: string;
 
   readonly resource_id: number;
   readonly author_id: number;
