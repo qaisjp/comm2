@@ -67,7 +67,7 @@
               <span *ngIf="user.hasPrivate" class="Label Label--outline ml-2">{{ res.visibility }}</span>
             </h3>
           </div>
-          <div class="Box-body" *ngIf="res.description.length > 0">{{ res.description }}</div>
+          <div class="Box-body" *ngIf="res.description.length > 0">{{ res.description.split("\n")[0] }}</div>
           <div class="Box-body text-italic text-gray-light" *ngIf="res.description.length === 0">no description provided</div>
           <div class="Box-footer">Last updated {{ res.updated_at | amTimeAgo }}</div>
         </div>
