@@ -17,14 +17,7 @@ export class ResourceViewService {
     private alerts: AlertService,
     private log: LogService,
   ) {
-    this.resource$.subscribe((data: Resource) => {
-      this.resources.getPackages(data.author_id, data.id).pipe(
-        single(),
-        tap(packages => {
-          this.downloadable = packages.some(pkg => pkg.published_at);
-        }),
-      ).subscribe(this.packages$);
-    });
+    this.reinit();
   }
 
   public resource$: ReplaySubject<Resource> = new ReplaySubject(1);
@@ -39,6 +32,14 @@ export class ResourceViewService {
     this.downloadable = false;
     this.downloadProgress = {};
     this.uploadProgress = 0;
+    this.resource$.subscribe((data: Resource) => {
+      this.resources.getPackages(data.author_id, data.id).pipe(
+        single(),
+        tap(packages => {
+          this.downloadable = packages.some(pkg => pkg.published_at);
+        }),
+      ).subscribe(this.packages$);
+    });
   }
 
 
