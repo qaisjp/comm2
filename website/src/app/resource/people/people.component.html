@@ -1,12 +1,24 @@
-<h2 class="mb-2">People</h2>
-<div *ngIf="(view.resource$ | async) as resource" class="d-flex flex-wrap">
-  <div *ngFor="let author of resource.authors;"
-       class="d-flex flex-items-center flex-column cursor-pointer mr-1 mr-md-4"
-       [routerLink]="['/u', author.username]">
-    <img [src]="author.gravatar + '?size=125'" class="mb-2">
-    <h4>
-      {{ author.username }}
-<!--      <span *ngIf="follower.follows_you" class="Label Label&#45;&#45;gray">follows you</span>-->
-    </h4>
+<div *ngIf="(view.resource$ | async) as resource">
+  <h2 class="mb-2 d-flex flex-justify-between flex-wrap">
+    People
+    <form [formGroup]="form" *ngIf="resource.can_manage" (ngSubmit)="add(form.value.username)">
+      <input class="form-control" type="text" placeholder="username" formControlName="username">
+      <button class="btn ml-2" type="submit">Add</button>
+    </form>
+  </h2>
+  <div class="d-flex flex-wrap">
+    <div *ngFor="let author of resource.authors;"
+         class="d-flex flex-items-center flex-column cursor-pointer mr-1 mr-md-4"
+         [routerLink]="['/u', author.username]">
+      <img [src]="author.gravatar + '?size=125'" class="mb-2">
+      <h4>
+        {{ author.username }}
+        <!--      <span *ngIf="follower.follows_you" class="Label Label&#45;&#45;gray">follows you</span>-->
+        <button
+          class="btn btn-sm ml-1" (click)="remove(author.id)"
+          *ngIf="resource.can_manage && author.id != resource.author_id"
+          >x</button>
+      </h4>
+    </div>
   </div>
 </div>
