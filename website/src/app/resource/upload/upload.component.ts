@@ -22,7 +22,7 @@ export class ResourceUploadComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private resources: ResourceService,
-    private view: ResourceViewService,
+    public view: ResourceViewService,
     private alerts: AlertService,
     private formBuilder: FormBuilder,
     private cd: ChangeDetectorRef,
@@ -31,12 +31,17 @@ export class ResourceUploadComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.view.uploadProgress = 0;
     this.route.data.subscribe(({ pkg }: { pkg: ResourcePackage }) => {
       this.editMode = pkg !== undefined;
       if (!this.editMode) {
         return;
       }
       this.pkg = pkg;
+      this.form.setValue({
+        description: pkg.description,
+        draft: !pkg.published_at,
+      });
       console.log(pkg);
     });
   }

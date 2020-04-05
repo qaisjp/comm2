@@ -87,12 +87,23 @@ export class ResourceService {
     );
   }
 
-  public createPackage(userID: UserID, resourceID: ResourceID, blob: Blob): Observable<PackageID> {
+  public createPackage(userID: UserID, resourceID: ResourceID, blob: Blob): Observable<HttpEvent<any>> {
+    const url = `${this.getResourceURL(userID, resourceID)}/pkg`;
     const formData = new FormData();
     formData.append('file', blob);
-    return this.http.post(`${this.getResourceURL(userID, resourceID)}/pkg`, formData).pipe(
-      map((data: ResourceCreatePackageResponse) => data.id),
-    );
+    // const req = new HttpRequest('POST', url, {
+    //   reportProgress: true,
+    //   responseType: 'json'}
+    // );
+    // return this.http.request(req);
+    return this.http.post(url, formData, {
+      headers: {
+        // 'Content-Type': 'multipart/form-data',
+      },
+      reportProgress: true,
+      responseType: 'json',
+      observe: 'events',
+    });
   }
 
   public patch(userID: UserID, resourceID: ResourceID, reqData: ResourcePatchRequest): Observable<void> {

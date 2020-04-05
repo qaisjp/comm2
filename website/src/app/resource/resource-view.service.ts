@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import {EMPTY, Observable, of, ReplaySubject, throwError} from 'rxjs';
-import {PackageID, Resource, ResourcePackage, ResourceService} from './resource.service';
-import {catchError, first, last, map, single, switchMap, takeUntil, takeWhile, tap} from 'rxjs/operators';
+import {Observable, of, ReplaySubject, throwError} from 'rxjs';
+import {PackageID, Resource, ResourceCreatePackageResponse, ResourcePackage, ResourceService} from './resource.service';
+import {catchError, first, map, single, switchMap, tap} from 'rxjs/operators';
 import {HttpErrorResponse, HttpEvent, HttpEventType} from '@angular/common/http';
 import {AlertService} from '../alert.service';
 import {LogService} from '../log.service';
@@ -31,7 +31,8 @@ export class ResourceViewService {
   public packages$: ReplaySubject<ResourcePackage[]> = new ReplaySubject(1);
   public downloadable = false;
 
-  downloadProgress: { [key: number]: number } = {}
+  downloadProgress: { [key: number]: number } = {};
+  uploadProgress = 0;
 
   getKeyCounter(key: string): Observable<number> {
     if (key === 'people') {
@@ -86,9 +87,46 @@ export class ResourceViewService {
     );
   }
 
+  // todo: if the user gets into a state where they are uploading two things at once
+  //       problems will happen.
+  private getUploadEventMessage(event: HttpEvent<any>): [boolean, string, number?] {
+    console.log('Event is', event);
+    switch (event.type) {
+      case HttpEventType.Sent:
+        this.uploadProgress = 0;
+        return [false, `Upload new version.`, null];
+
+      case HttpEventType.ResponseHeader:
+        return [false, `Uploading...`, null];
+
+      case HttpEventType.UploadProgress:
+        // Compute and show the % done:
+        const percentDone = Math.round(100 * event.loaded / event.total);
+        this.uploadProgress = percentDone;
+        return [false, `New version ${percentDone}% uploaded.`, null];
+
+      case HttpEventType.DownloadProgress:
+        return [false, `Downloading upload result.`, null];
+
+      case HttpEventType.Response:
+        this.uploadProgress = 100;
+        const id = (event.body as ResourceCreatePackageResponse).id;
+        return [true, `New version was completely uploaded!`, id];
+
+      default:
+        this.uploadProgress = 0;
+        return [true, `New version surprising upload event: ${event.type}.`, null];
+    }
+  }
+
   createPackage(blob: Blob): Observable<PackageID> {
     return this.resource$.pipe(
       switchMap(r => this.resources.createPackage(r.author_id, r.id, blob)),
+      map(event => this.getUploadEventMessage(event)),
+      tap(message => console.log(message[0], message[1], message[2])),
+      // todo: last() was not working, so we have first() as this 'done' message[0] bool
+      first(msg => msg[0] ),
+      map(data => data[2]),
       catchError((err: HttpErrorResponse) => {
         console.log(err);
         let reason = 'Something went wrong';
