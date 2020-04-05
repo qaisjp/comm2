@@ -50,7 +50,7 @@ func init() {
 }
 
 // CheckResourceZip decodes an input zip and checks if the resource is ok
-func CheckResourceZip(f io.ReaderAt, size int64) (ok bool, reason string, err error) {
+func CheckResourceZip(f io.ReaderAt, size int64) (meta *XmlMeta, ok bool, reason string, err error) {
 	r, err := zip.NewReader(f, size)
 	if err != nil {
 		return
@@ -70,33 +70,33 @@ func CheckResourceZip(f io.ReaderAt, size int64) (ok bool, reason string, err er
 
 		_, isBanned := bannedExtensions[fpath.Ext(filename)]
 		if isBanned {
-			return false, fmt.Sprintf("contains blocked file %#v", filename), nil
+			return nil, false, fmt.Sprintf("contains blocked file %#v", filename), nil
 		}
 	}
 
 	if metaZipfile == nil {
-		return false, "missing meta.xml file", nil
+		return nil, false, "missing meta.xml file", nil
 	}
 
 	metafile, err := metaZipfile.Open()
 	if err != nil {
-		return false, "", errors.Wrap(err, "could not open meta.xml")
+		return nil, false, "", errors.Wrap(err, "could not open meta.xml")
 	}
 	defer metafile.Close()
 
 	meta, errReason := checkMeta(metafile)
 	if meta == nil {
-		return false, errReason, nil
+		return nil, false, errReason, nil
 	}
 
 	fmt.Printf(`ok {"version": "%s", "type": "%s", "name": "%s"}`+"\n", meta.Infos[0].Version, meta.Infos[0].Type, meta.Infos[0].Name)
 	fmt.Printf("%#v\n", meta)
 
-	return true, "", nil
+	return meta, true, "", nil
 }
 
-func checkMeta(file io.ReadCloser) (meta *xmlMeta, reason string) {
-	meta = &xmlMeta{}
+func checkMeta(file io.ReadCloser) (meta *XmlMeta, reason string) {
+	meta = &XmlMeta{}
 
 	decoder := xml.NewDecoder(file)
 	err := decoder.Decode(meta)

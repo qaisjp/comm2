@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"fmt"
 	"io"
@@ -77,16 +78,11 @@ func (a *API) checkResourcePkg(ctx *gin.Context) {
 // createResourcePackage is an endpoint that creates a resource package draft
 func (a *API) createResourcePackage(c *gin.Context) {
 	user := c.MustGet("current_user").(*User)
-	resource := c.MustGet("resource").(*Resource)
+	res := c.MustGet("resource").(*Resource)
 
-	_, err := c.FormFile("file")
-	if err == nil {
-		c.JSON(http.StatusNotImplemented, gin.H{"message": "todo"})
-		return
-	} else if err != http.ErrNotMultipart {
-		a.somethingWentWrong(c, err).Errorln("ctx.FormFile failed unexpectedly")
-		return
-	}
+	fileUploadMode := false
+	var meta *resource.XmlMeta
+	var f io.Reader
 
 	var input struct {
 		Version     string `json:"version"`
@@ -94,8 +90,33 @@ func (a *API) createResourcePackage(c *gin.Context) {
 		Draft       bool   `json:"bool"`
 	}
 
-	if err := c.BindJSON(&input); err != nil {
+	header, err := c.FormFile("file")
+	if err == nil {
+		fileUploadMode = true
+
+		var message string
+		var status int
+		meta, f, status, message, err = a.readMetaFromheader(c, header)
+		if status != http.StatusOK {
+			if status == http.StatusInternalServerError {
+				a.somethingWentWrong(c, err).Errorln("could not upload resource package")
+				return
+			}
+			c.JSON(status, gin.H{"message": message})
+			return
+		}
+
+		input.Version = meta.Infos[0].Version
+		input.Draft = true
+
+	} else if err != http.ErrNotMultipart {
+		a.somethingWentWrong(c, err).Errorln("ctx.FormFile failed unexpectedly")
 		return
+	} else {
+		// If there's no file, we are doing a file-less creation
+		if err := c.BindJSON(&input); err != nil {
+			return
+		}
 	}
 
 	var publishedAt interface{} = pq.NullTime{}
@@ -103,19 +124,57 @@ func (a *API) createResourcePackage(c *gin.Context) {
 		publishedAt = squirrel.Expr("now()")
 	}
 
-	var id uint64
-	err = a.QB.Insert("resource_packages").
-		Columns("resource_id", "author_id", "description", "published_at", "version").
-		Values(resource.ID, user.ID, input.Description, publishedAt, input.Version).Suffix("RETURNING id").
-		ScanContext(c, &id)
-
+	query, args, err := a.QB.Insert("resource_packages").
+		Columns("resource_id", "author_id", "description", "published_at", "version", "file_uploaded").
+		Values(res.ID, user.ID, input.Description, publishedAt, input.Version, fileUploadMode).Suffix("RETURNING *").
+		ToSql()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
-		a.Log.WithError(err).Errorln("database error creating resource package")
+		a.somethingWentWrong(c, err).Errorln("database error creating resource package sql")
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"package_id": id})
+	tx, err := a.DB.BeginTxx(c, nil)
+	if err != nil {
+		a.somethingWentWrong(c, err).Errorln("could not create transaction")
+		return
+	}
+	rollback := func() {
+		if err := tx.Rollback(); err != nil {
+			a.Log.WithError(err).Errorln("failed to rollback")
+		}
+	}
+
+	row := tx.QueryRowxContext(c, query, args...)
+	if err := row.Err(); err != nil {
+		a.somethingWentWrong(c, err).Errorln("could not create resource package row")
+		rollback()
+		return
+	}
+
+	var pkg ResourcePackage
+	if err := row.StructScan(&pkg); err != nil {
+		a.somethingWentWrong(c, err).Errorln("could not create scan inserted resource package row")
+		rollback()
+		return
+	}
+
+	// Now that we have the ID, we upload the file
+	if fileUploadMode {
+		if err := pkg.writeToBucket(c, f, a.Bucket); err != nil {
+			a.somethingWentWrong(c, err).Errorln("could not write pkg to bucket")
+			if err := tx.Rollback(); err != nil {
+				a.Log.WithError(err).Errorln("failed to rollback")
+			}
+			return
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		a.somethingWentWrong(c, err).Errorln("could not commit during resource create pkg")
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"package_id": pkg.ID})
 }
 
 func (a *API) getResourcePackage(c *gin.Context) {
@@ -167,9 +226,7 @@ func (a *API) downloadResourcePackage(ctx *gin.Context) {
 	})
 }
 
-func (a *API) uploadResourcePackageWithHeader(ctx *gin.Context, header *multipart.FileHeader) (status int, message string, err error) {
-	pkg := ctx.MustGet("resource_pkg").(*ResourcePackage)
-
+func (a *API) readMetaFromheader(ctx *gin.Context, header *multipart.FileHeader) (meta *resource.XmlMeta, f *bytes.Reader, status int, message string, err error) {
 	status = http.StatusInternalServerError
 	message = "Something went wrong"
 
@@ -193,20 +250,13 @@ func (a *API) uploadResourcePackageWithHeader(ctx *gin.Context, header *multipar
 		return
 	}
 
-	f := bytes.NewReader(zipBody)
+	f = bytes.NewReader(zipBody)
 	var ok bool
-	if ok, message, err = resource.CheckResourceZip(f, int64(len(zipBody))); err != nil {
+	if meta, ok, message, err = resource.CheckResourceZip(f, int64(len(zipBody))); err != nil {
 		a.Log.WithError(err).Errorln("failed to check resource zip when uploading package")
 		return
 	} else if !ok {
 		status = http.StatusUnprocessableEntity
-		return
-	}
-
-	var w *blob.Writer
-	w, err = a.Bucket.NewWriter(ctx, pkg.GetBucketFilename(), nil)
-	if err != nil {
-		a.Log.WithError(err).Errorln("could not create new bucket writer when uploading package")
 		return
 	}
 
@@ -215,17 +265,23 @@ func (a *API) uploadResourcePackageWithHeader(ctx *gin.Context, header *multipar
 		return
 	}
 
+	return meta, f, http.StatusOK, "", nil
+}
+
+func (pkg *ResourcePackage) writeToBucket(ctx context.Context, f io.Reader, bucket *blob.Bucket) error {
+	w, err := bucket.NewWriter(ctx, pkg.GetBucketFilename(), nil)
+	if err != nil {
+		return errors.Wrap(err, "could not create new bucket writer when uploading package")
+	}
+
 	if _, err = io.Copy(w, f); err != nil {
-		a.Log.WithError(err).Errorln("could not copy from request to bucket when uploading package")
-		return
+		return errors.Wrap(err, "could not copy from request to bucket when uploading package")
 	}
 
 	if err = w.Close(); err != nil {
-		a.Log.WithError(err).Errorln("could not close writer when uploading package")
-		return
+		return errors.Wrap(err, "could not close writer when uploading package")
 	}
-
-	return http.StatusOK, "", nil
+	return nil
 }
 
 // uploadResourcePackage is an endpoint that uploads a file to an existing resource package
@@ -244,13 +300,19 @@ func (a *API) uploadResourcePackage(ctx *gin.Context) {
 		return
 	}
 
-	status, message, err := a.uploadResourcePackageWithHeader(ctx, header)
+	_, f, status, message, err := a.readMetaFromheader(ctx, header)
 	if status != http.StatusOK {
 		if status == http.StatusInternalServerError {
 			a.somethingWentWrong(ctx, err).Errorln("could not upload resource package")
 			return
 		}
 		ctx.JSON(status, gin.H{"message": message})
+		return
+	}
+
+	pkg := ctx.MustGet("resource_pkg").(*ResourcePackage)
+	if err := pkg.writeToBucket(ctx, f, a.Bucket); err != nil {
+		a.somethingWentWrong(ctx, err).Errorln("could not write pkg to bucket")
 		return
 	}
 

@@ -1,6 +1,6 @@
 package resource
 
-type xmlMeta struct {
+type XmlMeta struct {
 	Infos []xmlInfo `xml:"info"`
 }
 
