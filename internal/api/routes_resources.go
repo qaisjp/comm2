@@ -139,6 +139,10 @@ func (a *API) listResources(ctx *gin.Context) {
 		return
 	}
 
+	for _, r := range resources {
+		r.ShortDescription = strings.Split(r.Description, "\n")[0]
+	}
+
 	ctx.JSON(http.StatusOK, resources)
 }
 

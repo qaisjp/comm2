@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
@@ -127,6 +128,10 @@ func (a *API) getUserProfile(ctx *gin.Context) {
 			a.Log.WithError(err).Errorln("could not get resources for profile info")
 			return
 		}
+	}
+
+	for i, r := range resources {
+		resources[i].ShortDescription = strings.Split(r.Description, "\n")[0]
 	}
 
 	following, err := user.GetFollowing(ctx, a.DB)

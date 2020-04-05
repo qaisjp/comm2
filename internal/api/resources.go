@@ -18,6 +18,7 @@ type Resource struct {
 	Name        string `db:"name" json:"name"`
 	Title       string `db:"title" json:"title"`
 	Description string `db:"description" json:"description"`
+	ShortDescription string `db:"-" json:"short_description"`
 	// Rating      int    `db:"rating"`
 	// Downloads   int    `db:"downloads"`
 	// Type        int    `db:"type"` // todo: ResourceType

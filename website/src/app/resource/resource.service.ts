@@ -21,6 +21,7 @@ export interface Resource {
   name: string;
   title: string;
   description: string;
+  short_description: string;
   visibility: ResourceVisibility;
   archived: boolean;
   authors: User[];
