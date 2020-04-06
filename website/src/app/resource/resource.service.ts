@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpEvent, HttpRequest} from '@angular/common/http';
 import {LogService} from '../log.service';
-import {Observable, throwError} from 'rxjs';
+import {NEVER, Observable, throwError} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {catchError, map, tap} from 'rxjs/operators';
 import {alertErrorReturnZero} from '../util';
 import {User, UserID} from '../user/user.service';
-import {BAD_REQUEST} from 'http-status-codes';
+import {BAD_REQUEST, INTERNAL_SERVER_ERROR} from 'http-status-codes';
 
 export enum ResourceVisibility {
   PUBLIC = 'public',
@@ -170,4 +170,36 @@ export class ResourceService {
       tap(data => this.log.debug(`downloadResource(${userID}, ${resourceID}, ${packageID})`))
     );
   }
+
+  addCollab(userID: UserID, resourceID: ResourceID, targetUser: UserID) {
+    const url = this.getResourceURL(userID, resourceID) + '/collaborators/' + encodeURIComponent(targetUser);
+    return this.http.put(url, '').pipe(
+      tap(data => this.log.debug(`addCollab(${userID}, ${resourceID}, ${targetUser})`)),
+      catchError((err: HttpErrorResponse) => {
+        let reason = 'Something went wrong';
+        if (err.status !== INTERNAL_SERVER_ERROR) {
+          reason = err.error.message;
+        }
+        return throwError(reason);
+      }),
+      map(data => void 0),
+    );
+  }
+
+  delCollab(userID: UserID, resourceID: ResourceID, targetUser: UserID) {
+    const url = this.getResourceURL(userID, resourceID) + '/collaborators/' + encodeURIComponent(targetUser);
+    return this.http.delete(url).pipe(
+      tap(data => this.log.debug(`delCollab(${userID}, ${resourceID}, ${targetUser})`)),
+      catchError((err: HttpErrorResponse) => {
+        let reason = 'Something went wrong';
+        if (err.status !== INTERNAL_SERVER_ERROR) {
+          reason = err.error.message;
+        }
+        return throwError(reason);
+      }),
+      map(data => void 0),
+    );
+  }
+
+
 }

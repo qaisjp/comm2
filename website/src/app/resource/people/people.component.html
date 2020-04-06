@@ -8,11 +8,11 @@
   </h2>
   <div class="d-flex flex-wrap">
     <div *ngFor="let author of resource.authors;"
-         class="d-flex flex-items-center flex-column cursor-pointer mr-1 mr-md-4"
-         [routerLink]="['/u', author.username]">
-      <img [src]="author.gravatar + '?size=125'" class="mb-2">
+         class="d-flex flex-items-center flex-column cursor-pointer mr-1 mr-md-4">
+      <img [src]="author.gravatar + '?size=125'" class="mb-2"
+           [routerLink]="['/u', author.username]">
       <h4>
-        {{ author.username }}
+        <span [routerLink]="['/u', author.username]">{{ author.username }}</span>
         <!--      <span *ngIf="follower.follows_you" class="Label Label&#45;&#45;gray">follows you</span>-->
         <button
           class="btn btn-sm ml-1" (click)="remove(author.id)"

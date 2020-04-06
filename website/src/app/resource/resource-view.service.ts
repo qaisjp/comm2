@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable, of, ReplaySubject, throwError} from 'rxjs';
 import {PackageID, Resource, ResourceCreatePackageResponse, ResourcePackage, ResourceService} from './resource.service';
-import {catchError, first, map, single, switchMap, tap} from 'rxjs/operators';
+import {catchError, first, map, single, switchMap, take, tap} from 'rxjs/operators';
 import {HttpErrorResponse, HttpEvent, HttpEventType} from '@angular/common/http';
 import {AlertService} from '../alert.service';
 import {LogService} from '../log.service';
@@ -40,6 +40,13 @@ export class ResourceViewService {
         }),
       ).subscribe(this.packages$);
     });
+  }
+
+  refresh() {
+    this.resource$.pipe(
+      take(1),
+      switchMap(r => this.resources.get(r.author_id, r.id))
+    ).subscribe(this.resource$);
   }
 
 
