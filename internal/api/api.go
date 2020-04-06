@@ -152,6 +152,12 @@ func NewAPI(
 			resources.PATCH("", authRequired, a.mustOwnResource, a.patchResource)
 			resources.DELETE("", authRequired, a.mustOwnResource, a.deleteResource)
 
+			collabMiddle := a.parseUserID("target_user", "target_user", true)
+			if collab := resources.Group("collaborators/:target_user", authRequired, a.mustOwnResource, collabMiddle); true {
+				collab.PUT("", a.addResourceCollaborator)
+				collab.DELETE("", a.deleteResourceCollaborator)
+			}
+
 			resources.POST("/transfer", authRequired, a.mustOwnResource, a.transferResource)
 
 			resources.POST("/vote", authRequired, a.voteResource)

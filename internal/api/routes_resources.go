@@ -497,3 +497,64 @@ func (a *API) listResourcePackages(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, rows)
 }
+
+func (a *API) addResourceCollaborator(ctx *gin.Context) {
+	resource := ctx.MustGet("resource").(*Resource)
+	target := ctx.MustGet("target_user").(*User)
+	fmt.Println("add", target.Username)
+
+	var count int
+	err := a.QB.Select("count(*)").From("resource_collaborators").Where(squirrel.Eq{
+		"resource_id": resource.ID,
+		"user_id":     target.ID,
+	}).ScanContext(ctx, &count)
+	if err != nil {
+		a.somethingWentWrong(ctx, err).WithField("target_uid", target.ID).Errorln("unable to check if this user is already collaboraotr")
+		return
+	}
+
+	if count != 0 {
+		ctx.JSON(http.StatusConflict, gin.H{"message": "That user is already a collaborator."})
+		return
+	}
+
+	_, err = a.QB.Insert("resource_collaborators").Columns("resource_id", "user_id", "accepted").Values(resource.ID, target.ID, true).ExecContext(ctx)
+	if err != nil {
+		a.somethingWentWrong(ctx, err).WithField("target_uid", target.ID).Errorln("inserted new collaborator")
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
+}
+
+func (a *API) deleteResourceCollaborator(ctx *gin.Context) {
+	resource := ctx.MustGet("resource").(*Resource)
+	target := ctx.MustGet("target_user").(*User)
+	fmt.Println("add", target.Username)
+
+	var count int
+	err := a.QB.Select("count(*)").From("resource_collaborators").Where(squirrel.Eq{
+		"resource_id": resource.ID,
+		"user_id":     target.ID,
+	}).ScanContext(ctx, &count)
+	if err != nil {
+		a.somethingWentWrong(ctx, err).WithField("target_uid", target.ID).Errorln("unable to check if this user is already collaboraotr")
+		return
+	}
+
+	if count != 1 {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "That user is not a collaborator."})
+		return
+	}
+
+	_, err = a.QB.Delete("resource_collaborators").Where(squirrel.Eq{
+		"resource_id": resource.ID,
+		"user_id":     target.ID,
+	}).ExecContext(ctx)
+	if err != nil {
+		a.somethingWentWrong(ctx, err).WithField("target_uid", target.ID).Errorln("removed collaborator")
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
