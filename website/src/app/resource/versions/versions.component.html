@@ -25,11 +25,12 @@
                 <ng-container *ngIf="view.downloadProgress[pkg.id] === undefined; else showDownloadProgress">Download</ng-container>
                 <ng-template #showDownloadProgress>{{ view.downloadProgress[pkg.id] }}% downloaded</ng-template>
               </button>
-              <button class="btn btn-sm mx-1" (click)="view.download(pkg).subscribe()"
-                      [title]="pkg.uploaded_at ? '' : 'No file has been uploaded'"
-                      [disabled]="!pkg.uploaded_at">Contents
-              </button>
-              <button class="btn btn-sm" [routerLink]="['edit', pkg.id]">Edit</button>
+<!--              TODO: view zip contents -->
+<!--              <button class="btn btn-sm mx-1" (click)="view.download(pkg).subscribe()"-->
+<!--                      [title]="pkg.uploaded_at ? '' : 'No file has been uploaded'"-->
+<!--                      [disabled]="!pkg.uploaded_at">Contents-->
+<!--              </button>-->
+              <button class="btn btn-sm ml-1" [routerLink]="['edit', pkg.id]">Edit</button>
             </div>
           </div>
 
