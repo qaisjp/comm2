@@ -9,6 +9,10 @@ export const environment = {
   },
 };
 
+if (window.location.hostname === 'local.mta.community') {
+  environment.api.baseurl = 'http://localapi.mta.community';
+  console.log('Baseurl is now', environment.api.baseurl);
+}
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
