@@ -224,6 +224,11 @@ func (a *API) downloadResourcePackage(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
+	defer func() {
+		if err := r.Close(); err != nil {
+			a.Log.WithError(err).Errorln("unable to close blob reader")
+		}
+	}()
 
 	ctx.DataFromReader(http.StatusOK, r.Size(), "application/zip", r, map[string]string{
 		"Cache-Control":       "no-store",
