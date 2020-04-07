@@ -23,13 +23,13 @@
         </span>
       </div>
     </div>
-    <div class="col-2">
+    <div class="col-2" *ngIf="(auth.user$ | async) as me;">
       <!-- HACK TODO: this uses float right. we should use flex properly but it's not working properly and i don't wanna debug -->
-      <button *ngIf="(auth.user$ | async).id !== user.id" (click)="toggleFollowState()" [attr.aria-disabled]="loading"
+      <button *ngIf="me.id !== user.id" (click)="toggleFollowState()" [attr.aria-disabled]="loading"
               class="btn float-right" type="button">
         {{ (followed) ? "Unfollow" : "Follow" }}
       </button>
-      <button *ngIf="(auth.user$ | async).id === user.id" routerLink="/settings/profile" class="btn float-right d-flex" type="button">
+      <button *ngIf="me.id === user.id" routerLink="/settings/profile" class="btn float-right d-flex" type="button">
         <i appOcticon="pencil" class="mr-2"></i> Edit Profile
       </button>
     </div>
@@ -48,17 +48,19 @@
     <div class="col-lg-10">
       <div *ngIf="tab === 'resources'" class="d-flex flex-wrap">
         <ng-container *ngIf="user.resources.length === 0">
-          <div *ngIf="(auth.user$ | async).id === user.id; else noResourcesOther" class="blankslate col-12" >
-            <h3 class="mb-1">You don't seem to have any resources.</h3>
-            <p>Sharing resources with the community can help improve the community as a whole.</p>
-            <button class="btn btn-primary my-3" type="button" routerLink="/create">Create resource</button>
-          </div>
-          <ng-template #noResourcesOther>
-            <div *ngIf="(auth.user$ | async).id !== user.id" class="col-12">
-              <h3>This user doesn't seem to have any resources.</h3>
+          <ng-container *ngIf="(auth.user$ | async) as me; else noResourcesOther">
+            <div *ngIf="me.id === user.id; else noResourcesOther" class="blankslate col-12">
+              <h3 class="mb-1">You don't seem to have any resources.</h3>
+              <p>Sharing resources with the community can help improve the community as a whole.</p>
+              <button class="btn btn-primary my-3" type="button" routerLink="/create">Create resource</button>
             </div>
-          </ng-template>
+          </ng-container>
         </ng-container>
+        <ng-template #noResourcesOther>
+          <div class="col-12">
+            <h3>This user doesn't seem to have any resources.</h3>
+          </div>
+        </ng-template>
         <div *ngFor="let res of user.resources; let i = index;" class="pr-lg-2 mb-2 col-xl-4 col-lg-6 col-12 cursor-pointer"
              [routerLink]="['/u', res.author_id, res.name]">
           <div class="Box height-full">
