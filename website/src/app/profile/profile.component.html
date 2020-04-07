@@ -35,9 +35,9 @@
     </div>
   </div>
   <hr>
-  <div class="d-flex">
-    <div class="col-2 mr-3">
-      <nav class="SideNav border">
+  <div class="d-flex flex-wrap">
+    <div class="col-lg-2 pr-lg-3 col-12 mb-2 mb-lg-0">
+      <nav class="SideNav border width-full">
         <a *ngFor="let t of tabs" class="SideNav-item d-flex flex-justify-between" routerLink="./" [queryParams]="{tab: t.key}"
            [attr.aria-current]="this.tab === t.key ? 'page' : null"
         >
@@ -45,7 +45,7 @@
         </a>
       </nav>
     </div>
-    <div class="col-10">
+    <div class="col-lg-10">
       <div *ngIf="tab === 'resources'" class="d-flex flex-wrap">
         <ng-container *ngIf="user.resources.length === 0">
           <div *ngIf="(auth.user$ | async).id === user.id; else noResourcesOther" class="blankslate col-12" >
@@ -59,7 +59,7 @@
             </div>
           </ng-template>
         </ng-container>
-        <div *ngFor="let res of user.resources; let i = index;" class="pr-2 mb-2 col-4 cursor-pointer"
+        <div *ngFor="let res of user.resources; let i = index;" class="pr-lg-2 mb-2 col-xl-4 col-lg-6 col-12 cursor-pointer"
              [routerLink]="['/u', res.author_id, res.name]">
           <div class="Box height-full">
             <div class="Box-header">
