@@ -24,6 +24,7 @@ type Resource struct {
 	// Type        int    `db:"type"` // todo: ResourceType
 	Visibility string `db:"visibility" json:"visibility"`
 	Archived   bool   `db:"archived" json:"archived"`
+	DownloadCount int `db:"download_count" json:"download_count"`
 
 	CanManage bool `db:"-" json:"can_manage"`
 }

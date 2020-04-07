@@ -26,6 +26,7 @@ export interface Resource {
   archived: boolean;
   authors: User[];
   readonly can_manage: boolean;
+  download_count: number;
 }
 
 export type ResourceCreateResponse = Readonly<Pick<Resource, 'id'>>;

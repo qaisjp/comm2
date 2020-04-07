@@ -230,6 +230,11 @@ func (a *API) downloadResourcePackage(ctx *gin.Context) {
 		}
 	}()
 
+	_, err = a.DB.ExecContext(ctx, "update resources set download_count = download_count + 1 where id = $1", resource.ID)
+	if err != nil {
+		a.Log.WithContext(ctx).WithError(err).Errorln("could not increment download_count")
+	}
+
 	ctx.DataFromReader(http.StatusOK, r.Size(), "application/zip", r, map[string]string{
 		"Cache-Control":       "no-store",
 		"Content-Disposition": fmt.Sprintf("attachment; filename=\"%s\"", resource.Name+".zip"),

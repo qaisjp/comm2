@@ -178,7 +178,8 @@ CREATE TABLE public.resources (
     title text NOT NULL,
     description text NOT NULL,
     visibility text DEFAULT 'public'::text NOT NULL,
-    archived boolean DEFAULT false NOT NULL
+    archived boolean DEFAULT false NOT NULL,
+    download_count integer DEFAULT 0 NOT NULL
 );
 
 
