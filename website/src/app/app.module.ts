@@ -16,6 +16,7 @@ import {OcticonModule} from './octicon/octicon.module';
 import { SettingsProfileComponent } from './settings/profile.component';
 import { SettingsAccountComponent } from './settings/account.component';
 import {ReactiveFormsModule} from '@angular/forms';
+import {MomentModule} from 'ngx-moment';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import {ReactiveFormsModule} from '@angular/forms';
     ResourceModule,
     AuthModule,
     ReactiveFormsModule,
+    MomentModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

@@ -12,16 +12,24 @@
     MTA Hub features a Resource center that allows you to upload and share your latest developed resources with other members of our community.
   </p>
   <!-- todo: show spinner -->
-  <div>
-    <div *ngFor="let res of (latestResources$ | async); index as i">
-      <a [routerLink]="['/u', res.author_id, res.name]">
-        {{ res.name }}
-      </a>
-      by
-      <a [routerLink]="['/u', res.author_id]">
-        author{{ res.author_id }}
-      </a>
-      - <code style="color: green">{{res | json}}</code>
-    </div>
+  <div class="d-flex flex-wrap">
+    <ng-container *ngFor="let res of (latestResources$ | async); index as i">
+      <div class="col-6 col-md-3 mr-2 mb-2 Box cursor-pointer"
+           [routerLink]="['/u', res.author_id, res.name]"
+           *ngIf="res.short_description.length > 0"
+      >
+        <div class="Box-header">
+          <h3 class="Box-title">
+            {{ res.name }}
+            <span class="text-gray">by {{ res.author_username }}</span>
+            &middot;
+            <span class="text-gray-light">{{ res.updated_at | amTimeAgo }}</span>
+          </h3>
+        </div>
+        <div class="Box-body">
+          {{ res.short_description }}
+        </div>
+      </div>
+    </ng-container>
   </div>
 </div>

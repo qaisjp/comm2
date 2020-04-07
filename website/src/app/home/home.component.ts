@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {Resource, ResourceService} from '../resource/resource.service';
+import {LatestResource, ResourceService} from '../resource/resource.service';
 import {Observable} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 
@@ -9,7 +9,7 @@ import {ActivatedRoute} from '@angular/router';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  latestResources$: Observable<Resource[]>;
+  latestResources$: Observable<LatestResource[]>;
 
   constructor(
     private resources: ResourceService,

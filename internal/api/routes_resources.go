@@ -110,7 +110,12 @@ func (a *API) checkResource(ctx *gin.Context) {
 // - support search/filter fields
 // - support pagination / cursors
 func (a *API) listResources(ctx *gin.Context) {
-	resources := []*Resource{}
+	type ExtendedResource struct {
+		Resource
+		AuthorUsername string `db:"author_username" json:"author_username"`
+	}
+
+	resources := []*ExtendedResource{}
 	user := ctx.MustGet("current_user").(*User)
 
 	suffix := "where visibility = $1"
@@ -130,7 +135,7 @@ func (a *API) listResources(ctx *gin.Context) {
 		`
 	}
 
-	err := a.DB.SelectContext(ctx, &resources, "select r.* from resources as r "+suffix, args...)
+	err := a.DB.SelectContext(ctx, &resources, "select r.*, u.username as author_username from resources as r, users as u "+suffix+" and (r.author_id = u.id)", args...)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal server error",
