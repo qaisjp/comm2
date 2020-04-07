@@ -2,15 +2,17 @@
   <p class="lead-mktg text-gray">Welcome to Multi Theft Auto Hub - the official platform to share and download resources.</p>
 </div>
 
-<div>
+<div *ngIf="data">
   <h1>Latest resources</h1>
   <p>
     MTA Hub features a Resource center that allows you to upload and share your latest developed resources with other members of our community.
   </p>
   <!-- todo: show spinner -->
   <div class="d-flex flex-wrap">
-    <ng-container *ngFor="let res of (latestResources$ | async); index as i">
-      <div class="col-6 col-md-3 mr-2 mb-2 Box cursor-pointer"
+    <div
+      class="pr-lg-2 mb-2 col-xl-4 col-lg-6 col-12 cursor-pointer"
+      *ngFor="let res of data.latest; index as i">
+      <div class="Box height-full"
            [routerLink]="['/u', res.author_id, res.name]"
            *ngIf="res.short_description.length > 0"
       >
@@ -26,6 +28,6 @@
           {{ res.short_description }}
         </div>
       </div>
-    </ng-container>
+    </div>
   </div>
 </div>

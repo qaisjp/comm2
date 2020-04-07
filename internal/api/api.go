@@ -128,6 +128,7 @@ func NewAPI(
 
 	private := router.Group("/private", authMaybeRequired)
 	{
+		private.GET("homepage", a.getHomepageResources)
 		private.GET("/profile/:user_id", a.checkUser, a.getUserProfile)
 		private.DELETE("/account", authRequired, a.deleteCurrentUser)
 		private.POST("/account/username", authRequired, a.changeCurrentUserUsername)

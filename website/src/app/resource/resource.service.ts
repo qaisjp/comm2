@@ -28,10 +28,6 @@ export interface Resource {
   readonly can_manage: boolean;
 }
 
-export interface LatestResource extends Resource {
-  author_username: User['username'];
-}
-
 export type ResourceCreateResponse = Readonly<Pick<Resource, 'id'>>;
 export type ResourcePatchRequest = Partial<Pick<Resource, 'name' | 'title' | 'description' | 'visibility' | 'archived'>>;
 
@@ -74,14 +70,6 @@ export class ResourceService {
     return this.http.get(this.getResourceURL(userID, resourceID)).pipe(
       tap(data => this.log.debug(`getResource(${userID}/${resourceID})`)),
       map(data => data as Resource),
-    );
-  }
-
-  public getLatest(): Observable<LatestResource[]> {
-    return this.http.get(`${environment.api.baseurl}/v1/resources`, {headers: {'X-Authorization-None': ''}}).pipe(
-      tap(data => this.log.debug(`getLatestResources response`, data)),
-      catchError(alertErrorReturnZero<string>('ResourceService.getLatestResources')),
-      map(data => data as LatestResource[]),
     );
   }
 
