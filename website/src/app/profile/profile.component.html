@@ -59,17 +59,22 @@
             </div>
           </ng-template>
         </ng-container>
-        <div *ngFor="let res of user.resources; let i = index;" class="mr-2 mb-2 Box col-3 cursor-pointer"
+        <div *ngFor="let res of user.resources; let i = index;" class="pr-2 mb-2 col-4 cursor-pointer"
              [routerLink]="['/u', res.author_id, res.name]">
-          <div class="Box-header">
-            <h3 class="Box-title">
-              {{ res.name }}
-              <span *ngIf="user.hasPrivate" class="Label Label--outline ml-2">{{ res.visibility }}</span>
-            </h3>
+          <div class="Box height-full">
+            <div class="Box-header">
+              <h3 class="Box-title">
+                {{ res.name }}
+                <span *ngIf="user.hasPrivate" class="Label Label--outline ml-2">{{ res.visibility }}</span>
+                &middot;
+                <span class="text-gray-light">{{ res.updated_at | amTimeAgo }}</span>
+              </h3>
+            </div>
+            <div class="Box-body" *ngIf="res.description.length > 0">{{ res.short_description }}</div>
+            <div class="Box-body text-italic text-gray-light" *ngIf="res.description.length === 0">no description
+              provided
+            </div>
           </div>
-          <div class="Box-body" *ngIf="res.description.length > 0">{{ res.short_description }}</div>
-          <div class="Box-body text-italic text-gray-light" *ngIf="res.description.length === 0">no description provided</div>
-          <div class="Box-footer">Last updated {{ res.updated_at | amTimeAgo }}</div>
         </div>
       </div>
       <!-- Probably refactor this into its own template or element -->
