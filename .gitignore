@@ -1,6 +1,6 @@
 cmd/mtahub-sec
 cmd/mtahub-api/mtahub-api
-mta-api
+/mtahub-api
 dev_backup
 config.yaml
 
