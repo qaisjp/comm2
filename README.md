@@ -1,6 +1,6 @@
 # comm2
 
-Have at it. Most of this code is shit. I want to rewrite most of it. Aaaaaaaaaaaaaaa. comm2 will never be released.
+This project is abandoned. [@patrikjuvonen](https://github.com/patrikjuvonen) is working on comm3.
 
 ## Dependencies
 
@@ -144,4 +144,6 @@ Students can use [WebStorm](https://www.jetbrains.com/webstorm/) for free. We ha
 
 ## License
 
-This repository does not have a license. This means that you don't have the right to do anything with it. This _will_ be open source in the future, but not right now.
+MIT License
+
+Copyright (c) 2020 Qais Patankar
